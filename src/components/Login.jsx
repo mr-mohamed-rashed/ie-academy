@@ -1,0 +1,332 @@
+import React, { useState, useEffect } from 'react';
+import { BookOpen, User, Briefcase, Camera, Check } from 'lucide-react';
+
+const PRESET_AVATARS = [
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120",
+  "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=120",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120",
+  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=120",
+  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=120"
+];
+
+const Login = ({ onLogin, lang, instructors = [], initialRole }) => {
+  const [showModal, setShowModal] = useState(false);
+  const [inviteTeacherId, setInviteTeacherId] = useState(() => new URLSearchParams(window.location.search).get('teacher'));
+  const [isAdminMode, setIsAdminMode] = useState(false);
+  const [selectedInstructor, setSelectedInstructor] = useState(() => new URLSearchParams(window.location.search).get('teacher') || '');
+  const [selectedGrade, setSelectedGrade] = useState(() => new URLSearchParams(window.location.search).get('grade') || '');
+  const [selectedGroup, setSelectedGroup] = useState(() => new URLSearchParams(window.location.search).get('group') || '');
+
+  const [fullName, setFullName] = useState('');
+  const [role, setRole] = useState(initialRole || (isAdminMode ? 'admin' : (inviteTeacherId ? 'student' : 'instructor')));
+  const [avatarUrl, setAvatarUrl] = useState(PRESET_AVATARS[0]);
+  const [subject, setSubject] = useState('');
+  const [year, setYear] = useState('');
+  const [parentPhone, setParentPhone] = useState('');
+
+  const t = {
+    en: {
+      headline: "Welcome to EduAcademy Portal",
+      tagline: "Enter our digital learning center with unified student & instructor dashboards.",
+      googleBtn: "Sign in with Google Account",
+      facebookBtn: "Sign in with Facebook",
+      modalTitle: "Complete Your Account Profile",
+      modalSubtitle: "Customize how other students and instructors see you on the platform.",
+      nameLabel: "Your Full Name",
+      namePlaceholder: "Enter your name...",
+      roleLabel: "Select Your Access Role",
+      roleStudent: "Student Account",
+      roleInstructor: "Instructor Account",
+      roleAdmin: "System Admin",
+      avatarLabel: "Choose Your Avatar Profile",
+      avatarOrPaste: "Or paste a custom image URL:",
+      avatarPlaceholder: "https://example.com/photo.jpg",
+      subjectLabel: "Your Specialized Subject",
+      subjectPlaceholder: "e.g., Mathematics, Physics...",
+      yearLabel: "Grade Level / Year",
+      yearPlaceholder: "e.g., High School",
+      parentPhoneLabel: "Parent Phone Number",
+      parentPhonePlaceholder: "01xxxxxxxxx",
+      selectTeacherLabel: "Select Teacher",
+      selectGradeLabel: "Select Grade",
+      selectGroupLabel: "Select Group",
+      invitedBy: "Invited by Teacher",
+      submitBtn: "Create Profile & Login",
+      cancelBtn: "Cancel",
+    },
+    ar: {
+      headline: "مرحباً بكم في أكاديمية التعليم",
+      tagline: "بوابتك الرقمية التفاعلية التي تربط المعلمين بطلاب السنتر.",
+      googleBtn: "تسجيل الدخول باستخدام حساب Google",
+      facebookBtn: "تسجيل الدخول باستخدام حساب Facebook",
+      modalTitle: "استكمال بيانات ملفك الشخصي",
+      modalSubtitle: "حدد اسمك وصورتك وكيفية ظهورك للآخرين على المنصة.",
+      nameLabel: "الاسم الكامل",
+      namePlaceholder: "أدخل اسمك ثلاثياً...",
+      roleLabel: "اختر نوع الحساب وصلاحية الدخول",
+      roleStudent: "حساب طالب (Student)",
+      roleInstructor: "حساب معلم (Instructor)",
+      roleAdmin: "مدير النظام (Admin)",
+      avatarLabel: "اختر صورتك الرمزية (الافتراضية)",
+      avatarOrPaste: "أو الصق رابط صورة مخصص من الويب:",
+      avatarPlaceholder: "https://example.com/photo.jpg",
+      subjectLabel: "المادة المتخصص فيها المدرس",
+      subjectPlaceholder: "مثال: الرياضيات، الفيزياء، اللغة الإنجليزية...",
+      yearLabel: "الصف الدراسي / المرحلة",
+      yearPlaceholder: "مثال: ثانوي",
+      parentPhoneLabel: "رقم هاتف ولي الأمر",
+      parentPhonePlaceholder: "01xxxxxxxxx",
+      selectTeacherLabel: "اختر المعلم",
+      selectGradeLabel: "اختر الصف",
+      selectGroupLabel: "اختر المجموعة",
+      invitedBy: "دعوة انضمام من المعلم",
+      submitBtn: "حفظ الملف ودخول المنصة",
+      cancelBtn: "إلغاء",
+    }
+  }[lang];
+
+  const handleGoogleClick = () => {
+    // Simulates the auth popup by showing profile completion modal
+    setShowModal(true);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (role === 'student' && !inviteTeacherId && (!selectedInstructor || !selectedGroup)) {
+      return;
+    }
+
+    onLogin({
+      name: fullName,
+      role: role,
+      avatar: avatarUrl,
+      subject: role === 'instructor' ? subject : '',
+      yearAr: role === 'instructor' ? year : undefined,
+      yearEn: role === 'instructor' ? year : undefined,
+      parentPhone: role === 'student' ? parentPhone : undefined,
+      instructorId: role === 'student' ? selectedInstructor : undefined,
+      gradeId: role === 'student' ? selectedGrade : undefined,
+      groupId: role === 'student' ? selectedGroup : undefined
+    });
+  };
+
+  return (
+    <div className="login-screen-container">
+      <div className="glass-card" style={{ maxWidth: '460px', width: '100%', textAlign: 'center', padding: '3rem 2rem' }}>
+        
+        {/* Brand Logo */}
+        <div 
+          onDoubleClick={() => setIsAdminMode(true)}
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '60px', height: '60px', borderRadius: '16px', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: 'white', marginBottom: '1.5rem', boxShadow: '0 8px 16px rgba(99, 102, 241, 0.3)' }}
+        >
+          <BookOpen size={30} />
+        </div>
+
+        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.75rem' }}>{t.headline}</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2.5rem' }}>{t.tagline}</p>
+
+        {/* Google Sign In Button */}
+        <button onClick={handleGoogleClick} className="google-btn" style={{ marginBottom: '1rem' }}>
+          <svg className="google-icon-svg" viewBox="0 0 24 24">
+            <path fill="#ea4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2A11.95 11.95 0 0 0 12 0 11.94 11.94 0 0 0 1.29 6.29l3.73 2.9A7.12 7.12 0 0 1 12 5.04z"/>
+            <path fill="#4285f4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46a5.53 5.53 0 0 1-2.4 3.63l3.73 2.9a11.92 11.92 0 0 0 3.7-8.68z"/>
+            <path fill="#fbbc05" d="M5.02 8.78A7.13 7.13 0 0 1 12 5.04a7.12 7.12 0 0 1 6.98 3.74l3.73-2.9A11.94 11.94 0 0 0 12 0C7.8 0 4.19 2.05 2.02 5.24l3.73 2.9.27.64z"/>
+            <path fill="#34a853" d="M12 18.96c-1.92 0-3.63-.64-4.98-1.74l-3.73 2.9C5.46 21.95 8.54 24 12 24c4.14 0 7.73-1.4 10.3-3.8l-3.73-2.9a7.12 7.12 0 0 1-6.57 1.66z"/>
+          </svg>
+          <span>{t.googleBtn}</span>
+        </button>
+
+        {/* Facebook Sign In Button */}
+        <button onClick={handleGoogleClick} className="google-btn" style={{ backgroundColor: '#1877F2', color: 'white', borderColor: '#1877F2' }}>
+          <svg className="google-icon-svg" viewBox="0 0 24 24" style={{ fill: 'white' }}>
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          <span style={{ color: 'white' }}>{t.facebookBtn}</span>
+        </button>
+      </div>
+
+      {/* Profile Completion Modal Overlay */}
+      {showModal && (
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, left: 0, right: 0, bottom: 0, 
+          backgroundColor: 'rgba(0,0,0,0.85)', 
+          zIndex: 2000, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '485px', padding: '2rem', animation: 'slide-in 0.3s ease-out' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.25rem' }}>{t.modalTitle}</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{t.modalSubtitle}</p>
+            </div>
+
+            <form onSubmit={handleSubmit}>
+              
+              {/* Name Input */}
+              <div className="form-group">
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <User size={14} />
+                  <span>{t.nameLabel}</span>
+                </label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  placeholder={t.namePlaceholder}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required 
+                />
+              </div>
+
+
+
+              {/* Subject Input: visible only if instructor is toggled */}
+              {role === 'instructor' && (
+                <>
+                  <div className="form-group" style={{ animation: 'slide-in 0.2s ease-out' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <Briefcase size={14} />
+                      <span>{t.subjectLabel}</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      placeholder={t.subjectPlaceholder}
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      required={role === 'instructor'} 
+                    />
+                  </div>
+                  <div className="form-group" style={{ animation: 'slide-in 0.2s ease-out' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <Briefcase size={14} />
+                      <span>{t.yearLabel}</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      placeholder={t.yearPlaceholder}
+                      value={year}
+                      onChange={(e) => setYear(e.target.value)}
+                      required={role === 'instructor'} 
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Parent Phone Input: visible only if student is toggled */}
+              {role === 'student' && (
+                <div style={{ animation: 'slide-in 0.2s ease-out' }}>
+                  {inviteTeacherId ? (
+                    <div className="form-group" style={{ backgroundColor: 'rgba(99, 102, 241, 0.1)', padding: '1rem', borderRadius: '12px' }}>
+                      <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--accent-primary)', fontWeight: 'bold' }}>
+                        {t.invitedBy}: {instructors.find(i => String(i.id) === String(inviteTeacherId))?.nameAr || inviteTeacherId}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="form-group">
+                      <label>{t.selectTeacherLabel}</label>
+                      <select 
+                        className="form-control" 
+                        value={selectedInstructor} 
+                        onChange={(e) => { setSelectedInstructor(e.target.value); setSelectedGrade(''); setSelectedGroup(''); }}
+                        required
+                        style={{ appearance: 'auto' }}
+                      >
+                        <option value="">{t.selectTeacherLabel}...</option>
+                        {instructors.filter(i => i.isSubscribed).map(inst => (
+                          <option key={inst.id} value={inst.id}>{lang === 'ar' ? inst.nameAr : inst.nameEn}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  
+                  {selectedInstructor && (
+                    <>
+                      <div className="form-group">
+                        <label>{t.selectGradeLabel}</label>
+                        <select 
+                          className="form-control" 
+                          value={selectedGrade} 
+                          onChange={(e) => { setSelectedGrade(e.target.value); setSelectedGroup(''); }}
+                          required
+                          style={{ appearance: 'auto' }}
+                        >
+                          <option value="">{t.selectGradeLabel}...</option>
+                          {instructors.find(i => String(i.id) === String(selectedInstructor))?.grades?.map(g => (
+                            <option key={g.id} value={g.id}>{lang === 'ar' ? g.nameAr : g.nameEn}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {selectedGrade && (
+                        <div className="form-group">
+                          <label>{t.selectGroupLabel}</label>
+                          <select 
+                            className="form-control" 
+                            value={selectedGroup} 
+                            onChange={(e) => setSelectedGroup(e.target.value)}
+                            required
+                            style={{ appearance: 'auto' }}
+                          >
+                            <option value="">{t.selectGroupLabel}...</option>
+                            {instructors.find(i => String(i.id) === String(selectedInstructor))
+                              ?.grades?.find(g => String(g.id) === String(selectedGrade))
+                              ?.groups?.map(g => (
+                              <option key={g.id} value={g.id}>{lang === 'ar' ? g.nameAr : g.nameEn}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  <div className="form-group" style={{ marginTop: '1rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <User size={14} />
+                      <span>{t.parentPhoneLabel}</span>
+                    </label>
+                  <input 
+                    type="tel" 
+                    className="form-control" 
+                    placeholder={t.parentPhonePlaceholder}
+                    value={parentPhone}
+                    onChange={(e) => setParentPhone(e.target.value)}
+                    required={role === 'student'} 
+                  />
+                </div>
+                </div>
+              )}
+
+              {/* Action buttons */}
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)}
+                  className="config-btn" 
+                  style={{ flex: 1, justifyContent: 'center' }}
+                >
+                  {t.cancelBtn}
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn-primary" 
+                  style={{ flex: 1 }}
+                >
+                  {t.submitBtn}
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Login;
+export { PRESET_AVATARS };
