@@ -30,6 +30,7 @@ const Navbar = ({
   const [editSubject, setEditSubject] = useState(currentUser?.subject || '');
   const [editYear, setEditYear] = useState(currentUser?.year || currentUser?.yearAr || '');
   const [editParentPhone, setEditParentPhone] = useState(currentUser?.parentPhone || '');
+  const [editVideoUrl, setEditVideoUrl] = useState(currentUser?.videoUrl || '');
 
   const t = {
     en: {
@@ -55,7 +56,8 @@ const Navbar = ({
       parentPhoneLabel: "Parent Phone Number",
       submitBtn: "Save Changes",
       cancelBtn: "Cancel",
-      avatarOrPaste: "Or paste custom image URL:"
+      avatarOrPaste: "Or paste custom image URL:",
+      videoLabel: "Introductory Video Link (YouTube/Direct)"
     },
     ar: {
       logo: "أكاديمية التعليم",
@@ -80,7 +82,8 @@ const Navbar = ({
       parentPhoneLabel: "رقم هاتف ولي الأمر",
       submitBtn: "حفظ التغييرات",
       cancelBtn: "إلغاء",
-      avatarOrPaste: "أو الصق رابط صورة مخصص:"
+      avatarOrPaste: "أو الصق رابط صورة مخصص:",
+      videoLabel: "رابط فيديو تعريفي للمدرس (يوتيوب أو مباشر)"
     }
   }[lang];
 
@@ -91,6 +94,7 @@ const Navbar = ({
     setEditSubject(currentUser?.subject || '');
     setEditYear(currentUser?.year || currentUser?.yearAr || '');
     setEditParentPhone(currentUser?.parentPhone || '');
+    setEditVideoUrl(currentUser?.videoUrl || '');
     setShowEditModal(true);
   };
 
@@ -102,6 +106,7 @@ const Navbar = ({
       subject: currentUser.role === 'instructor' ? editSubject : '',
       yearAr: currentUser.role === 'instructor' ? editYear : undefined,
       yearEn: currentUser.role === 'instructor' ? editYear : undefined,
+      videoUrl: currentUser.role === 'instructor' ? editVideoUrl : undefined,
       parentPhone: currentUser.role === 'student' ? editParentPhone : undefined
     });
     setShowEditModal(false);
@@ -348,6 +353,16 @@ const Navbar = ({
                       value={editYear}
                       onChange={(e) => setEditYear(e.target.value)}
                       required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t.videoLabel}</label>
+                    <input 
+                      type="url" 
+                      className="form-control" 
+                      placeholder="https://..."
+                      value={editVideoUrl}
+                      onChange={(e) => setEditVideoUrl(e.target.value)}
                     />
                   </div>
                 </>

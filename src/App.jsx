@@ -8,7 +8,7 @@ import AdminDashboard from './components/AdminDashboard';
 import TeacherProfileModal from './components/TeacherProfileModal';
 import TeacherDetailsModal from './components/TeacherDetailsModal';
 import { initialStudents, initialSessions, initialInstructors } from './mockData';
-import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info } from 'lucide-react';
+import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info, Play, X } from 'lucide-react';
 
 function App() {
   const [lang, setLang] = useState('ar'); // Default to Arabic
@@ -33,6 +33,8 @@ function App() {
     const savedFee = localStorage.getItem('edu_academic_year_fee');
     return savedFee ? parseInt(savedFee, 10) : 2000; // default to 2000 EGP
   });
+
+  const [playingVideoUrl, setPlayingVideoUrl] = useState(null);
 
   // Derived active objectsy default
   
@@ -337,6 +339,7 @@ function App() {
               avatar: updatedData.avatar,
               subjectAr: updatedData.subject,
               subjectEn: updatedData.subject,
+              videoUrl: updatedData.videoUrl,
               yearAr: updatedData.yearAr || inst.yearAr,
               yearEn: updatedData.yearEn || inst.yearEn
             };
@@ -1083,11 +1086,22 @@ function App() {
           <div className="header-title">
             {userRole === 'instructor' ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <img 
-                  src={activeInstructor.avatar} 
-                  alt="Avatar" 
-                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} 
-                />
+                <div 
+                  style={{ position: 'relative', cursor: activeInstructor.videoUrl ? 'pointer' : 'default' }}
+                  onClick={() => activeInstructor.videoUrl && setPlayingVideoUrl(activeInstructor.videoUrl)}
+                  title={activeInstructor.videoUrl ? (lang === 'ar' ? 'تشغيل الفيديو التعريفي' : 'Play Intro Video') : ''}
+                >
+                  <img 
+                    src={activeInstructor.avatar} 
+                    alt="Avatar" 
+                    style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} 
+                  />
+                  {activeInstructor.videoUrl && (
+                    <div style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: 'var(--accent-primary)', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-app)' }}>
+                      <Play size={10} color="white" fill="white" />
+                    </div>
+                  )}
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
                   <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     {lang === 'ar' ? activeInstructor.nameAr : activeInstructor.nameEn}
@@ -1228,6 +1242,53 @@ function App() {
           </div>
         ))}
       </div>
+      {/* Floating Video Modal */}
+      {playingVideoUrl && (() => {
+        const getEmbedUrl = (url) => {
+          if (!url) return '';
+          let videoId = '';
+          if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            if (match && match[2].length === 11) {
+              videoId = match[2];
+            }
+            return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+          }
+          return url;
+        };
+
+        const embedUrl = getEmbedUrl(playingVideoUrl);
+
+        return (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(8px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999,
+            padding: '1rem'
+          }} onClick={() => setPlayingVideoUrl(null)}>
+            <div className="glass-card" style={{ width: '100%', maxWidth: '800px', padding: '0.5rem', border: '1px solid var(--border-glass)', borderRadius: '16px', position: 'relative' }} onClick={e => e.stopPropagation()}>
+              <button 
+                onClick={() => setPlayingVideoUrl(null)} 
+                style={{ position: 'absolute', top: '-2.5rem', right: 0, background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.9rem' }}
+              >
+                <X size={20} />
+                <span>{lang === 'ar' ? 'إغلاق' : 'Close'}</span>
+              </button>
+              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '12px' }}>
+                <iframe
+                  src={embedUrl}
+                  title="Intro Video"
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
     </div>
   );
 }
