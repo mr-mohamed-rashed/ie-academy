@@ -1116,6 +1116,85 @@ const InstructorDashboard = ({
         />
       )}
 
+    {/* Payment/Upgrade Modal */}
+      {showPaymentModal && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-card" style={{ maxWidth: '600px', width: '100%' }}>
+            <div className="modal-header">
+              <h2>{lang === 'ar' ? 'الترقية للنظام المدفوع' : 'Upgrade to Premium'}</h2>
+              <button onClick={() => setShowPaymentModal(false)} className="close-btn"><X size={24} /></button>
+            </div>
+            
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-glass)' }}>
+                <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-gold)' }}>{lang === 'ar' ? 'مميزات النظام المدفوع:' : 'Premium Features:'}</h4>
+                <ul style={{ margin: 0, paddingInlineStart: '1.5rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
+                  <li>{lang === 'ar' ? 'الظهور للطلاب في المنصة الرئيسية في صفحة بحث المدرسين.' : 'Appear to students on the main platform search.'}</li>
+                  <li>{lang === 'ar' ? 'دعم كامل لإعلانات المنصة وتسويق حصصك الدراسية.' : 'Full support for platform ads and marketing your sessions.'}</li>
+                  <li>{lang === 'ar' ? 'الحصول على أولوية في الظهور في لوحات الشرف والتقييمات.' : 'Priority appearance on honor boards and ratings.'}</li>
+                  <li>{lang === 'ar' ? 'لا حدود على عدد الفصول أو الطلاب المضافين.' : 'No limits on the number of classes or students added.'}</li>
+                </ul>
+              </div>
+
+              <div style={{ textAlign: 'center', padding: '1rem', border: '1px solid var(--border-glass)', borderRadius: '12px' }}>
+                <span style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+                  {lang === 'ar' ? 'قيمة الاشتراك الشهري' : 'Monthly Subscription Fee'}
+                </span>
+                <strong style={{ fontSize: '2.5rem', color: 'var(--accent-primary)' }}>{systemFee}</strong>
+                <span style={{ fontSize: '1rem', color: 'var(--text-muted)', marginInlineStart: '0.5rem' }}>{lang === 'ar' ? 'جنيه' : 'EGP'}</span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <h4 style={{ margin: 0, fontSize: '1rem' }}>{lang === 'ar' ? 'اختر طريقة الدفع:' : 'Select Payment Method:'}</h4>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button 
+                    onClick={() => setPaymentMethod('instapay')}
+                    className="glass-card"
+                    style={{ flex: 1, padding: '1rem', border: paymentMethod === 'instapay' ? '2px solid var(--accent-primary)' : '1px solid var(--border-glass)', cursor: 'pointer', textAlign: 'center' }}
+                  >
+                    <strong style={{ display: 'block', marginBottom: '0.25rem', color: paymentMethod === 'instapay' ? 'var(--accent-primary)' : 'inherit' }}>{lang === 'ar' ? 'انستاباي (InstaPay)' : 'InstaPay'}</strong>
+                  </button>
+                  <button 
+                    onClick={() => setPaymentMethod('cash')}
+                    className="glass-card"
+                    style={{ flex: 1, padding: '1rem', border: paymentMethod === 'cash' ? '2px solid var(--accent-red)' : '1px solid var(--border-glass)', cursor: 'pointer', textAlign: 'center' }}
+                  >
+                    <strong style={{ display: 'block', marginBottom: '0.25rem', color: paymentMethod === 'cash' ? 'var(--accent-red)' : 'inherit' }}>{lang === 'ar' ? 'فودافون كاش' : 'Vodafone Cash'}</strong>
+                  </button>
+                </div>
+              </div>
+
+              {paymentMethod && (
+                <div style={{ padding: '1.5rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '12px', border: '1px solid var(--border-glass)', textAlign: 'center' }}>
+                  <p style={{ margin: '0 0 1rem 0', color: 'var(--text-secondary)' }}>
+                    {lang === 'ar' ? 'يرجى تحويل مبلغ الاشتراك إلى الرقم التالي:' : 'Please transfer the subscription amount to the following number:'}
+                  </p>
+                  <div style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '2px', color: paymentMethod === 'instapay' ? 'var(--accent-primary)' : 'var(--accent-red)', marginBottom: '1.5rem', userSelect: 'all' }}>
+                    {paymentMethod === 'instapay' ? '01005144500' : '01020906262'}
+                  </div>
+                  
+                  <button 
+                    onClick={simulatePayment}
+                    disabled={isPaying}
+                    className="btn-primary" 
+                    style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.75rem' }}
+                  >
+                    {isPaying ? (
+                      <span className="loader" style={{ width: '20px', height: '20px', borderTopColor: '#fff' }}></span>
+                    ) : (
+                      <CheckCircle size={20} />
+                    )}
+                    {lang === 'ar' 
+                      ? (isPaying ? 'جاري التأكيد...' : 'لقد قمت بالتحويل بنجاح') 
+                      : (isPaying ? 'Confirming...' : 'I have transferred successfully')}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
