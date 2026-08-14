@@ -327,27 +327,27 @@ const InstructorDashboard = ({
       return;
     }
     
+    // Open WhatsApp synchronously in the event handler to bypass popup blockers
+    const targetNumber = paymentMethod === 'instapay' ? '01005144500' : '01020906262';
+    const planName = selectedPlan === 'monthly' ? (lang === 'ar' ? 'النظام الشهري' : 'Monthly VIP') : (lang === 'ar' ? 'النظام السنوي (9 أشهر)' : 'Academic Year VIP');
+    const amount = selectedPlan === 'monthly' ? systemFee : academicYearFee;
+    const teacherName = lang === 'ar' ? instructor.nameAr : instructor.nameEn;
+    
+    const message = lang === 'ar'
+      ? `مرحباً، لقد قمت بتحويل مبلغ ${amount} جنيه لتفعيل حساب المعلم: ${teacherName} على ${planName}.\nيرجى مراجعة صورة التحويل المرفقة لتفعيل الحساب.`
+      : `Hello, I have transferred ${amount} EGP to activate teacher ${teacherName}'s account on ${planName}.\nPlease review the attached screenshot to activate the account.`;
+
+    const whatsappUrl = `https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+
     setIsPaying(true);
     setTimeout(() => {
       setIsPaying(false);
       setPaymentSuccess(true);
       setHasSkippedPlan(true);
       onPaySubscription();
-      
-      const targetNumber = paymentMethod === 'instapay' ? '01005144500' : '01020906262';
-      const planName = selectedPlan === 'monthly' ? (lang === 'ar' ? 'النظام الشهري' : 'Monthly VIP') : (lang === 'ar' ? 'النظام السنوي (9 أشهر)' : 'Academic Year VIP');
-      const amount = selectedPlan === 'monthly' ? systemFee : academicYearFee;
-      const teacherName = lang === 'ar' ? instructor.nameAr : instructor.nameEn;
-      
-      const message = lang === 'ar'
-        ? `مرحباً، لقد قمت بتحويل مبلغ ${amount} جنيه لتفعيل حساب المعلم: ${teacherName} على ${planName}.\nيرجى مراجعة صورة التحويل المرفقة لتفعيل الحساب.`
-        : `Hello, I have transferred ${amount} EGP to activate teacher ${teacherName}'s account on ${planName}.\nPlease review the attached screenshot to activate the account.`;
-
-      const whatsappUrl = `https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
-      
       triggerToast(lang === 'ar' ? 'تم فتح واتساب لإرسال صورة التحويل وتفعيل حسابك!' : 'Opened WhatsApp to send screenshot and activate account.', 'success');
-    }, 1500);
+    }, 1000);
   };
 
   const handleScreenshotChange = (e) => {
