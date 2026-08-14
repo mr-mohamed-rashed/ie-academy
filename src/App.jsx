@@ -20,7 +20,15 @@ function App() {
 
   const [userRole, setUserRole] = useState('landing'); // 'landing' | 'instructor' | 'student' | 'admin'
   const [activeStudentId, setActiveStudentId] = useState(1);
-  const [activeInstructorId, setActiveInstructorId] = useState(101); // Nadia Ali by default
+  const [activeInstructorId, setActiveInstructorId] = useState(null);
+
+  // System subscription fee for instructors (Persisted)
+  const [systemFee, setSystemFee] = useState(() => {
+    const savedFee = localStorage.getItem('edu_system_fee');
+    return savedFee ? parseInt(savedFee, 10) : 750; // default to 750 EGP
+  });
+
+  // Derived active objectsy default
   
   // Lifted state for Instructor Dashboard grades/groups
   const [activeGradeId, setActiveGradeId] = useState('');
@@ -53,6 +61,9 @@ function App() {
   useEffect(() => {
     localStorage.setItem('edu_instructors', JSON.stringify(instructors));
   }, [instructors]);
+  useEffect(() => {
+    localStorage.setItem('edu_system_fee', systemFee);
+  }, [systemFee]);
   
   // PWA BeforeInstallPrompt Listener
   useEffect(() => {
@@ -781,7 +792,7 @@ function App() {
               {/* Classroom Card */}
               <div className="glass-card visitor-teacher-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-glass)' }}>
                 <img 
-                  src="/classroom.png" 
+                  src={`${import.meta.env.BASE_URL}classroom.png`} 
                   alt="Smart Classroom AI" 
                   style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
                 />
@@ -798,7 +809,7 @@ function App() {
               {/* Lobby Card */}
               <div className="glass-card visitor-teacher-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-glass)' }}>
                 <img 
-                  src="/lobby.png" 
+                  src={`${import.meta.env.BASE_URL}lobby.png`} 
                   alt="Luxury Lobby AI" 
                   style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
                 />
@@ -1144,6 +1155,8 @@ function App() {
             activeGroupId={activeGroupId}
             onGradeChange={setActiveGradeId}
             onGroupChange={setActiveGroupId}
+            systemFee={systemFee}
+            onPaySubscription={() => handleToggleSubscription(activeInstructor.id)}
           />
         )}
 
@@ -1171,6 +1184,8 @@ function App() {
             onToggleSubscription={handleToggleSubscription}
             lang={lang}
             triggerToast={triggerToast}
+            systemFee={systemFee}
+            setSystemFee={setSystemFee}
           />
         )}
 
