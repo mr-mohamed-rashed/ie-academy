@@ -395,7 +395,7 @@ const InstructorDashboard = ({
             </h3>
             <div style={{ textAlign: 'center', margin: '1rem 0' }}>
               <strong style={{ fontSize: '2.5rem', color: 'var(--color-gold)' }}>{academicYearFee}</strong>
-              <span style={{ fontSize: '1rem', color: 'var(--text-muted)', marginInlineStart: '0.5rem' }}>{lang === 'ar' ? 'جنيه / سنة' : 'EGP / Year'}</span>
+              <span style={{ fontSize: '1rem', color: 'var(--text-muted)', marginInlineStart: '0.5rem' }}>{lang === 'ar' ? 'جنيه / 9 أشهر' : 'EGP / 9 Months'}</span>
             </div>
             <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', color: 'var(--text-primary)' }}>
               <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'اشتراك كامل لمدة 9 أشهر دراسية' : 'Full subscription for 9 academic months'}</strong></li>
