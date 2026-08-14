@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X } from 'lucide-react';
+import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X, Camera } from 'lucide-react';
 import { calculateGPA, calculateAttendanceRate } from '../mockData';
 import StudentAnalyticsModal from './StudentAnalyticsModal';
 import Podium from './Podium';
