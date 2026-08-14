@@ -28,6 +28,12 @@ function App() {
     return savedFee ? parseInt(savedFee, 10) : 750; // default to 750 EGP
   });
 
+  // Academic Year subscription fee (9 months) (Persisted)
+  const [academicYearFee, setAcademicYearFee] = useState(() => {
+    const savedFee = localStorage.getItem('edu_academic_year_fee');
+    return savedFee ? parseInt(savedFee, 10) : 2000; // default to 2000 EGP
+  });
+
   // Derived active objectsy default
   
   // Lifted state for Instructor Dashboard grades/groups
@@ -64,6 +70,9 @@ function App() {
   useEffect(() => {
     localStorage.setItem('edu_system_fee', systemFee);
   }, [systemFee]);
+  useEffect(() => {
+    localStorage.setItem('edu_academic_year_fee', academicYearFee);
+  }, [academicYearFee]);
   
   // PWA BeforeInstallPrompt Listener
   useEffect(() => {
@@ -1172,6 +1181,7 @@ function App() {
             onGradeChange={setActiveGradeId}
             onGroupChange={setActiveGroupId}
             systemFee={systemFee}
+            academicYearFee={academicYearFee}
             onPaySubscription={() => handleToggleSubscription(activeInstructor.id)}
           />
         )}
@@ -1202,6 +1212,8 @@ function App() {
             triggerToast={triggerToast}
             systemFee={systemFee}
             setSystemFee={setSystemFee}
+            academicYearFee={academicYearFee}
+            setAcademicYearFee={setAcademicYearFee}
           />
         )}
 

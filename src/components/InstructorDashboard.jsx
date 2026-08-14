@@ -21,6 +21,7 @@ const InstructorDashboard = ({
   onGradeChange,
   onGroupChange,
   systemFee,
+  academicYearFee,
   onPaySubscription
 }) => {
   // Use props for grade and group state
@@ -63,6 +64,7 @@ const InstructorDashboard = ({
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(''); // 'instapay' | 'cash'
   const [hasSkippedPlan, setHasSkippedPlan] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState('monthly'); // 'monthly' | 'yearly'
 
   // Add Group State
   const [showAddGroup, setShowAddGroup] = useState(false);
@@ -338,10 +340,10 @@ const InstructorDashboard = ({
           {lang === 'ar' ? 'يمكنك استخدام المنصة مجاناً بصلاحيات محدودة، أو الترقية للنظام المدفوع للظهور للطلاب.' : 'Use the platform for free with limited access, or upgrade to appear to students.'}
         </p>
 
-        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '900px', width: '100%' }}>
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '1100px', width: '100%' }}>
           
           {/* Free Plan Card */}
-          <div className="glass-card" style={{ flex: '1 1 350px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border-glass)' }}>
+          <div className="glass-card" style={{ flex: '1 1 300px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border-glass)' }}>
             <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center' }}>
               {lang === 'ar' ? 'النظام المجاني' : 'Free Plan'}
             </h3>
@@ -361,27 +363,49 @@ const InstructorDashboard = ({
             </div>
           </div>
 
-          {/* Paid Plan Card */}
-          <div className="glass-card" style={{ flex: '1 1 350px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '2px solid var(--color-gold)', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: '1rem', right: '-2.5rem', backgroundColor: 'var(--color-gold)', color: '#000', padding: '0.25rem 3rem', transform: 'rotate(45deg)', fontWeight: 800, fontSize: '0.8rem' }}>
-              {lang === 'ar' ? 'الأفضل' : 'BEST'}
-            </div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-gold)', textAlign: 'center' }}>
-              {lang === 'ar' ? 'النظام المدفوع (VIP)' : 'VIP Premium Plan'}
+          {/* Monthly Paid Plan Card */}
+          <div className="glass-card" style={{ flex: '1 1 300px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border-glass)' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-primary)', textAlign: 'center' }}>
+              {lang === 'ar' ? 'النظام الشهري' : 'Monthly VIP Plan'}
             </h3>
             <div style={{ textAlign: 'center', margin: '1rem 0' }}>
               <strong style={{ fontSize: '2.5rem', color: 'var(--accent-primary)' }}>{systemFee}</strong>
               <span style={{ fontSize: '1rem', color: 'var(--text-muted)', marginInlineStart: '0.5rem' }}>{lang === 'ar' ? 'جنيه / شهر' : 'EGP / mo'}</span>
             </div>
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', color: 'var(--text-primary)' }}>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'الظهور للطلاب في المنصة الرئيسية' : 'Appear to students on main platform'}</strong></li>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'دعم كامل للإعلانات وتسويق حصصك' : 'Full ad support and marketing'}</strong></li>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'أولوية في لوحات الشرف والتقييمات' : 'Priority in honor boards & ratings'}</strong></li>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'لا حدود على عدد الفصول أو الطلاب' : 'Unlimited classes and students'}</strong></li>
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', color: 'var(--text-secondary)' }}>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--accent-primary)"/> <span>{lang === 'ar' ? 'الظهور للطلاب في المنصة الرئيسية' : 'Appear to students on main platform'}</span></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--accent-primary)"/> <span>{lang === 'ar' ? 'دعم إعلاني وتسويق لحصصك' : 'Full ad support and marketing'}</span></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--accent-primary)"/> <span>{lang === 'ar' ? 'أولوية في لوحات الشرف والتقييمات' : 'Priority in honor boards & ratings'}</span></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--accent-primary)"/> <span>{lang === 'ar' ? 'تجديد شهري حسب الحاجة' : 'Renew monthly as needed'}</span></li>
             </ul>
             <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
-              <button onClick={() => setShowPaymentModal(true)} className="btn-primary" style={{ width: '100%', padding: '1rem', justifyContent: 'center', backgroundColor: 'var(--color-gold)', color: '#000', fontWeight: 800 }}>
-                {lang === 'ar' ? 'اشترك ورقي حسابك' : 'Upgrade & Subscribe'}
+              <button onClick={() => { setSelectedPlan('monthly'); setShowPaymentModal(true); }} className="btn-primary" style={{ width: '100%', padding: '1rem', justifyContent: 'center' }}>
+                {lang === 'ar' ? 'اشترك شهرياً' : 'Subscribe Monthly'}
+              </button>
+            </div>
+          </div>
+
+          {/* Academic Year Paid Plan Card */}
+          <div className="glass-card" style={{ flex: '1 1 300px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '2px solid var(--color-gold)', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: '1rem', right: '-2.5rem', backgroundColor: 'var(--color-gold)', color: '#000', padding: '0.25rem 3rem', transform: 'rotate(45deg)', fontWeight: 800, fontSize: '0.8rem' }}>
+              {lang === 'ar' ? 'الأوفر' : 'BEST VALUE'}
+            </div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-gold)', textAlign: 'center' }}>
+              {lang === 'ar' ? 'النظام السنوي (9 أشهر)' : 'Academic Year VIP'}
+            </h3>
+            <div style={{ textAlign: 'center', margin: '1rem 0' }}>
+              <strong style={{ fontSize: '2.5rem', color: 'var(--color-gold)' }}>{academicYearFee}</strong>
+              <span style={{ fontSize: '1rem', color: 'var(--text-muted)', marginInlineStart: '0.5rem' }}>{lang === 'ar' ? 'جنيه / سنة' : 'EGP / Year'}</span>
+            </div>
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', color: 'var(--text-primary)' }}>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'اشتراك كامل لمدة 9 أشهر دراسية' : 'Full subscription for 9 academic months'}</strong></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'توفير مالي كبير مقارنة بالشهري' : 'Huge savings compared to monthly'}</strong></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'الظهور الدائم للطلاب في صفحات البحث' : 'Continuous appearance in searches'}</strong></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'أولوية في لوحات الشرف والتقييمات' : 'Priority in honor boards & ratings'}</strong></li>
+            </ul>
+            <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
+              <button onClick={() => { setSelectedPlan('yearly'); setShowPaymentModal(true); }} className="btn-primary" style={{ width: '100%', padding: '1rem', justifyContent: 'center', backgroundColor: 'var(--color-gold)', color: '#000', fontWeight: 800 }}>
+                {lang === 'ar' ? 'اشترك سنويًا (9 أشهر)' : 'Subscribe Academic Year'}
               </button>
             </div>
           </div>
@@ -1161,9 +1185,11 @@ const InstructorDashboard = ({
 
               <div style={{ textAlign: 'center', padding: '1rem', border: '1px solid var(--border-glass)', borderRadius: '12px' }}>
                 <span style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                  {lang === 'ar' ? 'قيمة الاشتراك الشهري' : 'Monthly Subscription Fee'}
+                  {lang === 'ar' ? (selectedPlan === 'monthly' ? 'قيمة الاشتراك الشهري' : 'قيمة الاشتراك السنوي (9 أشهر)') : (selectedPlan === 'monthly' ? 'Monthly Subscription Fee' : 'Academic Year Subscription Fee')}
                 </span>
-                <strong style={{ fontSize: '2.5rem', color: 'var(--accent-primary)' }}>{systemFee}</strong>
+                <strong style={{ fontSize: '2.5rem', color: 'var(--accent-primary)' }}>
+                  {selectedPlan === 'monthly' ? systemFee : academicYearFee}
+                </strong>
                 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', marginInlineStart: '0.5rem' }}>{lang === 'ar' ? 'جنيه' : 'EGP'}</span>
               </div>
 

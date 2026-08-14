@@ -39,7 +39,11 @@ const AdminDashboard = ({
   onDeleteTeacher,
   onToggleSubscription,
   lang,
-  triggerToast
+  triggerToast,
+  systemFee,
+  setSystemFee,
+  academicYearFee,
+  setAcademicYearFee
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -59,8 +63,7 @@ const AdminDashboard = ({
   const [introVideo, setIntroVideo] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
 
-  // Static subscription price configuration
-  const SUBSCRIPTION_FEE = 250; // monthly EGP fee
+  // Removed static SUBSCRIPTION_FEE to use systemFee prop
 
   const t = {
     en: {
@@ -153,7 +156,7 @@ const AdminDashboard = ({
   const totalCount = instructors.length;
   const subscribedCount = instructors.filter(i => i.isSubscribed).length;
   const freeCount = totalCount - subscribedCount;
-  const estimatedRevenue = subscribedCount * SUBSCRIPTION_FEE;
+  const estimatedRevenue = subscribedCount * systemFee;
 
   // Filtered teachers list based on search input
   const filteredInstructors = instructors.filter(i => {
@@ -320,15 +323,37 @@ const AdminDashboard = ({
         </div>
 
         {/* Projected monthly revenue */}
-        <div className="glass-card" style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem' }}>
+        <div className="glass-card" style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem', position: 'relative' }}>
           <div style={{ padding: '0.75rem', borderRadius: '12px', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: 'var(--color-gold)' }}>
             <DollarSign size={24} />
           </div>
-          <div>
+          <div style={{ flex: 1 }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block' }}>{t.statRevenue}</span>
             <strong style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-gold)' }}>
               {estimatedRevenue} {t.currency}
             </strong>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.5rem', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <input 
+                  type="number" 
+                  value={systemFee}
+                  onChange={(e) => setSystemFee(Number(e.target.value))}
+                  style={{ width: '60px', padding: '0.2rem', borderRadius: '4px', border: '1px solid var(--border-glass)', backgroundColor: 'transparent', color: 'var(--color-gold)', fontSize: '0.8rem' }}
+                  title="تعديل الاشتراك الشهري"
+                />
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{lang === 'ar' ? 'جنيه / شهر' : 'EGP / mo'}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <input 
+                  type="number" 
+                  value={academicYearFee}
+                  onChange={(e) => setAcademicYearFee(Number(e.target.value))}
+                  style={{ width: '60px', padding: '0.2rem', borderRadius: '4px', border: '1px solid var(--border-glass)', backgroundColor: 'transparent', color: 'var(--color-gold)', fontSize: '0.8rem' }}
+                  title="تعديل الاشتراك السنوي"
+                />
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{lang === 'ar' ? 'جنيه / سنوي (9 أشهر)' : 'EGP / Year (9m)'}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
