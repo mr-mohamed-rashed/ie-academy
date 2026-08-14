@@ -1073,10 +1073,26 @@ function App() {
         <header className="page-header">
           <div className="header-title">
             {userRole === 'instructor' ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                <h1 style={{ margin: 0 }}>{lang === 'ar' ? activeInstructor.nameAr : activeInstructor.nameEn}</h1>
-                <h3 style={{ margin: 0, color: 'var(--accent-primary)', fontSize: '1.2rem' }}>{lang === 'ar' ? activeInstructor.subjectAr : activeInstructor.subjectEn}</h3>
-                <h4 style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem', fontWeight: 600 }}>{lang === 'ar' ? activeInstructor.yearAr : activeInstructor.yearEn}</h4>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <img 
+                  src={activeInstructor.avatar} 
+                  alt="Avatar" 
+                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} 
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                  <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {lang === 'ar' ? activeInstructor.nameAr : activeInstructor.nameEn}
+                  </h1>
+                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span style={{ color: 'var(--accent-primary)', fontSize: '0.95rem', fontWeight: 500 }}>
+                      {lang === 'ar' ? activeInstructor.subjectAr : activeInstructor.subjectEn}
+                    </span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>•</span>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 400 }}>
+                      {lang === 'ar' ? activeInstructor.yearAr : activeInstructor.yearEn}
+                    </span>
+                  </div>
+                </div>
               </div>
             ) : (
               <>
