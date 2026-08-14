@@ -62,6 +62,7 @@ const InstructorDashboard = ({
   // Payment Modal State
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(''); // 'instapay' | 'cash'
+  const [hasSkippedPlan, setHasSkippedPlan] = useState(false);
 
   // Add Group State
   const [showAddGroup, setShowAddGroup] = useState(false);
@@ -321,10 +322,74 @@ const InstructorDashboard = ({
     setTimeout(() => {
       setIsPaying(false);
       setShowPaymentModal(false);
+      setHasSkippedPlan(true);
       onPaySubscription();
       triggerToast(lang === 'ar' ? 'تم تأكيد الدفع وتفعيل حسابك بنجاح!' : 'Payment confirmed! Account activated.', 'success');
     }, 2000);
   };
+
+  if (!instructor.isSubscribed && !hasSkippedPlan && !showPaymentModal) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem 1rem', animation: 'slide-up 0.5s ease-out' }}>
+        <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', textAlign: 'center' }}>
+          {lang === 'ar' ? 'اختر نظام حسابك' : 'Choose Your Account System'}
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '3rem', textAlign: 'center' }}>
+          {lang === 'ar' ? 'يمكنك استخدام المنصة مجاناً بصلاحيات محدودة، أو الترقية للنظام المدفوع للظهور للطلاب.' : 'Use the platform for free with limited access, or upgrade to appear to students.'}
+        </p>
+
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '900px', width: '100%' }}>
+          
+          {/* Free Plan Card */}
+          <div className="glass-card" style={{ flex: '1 1 350px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border-glass)' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center' }}>
+              {lang === 'ar' ? 'النظام المجاني' : 'Free Plan'}
+            </h3>
+            <div style={{ textAlign: 'center', margin: '1rem 0' }}>
+              <span style={{ fontSize: '2.5rem', fontWeight: 800 }}>{lang === 'ar' ? 'مجاناً' : 'Free'}</span>
+            </div>
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', color: 'var(--text-secondary)' }}>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--accent-green)"/> <span>{lang === 'ar' ? 'إضافة عدد محدود من الفصول والطلاب' : 'Add limited classes and students'}</span></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--accent-green)"/> <span>{lang === 'ar' ? 'إدارة درجات الطلاب وحضورهم' : 'Manage student grades and attendance'}</span></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', opacity: 0.5 }}><X size={18} /> <del>{lang === 'ar' ? 'الظهور للطلاب في المنصة الرئيسية' : 'Appear in student searches'}</del></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', opacity: 0.5 }}><X size={18} /> <del>{lang === 'ar' ? 'دعم إعلاني وتسويق لحصصك الدراسية' : 'Ads and marketing support'}</del></li>
+            </ul>
+            <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
+              <button onClick={() => setHasSkippedPlan(true)} className="config-btn" style={{ width: '100%', padding: '1rem', justifyContent: 'center' }}>
+                {lang === 'ar' ? 'الاستمرار بالنظام المجاني' : 'Continue for Free'}
+              </button>
+            </div>
+          </div>
+
+          {/* Paid Plan Card */}
+          <div className="glass-card" style={{ flex: '1 1 350px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '2px solid var(--color-gold)', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: '1rem', right: '-2.5rem', backgroundColor: 'var(--color-gold)', color: '#000', padding: '0.25rem 3rem', transform: 'rotate(45deg)', fontWeight: 800, fontSize: '0.8rem' }}>
+              {lang === 'ar' ? 'الأفضل' : 'BEST'}
+            </div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-gold)', textAlign: 'center' }}>
+              {lang === 'ar' ? 'النظام المدفوع (VIP)' : 'VIP Premium Plan'}
+            </h3>
+            <div style={{ textAlign: 'center', margin: '1rem 0' }}>
+              <strong style={{ fontSize: '2.5rem', color: 'var(--accent-primary)' }}>{systemFee}</strong>
+              <span style={{ fontSize: '1rem', color: 'var(--text-muted)', marginInlineStart: '0.5rem' }}>{lang === 'ar' ? 'جنيه / شهر' : 'EGP / mo'}</span>
+            </div>
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', color: 'var(--text-primary)' }}>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'الظهور للطلاب في المنصة الرئيسية' : 'Appear to students on main platform'}</strong></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'دعم كامل للإعلانات وتسويق حصصك' : 'Full ad support and marketing'}</strong></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'أولوية في لوحات الشرف والتقييمات' : 'Priority in honor boards & ratings'}</strong></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--color-gold)"/> <strong>{lang === 'ar' ? 'لا حدود على عدد الفصول أو الطلاب' : 'Unlimited classes and students'}</strong></li>
+            </ul>
+            <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
+              <button onClick={() => setShowPaymentModal(true)} className="btn-primary" style={{ width: '100%', padding: '1rem', justifyContent: 'center', backgroundColor: 'var(--color-gold)', color: '#000', fontWeight: 800 }}>
+                {lang === 'ar' ? 'اشترك ورقي حسابك' : 'Upgrade & Subscribe'}
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-grid" style={{ animation: 'slide-in 0.3s ease-out' }}>
