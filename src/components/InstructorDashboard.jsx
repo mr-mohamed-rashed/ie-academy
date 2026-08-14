@@ -394,8 +394,26 @@ const InstructorDashboard = ({
   return (
     <div className="dashboard-grid" style={{ animation: 'slide-in 0.3s ease-out' }}>
       
-      {/* Upgrade Banner for Free Accounts */}
-      {!instructor.isSubscribed && (
+      {/* Upgrade/Status Banner for Accounts */}
+      {instructor.isSubscribed ? (
+        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid var(--accent-green)', backgroundColor: 'rgba(16, 185, 129, 0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ width: '50px', height: '50px', backgroundColor: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-green)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CheckCircle size={28} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--accent-green)' }}>
+                  {lang === 'ar' ? 'حسابك مفعل على النظام المميز (VIP)' : 'Your account is active on VIP Premium'}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                  {lang === 'ar' ? 'يظهر حسابك الآن للطلاب في صفحات البحث الرئيسية للمنصة ويستفيد من كامل الدعم الإعلاني.' : 'Your account is now visible to students on the main search pages and benefits from full ad support.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
         <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid var(--accent-gold)', backgroundColor: 'rgba(251, 191, 36, 0.05)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -1118,11 +1136,16 @@ const InstructorDashboard = ({
 
     {/* Payment/Upgrade Modal */}
       {showPaymentModal && (
-        <div className="modal-overlay">
-          <div className="modal-content glass-card" style={{ maxWidth: '600px', width: '100%' }}>
-            <div className="modal-header">
-              <h2>{lang === 'ar' ? 'الترقية للنظام المدفوع' : 'Upgrade to Premium'}</h2>
-              <button onClick={() => setShowPaymentModal(false)} className="close-btn"><X size={24} /></button>
+        <div className="modal-overlay" style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.65)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div className="glass-card" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+            <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', borderBottom: '1px solid var(--border-glass)' }}>
+              <h2 style={{ margin: 0 }}>{lang === 'ar' ? 'الترقية للنظام المدفوع' : 'Upgrade to Premium'}</h2>
+              <button onClick={() => setShowPaymentModal(false)} className="close-btn" style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><X size={24} /></button>
             </div>
             
             <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
