@@ -65,6 +65,7 @@ const InstructorDashboard = ({
   const [paymentMethod, setPaymentMethod] = useState(''); // 'instapay' | 'cash'
   const [hasSkippedPlan, setHasSkippedPlan] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('monthly'); // 'monthly' | 'yearly'
+  const [screenshot, setScreenshot] = useState(null);
 
   // Add Group State
   const [showAddGroup, setShowAddGroup] = useState(false);
@@ -320,14 +321,44 @@ const InstructorDashboard = ({
   };
 
   const simulatePayment = () => {
+    if (!screenshot) {
+      triggerToast(lang === 'ar' ? 'يرجى إرفاق صورة لقطة شاشة التحويل أولاً!' : 'Please attach a screenshot of the transfer first!', 'error');
+      return;
+    }
+    
     setIsPaying(true);
     setTimeout(() => {
       setIsPaying(false);
       setShowPaymentModal(false);
       setHasSkippedPlan(true);
       onPaySubscription();
-      triggerToast(lang === 'ar' ? 'تم تأكيد الدفع وتفعيل حسابك بنجاح!' : 'Payment confirmed! Account activated.', 'success');
-    }, 2000);
+      
+      const targetNumber = paymentMethod === 'instapay' ? '01005144500' : '01020906262';
+      const planName = selectedPlan === 'monthly' ? (lang === 'ar' ? 'النظام الشهري' : 'Monthly VIP') : (lang === 'ar' ? 'النظام السنوي (9 أشهر)' : 'Academic Year VIP');
+      const amount = selectedPlan === 'monthly' ? systemFee : academicYearFee;
+      const teacherName = lang === 'ar' ? instructor.nameAr : instructor.nameEn;
+      
+      const message = lang === 'ar'
+        ? `مرحباً، لقد قمت بتحويل مبلغ ${amount} جنيه لتفعيل حساب المعلم: ${teacherName} على ${planName}.\nيرجى مراجعة صورة التحويل المرفقة لتفعيل الحساب.`
+        : `Hello, I have transferred ${amount} EGP to activate teacher ${teacherName}'s account on ${planName}.\nPlease review the attached screenshot to activate the account.`;
+
+      const whatsappUrl = `https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+      
+      triggerToast(lang === 'ar' ? 'تم فتح واتساب لإرسال صورة التحويل وتفعيل حسابك!' : 'Opened WhatsApp to send screenshot and activate account.', 'success');
+      setScreenshot(null);
+    }, 1500);
+  };
+
+  const handleScreenshotChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setScreenshot(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   if (!instructor.isSubscribed && !hasSkippedPlan && !showPaymentModal) {
@@ -1183,6 +1214,27 @@ const InstructorDashboard = ({
                 </ul>
               </div>
 
+              {/* Package Toggle */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <h4 style={{ margin: 0, fontSize: '1rem' }}>{lang === 'ar' ? 'اختر باقة الاشتراك:' : 'Select Subscription Package:'}</h4>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button 
+                    onClick={() => { setSelectedPlan('monthly'); setPaymentMethod(''); }}
+                    className="role-tab"
+                    style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', backgroundColor: selectedPlan === 'monthly' ? 'var(--accent-primary)' : 'transparent', color: selectedPlan === 'monthly' ? '#fff' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    {lang === 'ar' ? 'باقة شهرية' : 'Monthly'} ({systemFee} {lang === 'ar' ? 'جنيه' : 'EGP'})
+                  </button>
+                  <button 
+                    onClick={() => { setSelectedPlan('yearly'); setPaymentMethod(''); }}
+                    className="role-tab"
+                    style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', backgroundColor: selectedPlan === 'yearly' ? 'var(--color-gold)' : 'transparent', color: selectedPlan === 'yearly' ? '#000' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    {lang === 'ar' ? 'باقة سنوية (9 أشهر)' : 'Academic Year'} ({academicYearFee} {lang === 'ar' ? 'جنيه' : 'EGP'})
+                  </button>
+                </div>
+              </div>
+
               <div style={{ textAlign: 'center', padding: '1rem', border: '1px solid var(--border-glass)', borderRadius: '12px' }}>
                 <span style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
                   {lang === 'ar' ? (selectedPlan === 'monthly' ? 'قيمة الاشتراك الشهري' : 'قيمة الاشتراك السنوي (9 أشهر)') : (selectedPlan === 'monthly' ? 'Monthly Subscription Fee' : 'Academic Year Subscription Fee')}
@@ -1214,19 +1266,45 @@ const InstructorDashboard = ({
               </div>
 
               {paymentMethod && (
-                <div style={{ padding: '1.5rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '12px', border: '1px solid var(--border-glass)', textAlign: 'center' }}>
-                  <p style={{ margin: '0 0 1rem 0', color: 'var(--text-secondary)' }}>
+                <div style={{ padding: '1.5rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '12px', border: '1px solid var(--border-glass)', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <p style={{ margin: 0, color: 'var(--text-secondary)' }}>
                     {lang === 'ar' ? 'يرجى تحويل مبلغ الاشتراك إلى الرقم التالي:' : 'Please transfer the subscription amount to the following number:'}
                   </p>
-                  <div style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '2px', color: paymentMethod === 'instapay' ? 'var(--accent-primary)' : 'var(--accent-red)', marginBottom: '1.5rem', userSelect: 'all' }}>
+                  <div style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '2px', color: paymentMethod === 'instapay' ? 'var(--accent-primary)' : 'var(--accent-red)', margin: '0.5rem 0', userSelect: 'all' }}>
                     {paymentMethod === 'instapay' ? '01005144500' : '01020906262'}
+                  </div>
+
+                  {/* Screenshot Uploader */}
+                  <div style={{ textAlign: 'start' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>
+                      {lang === 'ar' ? 'ارفاق صورة التحويل (لقطة الشاشة):' : 'Attach Transfer Screenshot:'}
+                    </label>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleScreenshotChange}
+                      style={{ display: 'none' }}
+                      id="payment-screenshot-input"
+                    />
+                    <label htmlFor="payment-screenshot-input" className="config-btn" style={{ justifyContent: 'center', padding: '0.75rem', cursor: 'pointer', borderStyle: 'dashed', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <Camera size={16} />
+                      <span>{lang === 'ar' ? 'اختر صورة التحويل' : 'Choose screenshot'}</span>
+                    </label>
+                    {screenshot && (
+                      <div style={{ marginTop: '0.75rem', position: 'relative', display: 'inline-block' }}>
+                        <img src={screenshot} alt="Screenshot Preview" style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '8px', border: '1px solid var(--border-glass)' }} />
+                        <button onClick={() => setScreenshot(null)} style={{ position: 'absolute', top: '5px', right: '5px', background: 'rgba(239, 68, 68, 0.9)', border: 'none', color: 'white', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <X size={12} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                   
                   <button 
                     onClick={simulatePayment}
                     disabled={isPaying}
                     className="btn-primary" 
-                    style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.75rem' }}
+                    style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.75rem', backgroundColor: paymentMethod === 'instapay' ? 'var(--accent-primary)' : 'var(--accent-red)' }}
                   >
                     {isPaying ? (
                       <span className="loader" style={{ width: '20px', height: '20px', borderTopColor: '#fff' }}></span>
@@ -1234,8 +1312,8 @@ const InstructorDashboard = ({
                       <CheckCircle size={20} />
                     )}
                     {lang === 'ar' 
-                      ? (isPaying ? 'جاري التأكيد...' : 'لقد قمت بالتحويل بنجاح') 
-                      : (isPaying ? 'Confirming...' : 'I have transferred successfully')}
+                      ? (isPaying ? 'جاري التحقق...' : 'إرسال تأكيد التحويل عبر واتساب') 
+                      : (isPaying ? 'Confirming...' : 'Send confirmation via WhatsApp')}
                   </button>
                 </div>
               )}
