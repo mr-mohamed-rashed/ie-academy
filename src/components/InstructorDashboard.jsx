@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign } from 'lucide-react';
+import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X } from 'lucide-react';
 import { calculateGPA, calculateAttendanceRate } from '../mockData';
 import StudentAnalyticsModal from './StudentAnalyticsModal';
 import Podium from './Podium';
@@ -57,8 +57,11 @@ const InstructorDashboard = ({
   const [sessionDescEn, setSessionDescEn] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
 
-  // Selected Session for QR Code generation
   const [selectedQrSessionId, setSelectedQrSessionId] = useState('');
+
+  // Payment Modal State
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState(''); // 'instapay' | 'cash'
 
   // Add Group State
   const [showAddGroup, setShowAddGroup] = useState(false);
@@ -317,58 +320,38 @@ const InstructorDashboard = ({
     setIsPaying(true);
     setTimeout(() => {
       setIsPaying(false);
+      setShowPaymentModal(false);
       onPaySubscription();
-      triggerToast(lang === 'ar' ? 'تم الدفع وتفعيل حسابك بنجاح!' : 'Payment successful! Account activated.', 'success');
+      triggerToast(lang === 'ar' ? 'تم تأكيد الدفع وتفعيل حسابك بنجاح!' : 'Payment confirmed! Account activated.', 'success');
     }, 2000);
   };
-
-  if (!instructor.isSubscribed) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 1rem', textAlign: 'center', animation: 'slide-up 0.5s ease-out' }}>
-        <div className="glass-card" style={{ maxWidth: '500px', width: '100%', padding: '3rem 2rem' }}>
-          <div style={{ width: '80px', height: '80px', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: 'var(--color-gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto' }}>
-            <DollarSign size={40} />
-          </div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem' }}>
-            {lang === 'ar' ? 'اشتراكك غير مفعل' : 'Subscription Inactive'}
-          </h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', lineHeight: '1.6' }}>
-            {lang === 'ar' 
-              ? 'أهلاً بك في منصتنا! للتمكن من إدارة فصولك الدراسية والظهور للطلاب في المنصة الرئيسية، يرجى تفعيل اشتراكك الشهري.' 
-              : 'Welcome to our platform! To manage your classes and appear to students on the main platform, please activate your monthly subscription.'}
-          </p>
-          
-          <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-glass)', marginBottom: '2rem' }}>
-            <span style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-              {lang === 'ar' ? 'قيمة الاشتراك الشهري:' : 'Monthly Subscription Fee:'}
-            </span>
-            <strong style={{ fontSize: '2.5rem', color: 'var(--accent-primary)' }}>{systemFee}</strong>
-            <span style={{ fontSize: '1rem', color: 'var(--text-muted)', marginInlineStart: '0.5rem' }}>{lang === 'ar' ? 'جنيه' : 'EGP'}</span>
-          </div>
-
-          <button 
-            onClick={simulatePayment}
-            disabled={isPaying}
-            className="btn-primary" 
-            style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.75rem' }}
-          >
-            {isPaying ? (
-              <span className="loader" style={{ width: '20px', height: '20px', borderTopColor: '#fff' }}></span>
-            ) : (
-              <CheckCircle size={20} />
-            )}
-            {lang === 'ar' 
-              ? (isPaying ? 'جاري تأكيد الدفع...' : 'دفع بواسطة انستاباي / كاش') 
-              : (isPaying ? 'Confirming payment...' : 'Pay via InstaPay / Cash')}
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="dashboard-grid" style={{ animation: 'slide-in 0.3s ease-out' }}>
       
+      {/* Upgrade Banner for Free Accounts */}
+      {!instructor.isSubscribed && (
+        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid var(--accent-gold)', backgroundColor: 'rgba(251, 191, 36, 0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ width: '50px', height: '50px', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: 'var(--color-gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <DollarSign size={28} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-gold)' }}>
+                  {lang === 'ar' ? 'أنت الآن على النظام المجاني (صلاحيات محدودة)' : 'You are on the Free Plan (Limited Access)'}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                  {lang === 'ar' ? 'قم بالترقية للنظام المدفوع للظهور على المنصة الرئيسية للطلاب والاستفادة من ميزات إضافية.' : 'Upgrade to the paid plan to appear on the main platform to students and unlock premium features.'}
+                </p>
+              </div>
+            </div>
+            <button onClick={() => setShowPaymentModal(true)} className="btn-primary" style={{ padding: '0.75rem 1.5rem', backgroundColor: 'var(--color-gold)', color: '#000', fontWeight: 800 }}>
+              {lang === 'ar' ? 'ترقية الحساب الآن' : 'Upgrade Account Now'}
+            </button>
+          </div>
+        </div>
+      )}
       {/* Group selector and Referral Link header */}
       <div className="glass-card" style={{ gridColumn: 'span 12', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
