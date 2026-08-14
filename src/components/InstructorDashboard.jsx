@@ -66,6 +66,7 @@ const InstructorDashboard = ({
   const [hasSkippedPlan, setHasSkippedPlan] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('monthly'); // 'monthly' | 'yearly'
   const [screenshot, setScreenshot] = useState(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   // Add Group State
   const [showAddGroup, setShowAddGroup] = useState(false);
@@ -329,7 +330,7 @@ const InstructorDashboard = ({
     setIsPaying(true);
     setTimeout(() => {
       setIsPaying(false);
-      setShowPaymentModal(false);
+      setPaymentSuccess(true);
       setHasSkippedPlan(true);
       onPaySubscription();
       
@@ -346,7 +347,6 @@ const InstructorDashboard = ({
       window.open(whatsappUrl, '_blank');
       
       triggerToast(lang === 'ar' ? 'تم فتح واتساب لإرسال صورة التحويل وتفعيل حسابك!' : 'Opened WhatsApp to send screenshot and activate account.', 'success');
-      setScreenshot(null);
     }, 1500);
   };
 
@@ -1200,70 +1200,95 @@ const InstructorDashboard = ({
           <div className="glass-card" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}>
             <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', borderBottom: '1px solid var(--border-glass)' }}>
               <h2 style={{ margin: 0 }}>{lang === 'ar' ? 'الترقية للنظام المدفوع' : 'Upgrade to Premium'}</h2>
-              <button onClick={() => setShowPaymentModal(false)} className="close-btn" style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><X size={24} /></button>
+              <button onClick={() => { setShowPaymentModal(false); setPaymentSuccess(false); setScreenshot(null); }} className="close-btn" style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><X size={24} /></button>
             </div>
             
             <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-glass)' }}>
-                <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-gold)' }}>{lang === 'ar' ? 'مميزات النظام المدفوع:' : 'Premium Features:'}</h4>
-                <ul style={{ margin: 0, paddingInlineStart: '1.5rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
-                  <li>{lang === 'ar' ? 'الظهور للطلاب في المنصة الرئيسية في صفحة بحث المدرسين.' : 'Appear to students on the main platform search.'}</li>
-                  <li>{lang === 'ar' ? 'دعم كامل لإعلانات المنصة وتسويق حصصك الدراسية.' : 'Full support for platform ads and marketing your sessions.'}</li>
-                  <li>{lang === 'ar' ? 'الحصول على أولوية في الظهور في لوحات الشرف والتقييمات.' : 'Priority appearance on honor boards and ratings.'}</li>
-                  <li>{lang === 'ar' ? 'لا حدود على عدد الفصول أو الطلاب المضافين.' : 'No limits on the number of classes or students added.'}</li>
-                </ul>
-              </div>
-
-              {/* Package Toggle */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <h4 style={{ margin: 0, fontSize: '1rem' }}>{lang === 'ar' ? 'اختر باقة الاشتراك:' : 'Select Subscription Package:'}</h4>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+              {paymentSuccess ? (
+                <div style={{ textAlign: 'center', padding: '2rem 1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center' }}>
+                  <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-green)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CheckCircle size={48} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+                      {lang === 'ar' ? 'تم إرسال التأكيد بنجاح!' : 'Confirmation Sent Successfully!'}
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>
+                      {lang === 'ar' ? 'لقد تم فتح محادثة واتساب لإرسال صورة التحويل. حسابك الآن مفعل على النظام المميز ويظهر للطلاب!' : 'WhatsApp has been opened to send the screenshot. Your account is now active on the VIP plan and visible to students!'}
+                    </p>
+                  </div>
                   <button 
-                    onClick={() => { setSelectedPlan('monthly'); setPaymentMethod(''); }}
-                    className="role-tab"
-                    style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', backgroundColor: selectedPlan === 'monthly' ? 'var(--accent-primary)' : 'transparent', color: selectedPlan === 'monthly' ? '#fff' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600 }}
+                    onClick={() => { setShowPaymentModal(false); setPaymentSuccess(false); setScreenshot(null); }} 
+                    className="btn-primary" 
+                    style={{ width: '100%', padding: '1rem', justifyContent: 'center', fontWeight: 800 }}
                   >
-                    {lang === 'ar' ? 'باقة شهرية' : 'Monthly'} ({systemFee} {lang === 'ar' ? 'جنيه' : 'EGP'})
-                  </button>
-                  <button 
-                    onClick={() => { setSelectedPlan('yearly'); setPaymentMethod(''); }}
-                    className="role-tab"
-                    style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', backgroundColor: selectedPlan === 'yearly' ? 'var(--color-gold)' : 'transparent', color: selectedPlan === 'yearly' ? '#000' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600 }}
-                  >
-                    {lang === 'ar' ? 'باقة سنوية (9 أشهر)' : 'Academic Year'} ({academicYearFee} {lang === 'ar' ? 'جنيه' : 'EGP'})
+                    {lang === 'ar' ? 'الدخول إلى لوحة التحكم' : 'Go to Dashboard'}
                   </button>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-glass)' }}>
+                    <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-gold)' }}>{lang === 'ar' ? 'مميزات النظام المدفوع:' : 'Premium Features:'}</h4>
+                    <ul style={{ margin: 0, paddingInlineStart: '1.5rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
+                      <li>{lang === 'ar' ? 'الظهور للطلاب في المنصة الرئيسية في صفحة بحث المدرسين.' : 'Appear to students on the main platform search.'}</li>
+                      <li>{lang === 'ar' ? 'دعم كامل لإعلانات المنصة وتسويق حصصك الدراسية.' : 'Full support for platform ads and marketing your sessions.'}</li>
+                      <li>{lang === 'ar' ? 'الحصول على أولوية في الظهور في لوحات الشرف والتقييمات.' : 'Priority appearance on honor boards and ratings.'}</li>
+                      <li>{lang === 'ar' ? 'لا حدود على عدد الفصول أو الطلاب المضافين.' : 'No limits on the number of classes or students added.'}</li>
+                    </ul>
+                  </div>
 
-              <div style={{ textAlign: 'center', padding: '1rem', border: '1px solid var(--border-glass)', borderRadius: '12px' }}>
-                <span style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                  {lang === 'ar' ? (selectedPlan === 'monthly' ? 'قيمة الاشتراك الشهري' : 'قيمة الاشتراك السنوي (9 أشهر)') : (selectedPlan === 'monthly' ? 'Monthly Subscription Fee' : 'Academic Year Subscription Fee')}
-                </span>
-                <strong style={{ fontSize: '2.5rem', color: 'var(--accent-primary)' }}>
-                  {selectedPlan === 'monthly' ? systemFee : academicYearFee}
-                </strong>
-                <span style={{ fontSize: '1rem', color: 'var(--text-muted)', marginInlineStart: '0.5rem' }}>{lang === 'ar' ? 'جنيه' : 'EGP'}</span>
-              </div>
+                  {/* Package Toggle */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <h4 style={{ margin: 0, fontSize: '1rem' }}>{lang === 'ar' ? 'اختر باقة الاشتراك:' : 'Select Subscription Package:'}</h4>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <button 
+                        onClick={() => { setSelectedPlan('monthly'); setPaymentMethod(''); }}
+                        className="role-tab"
+                        style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', backgroundColor: selectedPlan === 'monthly' ? 'var(--accent-primary)' : 'transparent', color: selectedPlan === 'monthly' ? '#fff' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600 }}
+                      >
+                        {lang === 'ar' ? 'باقة شهرية' : 'Monthly'} ({systemFee} {lang === 'ar' ? 'جنيه' : 'EGP'})
+                      </button>
+                      <button 
+                        onClick={() => { setSelectedPlan('yearly'); setPaymentMethod(''); }}
+                        className="role-tab"
+                        style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', backgroundColor: selectedPlan === 'yearly' ? 'var(--color-gold)' : 'transparent', color: selectedPlan === 'yearly' ? '#000' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600 }}
+                      >
+                        {lang === 'ar' ? 'باقة سنوية (9 أشهر)' : 'Academic Year'} ({academicYearFee} {lang === 'ar' ? 'جنيه' : 'EGP'})
+                      </button>
+                    </div>
+                  </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <h4 style={{ margin: 0, fontSize: '1rem' }}>{lang === 'ar' ? 'اختر طريقة الدفع:' : 'Select Payment Method:'}</h4>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <button 
-                    onClick={() => setPaymentMethod('instapay')}
-                    className="glass-card"
-                    style={{ flex: 1, padding: '1rem', border: paymentMethod === 'instapay' ? '2px solid var(--accent-primary)' : '1px solid var(--border-glass)', cursor: 'pointer', textAlign: 'center' }}
-                  >
-                    <strong style={{ display: 'block', marginBottom: '0.25rem', color: paymentMethod === 'instapay' ? 'var(--accent-primary)' : 'inherit' }}>{lang === 'ar' ? 'انستاباي (InstaPay)' : 'InstaPay'}</strong>
-                  </button>
-                  <button 
-                    onClick={() => setPaymentMethod('cash')}
-                    className="glass-card"
-                    style={{ flex: 1, padding: '1rem', border: paymentMethod === 'cash' ? '2px solid var(--accent-red)' : '1px solid var(--border-glass)', cursor: 'pointer', textAlign: 'center' }}
-                  >
-                    <strong style={{ display: 'block', marginBottom: '0.25rem', color: paymentMethod === 'cash' ? 'var(--accent-red)' : 'inherit' }}>{lang === 'ar' ? 'فودافون كاش' : 'Vodafone Cash'}</strong>
-                  </button>
-                </div>
-              </div>
+                  <div style={{ textAlign: 'center', padding: '1rem', border: '1px solid var(--border-glass)', borderRadius: '12px' }}>
+                    <span style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+                      {lang === 'ar' ? (selectedPlan === 'monthly' ? 'قيمة الاشتراك الشهري' : 'قيمة الاشتراك السنوي (9 أشهر)') : (selectedPlan === 'monthly' ? 'Monthly Subscription Fee' : 'Academic Year Subscription Fee')}
+                    </span>
+                    <strong style={{ fontSize: '2.5rem', color: 'var(--accent-primary)' }}>
+                      {selectedPlan === 'monthly' ? systemFee : academicYearFee}
+                    </strong>
+                    <span style={{ fontSize: '1rem', color: 'var(--text-muted)', marginInlineStart: '0.5rem' }}>{lang === 'ar' ? 'جنيه' : 'EGP'}</span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <h4 style={{ margin: 0, fontSize: '1rem' }}>{lang === 'ar' ? 'اختر طريقة الدفع:' : 'Select Payment Method:'}</h4>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <button 
+                        onClick={() => setPaymentMethod('instapay')}
+                        className="glass-card"
+                        style={{ flex: 1, padding: '1rem', border: paymentMethod === 'instapay' ? '2px solid var(--accent-primary)' : '1px solid var(--border-glass)', cursor: 'pointer', textAlign: 'center' }}
+                      >
+                        <strong style={{ display: 'block', marginBottom: '0.25rem', color: paymentMethod === 'instapay' ? 'var(--accent-primary)' : 'inherit' }}>{lang === 'ar' ? 'انستاباي (InstaPay)' : 'InstaPay'}</strong>
+                      </button>
+                      <button 
+                        onClick={() => setPaymentMethod('cash')}
+                        className="glass-card"
+                        style={{ flex: 1, padding: '1rem', border: paymentMethod === 'cash' ? '2px solid var(--accent-red)' : '1px solid var(--border-glass)', cursor: 'pointer', textAlign: 'center' }}
+                      >
+                        <strong style={{ display: 'block', marginBottom: '0.25rem', color: paymentMethod === 'cash' ? 'var(--accent-red)' : 'inherit' }}>{lang === 'ar' ? 'فودافون كاش' : 'Vodafone Cash'}</strong>
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
 
               {paymentMethod && (
                 <div style={{ padding: '1.5rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '12px', border: '1px solid var(--border-glass)', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
