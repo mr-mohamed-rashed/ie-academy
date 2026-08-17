@@ -9,6 +9,10 @@ import TeacherProfileModal from './components/TeacherProfileModal';
 import TeacherDetailsModal from './components/TeacherDetailsModal';
 import { initialStudents, initialSessions, initialInstructors } from './mockData';
 import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info, Play, X } from 'lucide-react';
+import { 
+  getInstructors, getStudents, getSessions, getPendingPayments, 
+  saveInstructor, saveStudent, saveSession, addPendingPayment, deletePendingPayment 
+} from './db';
 
 function App() {
   const [lang, setLang] = useState('ar'); // Default to Arabic
@@ -45,41 +49,57 @@ function App() {
   // Active viewing state for student dashboard
   const [activeTeacherId, setActiveTeacherId] = useState(null); // For student view course page routing
   
-  // Custom mock database state with localStorage persistence
-  const [students, setStudents] = useState(() => {
-    const saved = localStorage.getItem('edu_students');
-    return saved ? JSON.parse(saved) : initialStudents;
-  });
-  const [sessions, setSessions] = useState(() => {
-    const saved = localStorage.getItem('edu_sessions');
-    return saved ? JSON.parse(saved) : initialSessions;
-  });
-  const [instructors, setInstructors] = useState(() => {
-    const saved = localStorage.getItem('edu_instructors');
-    return saved ? JSON.parse(saved) : initialInstructors;
-  });
+  const [students, setStudents] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [instructors, setInstructors] = useState([]);
+  const [pendingPayments, setPendingPayments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [pendingPayments, setPendingPayments] = useState(() => {
-    const saved = localStorage.getItem('edu_pending_payments');
-    return saved ? JSON.parse(saved) : [];
-  });
+  // Load data from Supabase on mount (falls back to localStorage if not configured)
+  useEffect(() => {
+    async function loadData() {
+      const insts = await getInstructors();
+      const studs = await getStudents();
+      const sesss = await getSessions();
+      const pends = await getPendingPayments();
+      setInstructors(insts);
+      setStudents(studs);
+      setSessions(sesss);
+      setPendingPayments(pends);
+      setIsLoading(false);
+    }
+    loadData();
+  }, []);
 
-  // Save to localStorage whenever these change
+  // Sync state to local storage and Supabase database
   useEffect(() => {
     localStorage.setItem('edu_students', JSON.stringify(students));
-  }, [students]);
+    if (!isLoading && students.length > 0) {
+      students.forEach(s => saveStudent(s));
+    }
+  }, [students, isLoading]);
+
   useEffect(() => {
     localStorage.setItem('edu_sessions', JSON.stringify(sessions));
-  }, [sessions]);
+    if (!isLoading && sessions.length > 0) {
+      sessions.forEach(s => saveSession(s));
+    }
+  }, [sessions, isLoading]);
+
   useEffect(() => {
     localStorage.setItem('edu_instructors', JSON.stringify(instructors));
-  }, [instructors]);
+    if (!isLoading && instructors.length > 0) {
+      instructors.forEach(i => saveInstructor(i));
+    }
+  }, [instructors, isLoading]);
+
   useEffect(() => {
     localStorage.setItem('edu_system_fee', systemFee);
   }, [systemFee]);
   useEffect(() => {
     localStorage.setItem('edu_academic_year_fee', academicYearFee);
   }, [academicYearFee]);
+
   useEffect(() => {
     localStorage.setItem('edu_pending_payments', JSON.stringify(pendingPayments));
   }, [pendingPayments]);
@@ -334,6 +354,7 @@ function App() {
       status: 'pending'
     };
     setPendingPayments((prev) => [...prev, newRequest]);
+    addPendingPayment(newRequest); // Sync to Supabase
   };
 
   const handleApprovePayment = (requestId, instructorId) => {
@@ -341,11 +362,13 @@ function App() {
       prev.map((inst) => (inst.id === instructorId ? { ...inst, isSubscribed: true } : inst))
     );
     setPendingPayments((prev) => prev.filter((r) => r.id !== requestId));
+    deletePendingPayment(requestId); // Sync to Supabase
     triggerToast(lang === 'ar' ? 'تمت الموافقة على التحويل وتفعيل الاشتراك بنجاح!' : 'Payment approved and subscription activated!', 'success');
   };
 
   const handleRejectPayment = (requestId) => {
     setPendingPayments((prev) => prev.filter((r) => r.id !== requestId));
+    deletePendingPayment(requestId); // Sync to Supabase
     triggerToast(lang === 'ar' ? 'تم رفض طلب الاشتراك وحذف الطلب' : 'Subscription request rejected and removed', 'error');
   };
 
@@ -646,6 +669,14 @@ function App() {
       guestHeadline: "لوحة الشرف والمكرمين"
     }
   }[lang];
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--bg-app)', color: 'white' }}>
+        <div className="loader" style={{ width: '40px', height: '40px', borderTopColor: 'var(--accent-primary)' }}></div>
+      </div>
+    );
+  }
 
   // If not logged in, render the Visitor Landing Page
   if (!isLoggedIn) {
