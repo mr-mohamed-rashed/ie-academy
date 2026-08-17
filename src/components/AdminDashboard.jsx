@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, DollarSign, CheckCircle, AlertCircle, PlusCircle, Edit, Trash2, Search, Check, Camera, ShieldAlert } from 'lucide-react';
+import { Users, DollarSign, CheckCircle, AlertCircle, PlusCircle, Edit, Trash2, Search, Check, Camera, ShieldAlert, Clock, X } from 'lucide-react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -30,7 +30,6 @@ const PRESET_AVATARS = [
   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120",
   "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=120"
 ];
-
 const AdminDashboard = ({
   instructors,
   students,
@@ -43,9 +42,13 @@ const AdminDashboard = ({
   systemFee,
   setSystemFee,
   academicYearFee,
-  setAcademicYearFee
+  setAcademicYearFee,
+  pendingPayments = [],
+  onApprovePayment,
+  onRejectPayment
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewingScreenshot, setViewingScreenshot] = useState(null);
   
   // Modals visibility states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -398,6 +401,111 @@ const AdminDashboard = ({
           </div>
         </div>
       </div>
+
+      {/* Pending Subscription Requests (Verifications) */}
+      <div className="glass-card" style={{ width: '100%', padding: '1.5rem', marginBottom: '2.5rem', border: pendingPayments.length > 0 ? '1px solid var(--accent-purple)' : '1px solid var(--border-glass)' }}>
+        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-primary)' }}>
+          <Clock size={20} color="var(--accent-purple)" />
+          <span>{lang === 'ar' ? 'طلبات الترقية والاشتراكات المعلقة' : 'Pending Upgrade & Subscription Requests'}</span>
+          {pendingPayments.length > 0 && (
+            <span style={{ backgroundColor: 'var(--accent-purple)', color: '#fff', fontSize: '0.8rem', padding: '0.2rem 0.6rem', borderRadius: '12px', marginInlineStart: '0.5rem', fontWeight: 800 }}>
+              {pendingPayments.length}
+            </span>
+          )}
+        </h3>
+
+        {pendingPayments.length === 0 ? (
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
+            {lang === 'ar' ? 'لا توجد طلبات ترقية بانتظار المراجعة حالياً.' : 'No pending upgrade requests at the moment.'}
+          </p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'start' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid var(--border-glass)', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                  <th style={{ padding: '0.75rem 1rem' }}>{lang === 'ar' ? 'المعلم' : 'Instructor'}</th>
+                  <th style={{ padding: '0.75rem 1rem' }}>{lang === 'ar' ? 'الباقة' : 'Plan'}</th>
+                  <th style={{ padding: '0.75rem 1rem' }}>{lang === 'ar' ? 'المبلغ' : 'Amount'}</th>
+                  <th style={{ padding: '0.75rem 1rem' }}>{lang === 'ar' ? 'تاريخ الطلب' : 'Date'}</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>{lang === 'ar' ? 'صورة التحويل' : 'Receipt Screenshot'}</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>{lang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingPayments.map((req) => (
+                  <tr key={req.id} style={{ borderBottom: '1px solid var(--border-glass)', fontSize: '0.9rem', verticalAlign: 'middle' }}>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{req.instructorName}</td>
+                    <td style={{ padding: '0.75rem 1rem' }}>
+                      <span style={{
+                        padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600,
+                        backgroundColor: req.plan === 'yearly' ? 'rgba(251, 191, 36, 0.15)' : 'rgba(99, 102, 241, 0.15)',
+                        color: req.plan === 'yearly' ? 'var(--color-gold)' : 'var(--accent-primary)'
+                      }}>
+                        {req.plan === 'yearly' ? (lang === 'ar' ? 'سنوي (9 أشهر)' : 'Academic Year') : (lang === 'ar' ? 'شهري' : 'Monthly')}
+                      </span>
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: 'var(--accent-green)' }}>{req.amount} {lang === 'ar' ? 'جنيه' : 'EGP'}</td>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{req.date}</td>
+                    <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
+                      {req.screenshot ? (
+                        <div 
+                          onClick={() => setViewingScreenshot(req.screenshot)}
+                          style={{ display: 'inline-block', cursor: 'pointer', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--border-glass)', width: '60px', height: '40px', position: 'relative' }}
+                        >
+                          <img src={req.screenshot} alt="Receipt" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 1 }} className="hover-overlay">
+                            <Camera size={14} color="#fff" />
+                          </div>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)' }}>-</span>
+                      )}
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                        <button 
+                          onClick={() => onApprovePayment(req.id, req.instructorId)} 
+                          className="btn-primary" 
+                          style={{ padding: '0.4rem 0.75rem', width: 'auto', fontSize: '0.8rem', backgroundColor: 'var(--accent-green)', borderColor: 'var(--accent-green)', color: '#fff', fontWeight: 700 }}
+                        >
+                          {lang === 'ar' ? 'موافقة وتفعيل' : 'Approve'}
+                        </button>
+                        <button 
+                          onClick={() => onRejectPayment(req.id)} 
+                          className="config-btn" 
+                          style={{ padding: '0.4rem 0.75rem', width: 'auto', fontSize: '0.8rem', borderColor: 'var(--accent-red)', color: 'var(--accent-red)', fontWeight: 600 }}
+                        >
+                          {lang === 'ar' ? 'رفض' : 'Reject'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Screenshot Viewer Modal */}
+      {viewingScreenshot && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999,
+          padding: '1rem'
+        }} onClick={() => setViewingScreenshot(null)}>
+          <div className="glass-card" style={{ maxWidth: '600px', width: '100%', padding: '0.5rem', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setViewingScreenshot(null)}
+              style={{ position: 'absolute', top: '1rem', right: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.9)', border: 'none', color: '#fff', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
+            >
+              <X size={18} />
+            </button>
+            <img src={viewingScreenshot} alt="Receipt Fullsize" style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: '8px', objectFit: 'contain' }} />
+          </div>
+        </div>
+      )}
 
       {/* Teachers Directory & Controls */}
       <div className="glass-card" style={{ width: '100%', padding: '1.5rem' }}>

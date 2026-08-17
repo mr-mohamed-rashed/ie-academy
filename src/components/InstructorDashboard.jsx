@@ -22,6 +22,8 @@ const InstructorDashboard = ({
   onGroupChange,
   systemFee,
   academicYearFee,
+  pendingPayments,
+  onSubmitPaymentRequest,
   onPaySubscription
 }) => {
   // Use props for grade and group state
@@ -326,27 +328,24 @@ const InstructorDashboard = ({
       triggerToast(lang === 'ar' ? 'يرجى إرفاق صورة لقطة شاشة التحويل أولاً!' : 'Please attach a screenshot of the transfer first!', 'error');
       return;
     }
-    
-    // Open WhatsApp synchronously in the event handler to bypass popup blockers
-    const targetNumber = paymentMethod === 'instapay' ? '01005144500' : '01020906262';
-    const planName = selectedPlan === 'monthly' ? (lang === 'ar' ? 'النظام الشهري' : 'Monthly VIP') : (lang === 'ar' ? 'النظام السنوي (9 أشهر)' : 'Academic Year VIP');
-    const amount = selectedPlan === 'monthly' ? systemFee : academicYearFee;
-    const teacherName = lang === 'ar' ? instructor.nameAr : instructor.nameEn;
-    
-    const message = lang === 'ar'
-      ? `مرحباً، لقد قمت بتحويل مبلغ ${amount} جنيه لتفعيل حساب المعلم: ${teacherName} على ${planName}.\nيرجى مراجعة صورة التحويل المرفقة لتفعيل الحساب.`
-      : `Hello, I have transferred ${amount} EGP to activate teacher ${teacherName}'s account on ${planName}.\nPlease review the attached screenshot to activate the account.`;
-
-    const whatsappUrl = `https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
 
     setIsPaying(true);
     setTimeout(() => {
       setIsPaying(false);
       setPaymentSuccess(true);
       setHasSkippedPlan(true);
-      onPaySubscription();
-      triggerToast(lang === 'ar' ? 'تم فتح واتساب لإرسال صورة التحويل وتفعيل حسابك!' : 'Opened WhatsApp to send screenshot and activate account.', 'success');
+      
+      if (onSubmitPaymentRequest) {
+        onSubmitPaymentRequest({
+          instructorId: instructor.id,
+          instructorName: lang === 'ar' ? instructor.nameAr : instructor.nameEn,
+          plan: selectedPlan,
+          amount: selectedPlan === 'monthly' ? systemFee : academicYearFee,
+          screenshot: screenshot
+        });
+      }
+      
+      triggerToast(lang === 'ar' ? 'تم إرسال لقطة شاشة التحويل للإدارة بنجاح!' : 'Transfer screenshot submitted to administration successfully!', 'success');
     }, 1000);
   };
 
@@ -361,7 +360,9 @@ const InstructorDashboard = ({
     }
   };
 
-  if (!instructor.isSubscribed && !hasSkippedPlan && !showPaymentModal) {
+  const hasPendingRequest = pendingPayments?.some(r => r.instructorId === instructor.id && r.status === 'pending');
+
+  if (!instructor.isSubscribed && !hasSkippedPlan && !showPaymentModal && !hasPendingRequest) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem 1rem', animation: 'slide-up 0.5s ease-out' }}>
         <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', textAlign: 'center' }}>
@@ -466,6 +467,29 @@ const InstructorDashboard = ({
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      ) : hasPendingRequest ? (
+        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid var(--color-gold)', backgroundColor: 'rgba(251, 191, 36, 0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ width: '50px', height: '50px', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: 'var(--color-gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Clock size={28} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-gold)' }}>
+                  {lang === 'ar' ? 'طلب الترقية قيد المراجعة حالياً' : 'Upgrade Request Under Review'}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                  {lang === 'ar' 
+                    ? 'لقد قمت برفع صورة التحويل بنجاح. يتم الآن مراجعة الطلب من قبل الإدارة لتفعيل حسابك كـ VIP في أسرع وقت.' 
+                    : 'You have uploaded the transfer screenshot successfully. The admin is currently reviewing your request to activate VIP status.'}
+                </p>
+              </div>
+            </div>
+            <span style={{ fontSize: '0.9rem', color: 'var(--color-gold)', fontWeight: 700, border: '1px solid var(--color-gold)', padding: '0.5rem 1rem', borderRadius: '8px' }}>
+              {lang === 'ar' ? 'قيد الانتظار' : 'Pending'}
+            </span>
           </div>
         </div>
       ) : (
@@ -1211,10 +1235,10 @@ const InstructorDashboard = ({
                   </div>
                   <div>
                     <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
-                      {lang === 'ar' ? 'تم إرسال التأكيد بنجاح!' : 'Confirmation Sent Successfully!'}
+                      {lang === 'ar' ? 'تم إرسال الطلب بنجاح!' : 'Request Sent Successfully!'}
                     </h3>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>
-                      {lang === 'ar' ? 'لقد تم فتح محادثة واتساب لإرسال صورة التحويل. حسابك الآن مفعل على النظام المميز ويظهر للطلاب!' : 'WhatsApp has been opened to send the screenshot. Your account is now active on the VIP plan and visible to students!'}
+                      {lang === 'ar' ? 'لقد تم إرفاق صورة التحويل وإرسال طلب الترقية بنجاح. حسابك الآن قيد المراجعة وسيتم تفعيله كـ VIP فور مراجعة التحويل والتحقق من قبل الإدارة.' : 'The transfer screenshot has been attached and your upgrade request has been sent successfully. Your account is now under review and will be activated as VIP shortly after validation.'}
                     </p>
                   </div>
                   <button 

@@ -59,6 +59,11 @@ function App() {
     return saved ? JSON.parse(saved) : initialInstructors;
   });
 
+  const [pendingPayments, setPendingPayments] = useState(() => {
+    const saved = localStorage.getItem('edu_pending_payments');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   // Save to localStorage whenever these change
   useEffect(() => {
     localStorage.setItem('edu_students', JSON.stringify(students));
@@ -75,6 +80,9 @@ function App() {
   useEffect(() => {
     localStorage.setItem('edu_academic_year_fee', academicYearFee);
   }, [academicYearFee]);
+  useEffect(() => {
+    localStorage.setItem('edu_pending_payments', JSON.stringify(pendingPayments));
+  }, [pendingPayments]);
   
   // PWA BeforeInstallPrompt Listener
   useEffect(() => {
@@ -312,6 +320,33 @@ function App() {
     setCurrentUser(null);
     setUserRole('landing');
     triggerToast(lang === 'ar' ? 'تم تسجيل الخروج بنجاح' : 'Successfully logged out', 'success');
+  };
+
+  const handleSubmitPaymentRequest = (requestData) => {
+    const newRequest = {
+      id: `req-${Date.now()}`,
+      instructorId: requestData.instructorId,
+      instructorName: requestData.instructorName,
+      plan: requestData.plan,
+      amount: requestData.amount,
+      screenshot: requestData.screenshot,
+      date: new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      status: 'pending'
+    };
+    setPendingPayments((prev) => [...prev, newRequest]);
+  };
+
+  const handleApprovePayment = (requestId, instructorId) => {
+    setInstructors((prev) =>
+      prev.map((inst) => (inst.id === instructorId ? { ...inst, isSubscribed: true } : inst))
+    );
+    setPendingPayments((prev) => prev.filter((r) => r.id !== requestId));
+    triggerToast(lang === 'ar' ? 'تمت الموافقة على التحويل وتفعيل الاشتراك بنجاح!' : 'Payment approved and subscription activated!', 'success');
+  };
+
+  const handleRejectPayment = (requestId) => {
+    setPendingPayments((prev) => prev.filter((r) => r.id !== requestId));
+    triggerToast(lang === 'ar' ? 'تم رفض طلب الاشتراك وحذف الطلب' : 'Subscription request rejected and removed', 'error');
   };
 
   const handleUpdateProfile = (updatedData) => {
@@ -1196,6 +1231,8 @@ function App() {
             onGroupChange={setActiveGroupId}
             systemFee={systemFee}
             academicYearFee={academicYearFee}
+            pendingPayments={pendingPayments}
+            onSubmitPaymentRequest={handleSubmitPaymentRequest}
             onPaySubscription={() => handleToggleSubscription(activeInstructor.id)}
           />
         )}
@@ -1228,6 +1265,9 @@ function App() {
             setSystemFee={setSystemFee}
             academicYearFee={academicYearFee}
             setAcademicYearFee={setAcademicYearFee}
+            pendingPayments={pendingPayments}
+            onApprovePayment={handleApprovePayment}
+            onRejectPayment={handleRejectPayment}
           />
         )}
 
