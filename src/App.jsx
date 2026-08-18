@@ -123,18 +123,6 @@ function App() {
     localStorage.setItem('edu_pending_payments', JSON.stringify(pendingPayments));
   }, [pendingPayments]);
 
-  // Lock background scroll when modal overlays are active
-  useEffect(() => {
-    if (showLoginModal) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [showLoginModal]);
-
   useEffect(() => {
     localStorage.setItem('edu_is_logged_in', isLoggedIn);
     localStorage.setItem('edu_user_role', userRole);
@@ -208,6 +196,18 @@ function App() {
   const [showInstallBanner, setShowInstallBanner] = useState(false);
 
   const [toasts, setToasts] = useState([]);
+
+  // Lock background scroll when modal overlays are active
+  useEffect(() => {
+    if (showLoginModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showLoginModal]);
 
   const subscribedTeachers = instructors.filter(i => i.isSubscribed);
 
