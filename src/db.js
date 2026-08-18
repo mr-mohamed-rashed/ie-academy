@@ -28,6 +28,7 @@ export async function getInstructors() {
     // Map DB schema to UI state
     return data.map(db => ({
       id: db.id,
+      email: db.email,
       nameAr: db.name_ar,
       nameEn: db.name_en,
       avatar: db.avatar,
@@ -59,6 +60,7 @@ export async function getStudents() {
     if (error) throw error;
     return data.map(db => ({
       id: db.id,
+      email: db.email,
       nameAr: db.name_ar,
       nameEn: db.name_en,
       avatar: db.avatar,
@@ -133,6 +135,7 @@ export async function saveInstructor(inst) {
   try {
     const dbRecord = {
       id: inst.id,
+      email: inst.email,
       name_ar: inst.nameAr,
       name_en: inst.nameEn,
       avatar: inst.avatar,
@@ -156,6 +159,7 @@ export async function saveStudent(student) {
   try {
     const dbRecord = {
       id: student.id,
+      email: student.email,
       name_ar: student.nameAr,
       name_en: student.nameEn,
       avatar: student.avatar,

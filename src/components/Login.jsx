@@ -267,6 +267,20 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
     }
   }[lang];
 
+  const checkEmailExists = (selectedEmail) => {
+    // Check if an instructor has this email
+    const existingInst = instructors?.find(i => i.email === selectedEmail);
+    if (existingInst) {
+      return { role: 'instructor', data: existingInst };
+    }
+    // Check if a student has this email
+    const existingStud = students?.find(s => s.email === selectedEmail);
+    if (existingStud) {
+      return { role: 'student', data: existingStud };
+    }
+    return null;
+  };
+
   const handleGoogleClick = () => {
     setShowGoogleAuth(true);
   };
@@ -906,9 +920,24 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                     setTimeout(() => {
                       setAuthLoading(false);
                       setShowGoogleAuth(false);
-                      setFullName('Mohamed Rashed');
-                      setAvatarUrl(PRESET_AVATARS[0]);
-                      setShowModal(true);
+                      
+                      const existing = checkEmailExists('rishobeh@gmail.com');
+                      if (existing) {
+                        onLogin({
+                          id: existing.data.id,
+                          name: existing.role === 'instructor' ? (existing.data.nameAr || existing.data.nameEn) : (existing.data.nameEn || existing.data.nameAr),
+                          role: existing.role,
+                          avatar: existing.data.avatar,
+                          email: 'rishobeh@gmail.com',
+                          isSubscribed: existing.data.isSubscribed,
+                          isExisting: true
+                        });
+                      } else {
+                        setFullName('Mohamed Rashed');
+                        setEmail('rishobeh@gmail.com');
+                        setAvatarUrl(PRESET_AVATARS[0]);
+                        setShowModal(true);
+                      }
                     }, 1200);
                   }}
                   style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: '1px solid #e5e7eb', borderRadius: '8px', backgroundColor: '#f9fafb', cursor: 'pointer', transition: 'background-color 0.2s', textDecoration: 'none' }}
@@ -927,9 +956,23 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                     setTimeout(() => {
                       setAuthLoading(false);
                       setShowGoogleAuth(false);
-                      setFullName('Test Student');
-                      setAvatarUrl(PRESET_AVATARS[1]);
-                      setShowModal(true);
+                      
+                      const existing = checkEmailExists('student.test@gmail.com');
+                      if (existing) {
+                        onLogin({
+                          id: existing.data.id,
+                          name: existing.role === 'student' ? (existing.data.nameAr || existing.data.nameEn) : (existing.data.nameEn || existing.data.nameAr),
+                          role: existing.role,
+                          avatar: existing.data.avatar,
+                          email: 'student.test@gmail.com',
+                          isExisting: true
+                        });
+                      } else {
+                        setFullName('Test Student');
+                        setEmail('student.test@gmail.com');
+                        setAvatarUrl(PRESET_AVATARS[1]);
+                        setShowModal(true);
+                      }
                     }, 1200);
                   }}
                   style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: '1px solid #e5e7eb', borderRadius: '8px', backgroundColor: '#f9fafb', cursor: 'pointer', transition: 'background-color 0.2s', textDecoration: 'none' }}
@@ -998,9 +1041,24 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                     setTimeout(() => {
                       setAuthLoading(false);
                       setShowFacebookAuth(false);
-                      setFullName('Mohamed Rashed');
-                      setAvatarUrl(PRESET_AVATARS[0]);
-                      setShowModal(true);
+                      
+                      const existing = checkEmailExists('rishobeh@gmail.com');
+                      if (existing) {
+                        onLogin({
+                          id: existing.data.id,
+                          name: existing.role === 'instructor' ? (existing.data.nameAr || existing.data.nameEn) : (existing.data.nameEn || existing.data.nameAr),
+                          role: existing.role,
+                          avatar: existing.data.avatar,
+                          email: 'rishobeh@gmail.com',
+                          isSubscribed: existing.data.isSubscribed,
+                          isExisting: true
+                        });
+                      } else {
+                        setFullName('Mohamed Rashed');
+                        setEmail('rishobeh@gmail.com');
+                        setAvatarUrl(PRESET_AVATARS[0]);
+                        setShowModal(true);
+                      }
                     }, 1200);
                   }}
                   style={{ padding: '0.75rem', border: 'none', borderRadius: '8px', backgroundColor: '#1877F2', color: 'white', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', transition: 'background-color 0.2s', width: '100%' }}

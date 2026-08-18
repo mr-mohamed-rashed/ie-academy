@@ -2,6 +2,7 @@
 export const initialInstructors = [
   {
     id: 101,
+    email: "rishobeh@gmail.com",
     nameAr: "أ. محمود الجوهري (مدرس افتراضي)",
     nameEn: "Mr. Mahmoud El-Gohary (Virtual)",
     avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120",
@@ -76,6 +77,7 @@ export const initialInstructors = [
 export const initialStudents = [
   {
     id: 1,
+    email: "student.test@gmail.com",
     nameAr: "أحمد المحمود",
     nameEn: "Ahmed El-Mahmoud",
     phone: "+201012345671",

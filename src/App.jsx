@@ -340,6 +340,28 @@ function App() {
       formattedName = formatTeacherName(profileData.name);
     }
     
+    // Existing user direct login logic
+    if (profileData.isExisting) {
+      setIsLoggedIn(true);
+      setCurrentUser({
+        id: profileData.id,
+        name: formattedName,
+        role: profileData.role,
+        avatar: profileData.avatar,
+        email: profileData.email,
+        isSubscribed: profileData.isSubscribed
+      });
+      setUserRole(profileData.role);
+      if (profileData.role === 'instructor') {
+        setActiveInstructorId(profileData.id);
+      } else if (profileData.role === 'student') {
+        setActiveStudentId(profileData.id);
+      }
+      setShowLoginModal(false);
+      triggerToast(lang === 'ar' ? `مرحباً بعودتك يا ${formattedName}!` : `Welcome back, ${formattedName}!`, 'success');
+      return;
+    }
+    
     const updatedProfileData = { ...profileData, name: formattedName };
     setCurrentUser(updatedProfileData);
     setIsLoggedIn(true);
@@ -350,6 +372,7 @@ function App() {
       const newTeacherId = 100 + instructors.length + 1;
       const newTeacherObj = {
         id: newTeacherId,
+        email: profileData.email, // Save email!
         nameAr: formattedName,
         nameEn: formattedName,
         avatar: profileData.avatar,
@@ -374,6 +397,7 @@ function App() {
       const newStudentId = students.length + 1;
       const newStudentObj = {
         id: newStudentId,
+        email: profileData.email, // Save email!
         nameAr: formattedName,
         nameEn: formattedName,
         avatar: updatedProfileData.avatar,
