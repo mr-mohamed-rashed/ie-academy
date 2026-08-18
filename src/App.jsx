@@ -316,6 +316,7 @@ function App() {
         nameAr: formattedName,
         nameEn: formattedName,
         avatar: updatedProfileData.avatar,
+        studentPhone: profileData.studentPhone || '',
         parentPhone: profileData.parentPhone || '',
         enrollments: [
           { 

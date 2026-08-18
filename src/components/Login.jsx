@@ -53,7 +53,9 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
   const [avatarUrl, setAvatarUrl] = useState(PRESET_AVATARS[0]);
   const [subject, setSubject] = useState('');
   const [year, setYear] = useState('');
+  const [studentPhone, setStudentPhone] = useState('');
   const [parentPhone, setParentPhone] = useState('');
+  const [studentStep, setStudentStep] = useState(1);
 
   // Email login states
   const [loginTab, setLoginTab] = useState(initialRole === 'admin' ? 'email' : 'quick'); // 'quick' | 'email'
@@ -191,8 +193,14 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (role === 'student' && !inviteTeacherId && (!selectedInstructor || !selectedGroup)) {
-      return;
+    if (role === 'student') {
+      if (studentStep === 1 && !inviteTeacherId) {
+        setStudentStep(2);
+        return;
+      }
+      if (!selectedInstructor || !selectedGroup) {
+        return;
+      }
     }
 
     onLogin({
@@ -202,13 +210,15 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
       subject: role === 'instructor' ? subject : '',
       yearAr: role === 'instructor' ? year : undefined,
       yearEn: role === 'instructor' ? year : undefined,
+      studentPhone: role === 'student' ? studentPhone : undefined,
       parentPhone: role === 'student' ? parentPhone : undefined,
-      instructorId: role === 'student' ? selectedInstructor : undefined,
+      instructorId: role === 'student' ? Number(selectedInstructor) : undefined,
       gradeId: role === 'student' ? selectedGrade : undefined,
       groupId: role === 'student' ? selectedGroup : undefined
     });
   };
 
+  return (
     <div className="login-screen-container">
       <div className="glass-card" style={{ maxWidth: '460px', width: '100%', textAlign: 'center', padding: '3rem 2rem', position: 'relative' }}>
         
@@ -404,122 +414,201 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
               {role === 'student' && (
                 <div style={{ animation: 'slide-in 0.2s ease-out' }}>
                   
-                  {/* Invitation Code Input */}
-                  <div className="form-group">
-                    <label>{lang === 'ar' ? 'كود الدعوة الخاص بالمعلم (اختياري)' : 'Teacher Invitation Code (Optional)'}</label>
-                    <input 
-                      type="text" 
-                      className="form-control" 
-                      placeholder="e.g. IE-101"
-                      value={invitationCode}
-                      onChange={(e) => setInvitationCode(e.target.value)}
-                      style={{ border: inviteTeacherId ? '1px solid var(--accent-green)' : '1px solid var(--border-glass)' }}
-                    />
-                    {inviteTeacherId && (
-                      <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.8rem', color: 'var(--accent-green)', fontWeight: 'bold' }}>
-                        ✓ {lang === 'ar' ? `دعوة صالحة من المعلم: ${instructors.find(i => i.id === inviteTeacherId)?.nameAr}` : `Valid invitation from: ${instructors.find(i => i.id === inviteTeacherId)?.nameEn}`}
-                      </p>
-                    )}
-                  </div>
-
-                  {inviteTeacherId ? (
-                    <div className="form-group" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '1rem', borderRadius: '12px', marginBottom: '1rem' }}>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--accent-green)', fontWeight: 'bold' }}>
-                        {t.invitedBy}: {instructors.find(i => String(i.id) === String(inviteTeacherId))?.nameAr || inviteTeacherId}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="form-group">
-                      <label>{t.selectTeacherLabel}</label>
-                      <select 
-                        className="form-control" 
-                        value={selectedInstructor} 
-                        onChange={(e) => { setSelectedInstructor(e.target.value); setSelectedGrade(''); setSelectedGroup(''); }}
-                        required
-                        style={{ appearance: 'auto' }}
-                      >
-                        <option value="">{t.selectTeacherLabel}...</option>
-                        {instructors.filter(i => i.isSubscribed).map(inst => (
-                          <option key={inst.id} value={inst.id}>{lang === 'ar' ? inst.nameAr : inst.nameEn}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                  
-                  {selectedInstructor && (
-                    <>
+                  {studentStep === 1 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                      {/* Student Phone Input */}
                       <div className="form-group">
-                        <label>{t.selectGradeLabel}</label>
-                        <select 
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <User size={14} />
+                          <span>{lang === 'ar' ? 'رقم هاتف الطالب' : 'Student Phone Number'}</span>
+                        </label>
+                        <input 
+                          type="tel" 
                           className="form-control" 
-                          value={selectedGrade} 
-                          onChange={(e) => { setSelectedGrade(e.target.value); setSelectedGroup(''); }}
-                          required
-                          style={{ appearance: 'auto' }}
-                        >
-                          <option value="">{t.selectGradeLabel}...</option>
-                          {instructors.find(i => String(i.id) === String(selectedInstructor))?.grades?.map(g => (
-                            <option key={g.id} value={g.id}>{lang === 'ar' ? g.nameAr : g.nameEn}</option>
-                          ))}
-                        </select>
+                          placeholder="01xxxxxxxxx"
+                          value={studentPhone}
+                          onChange={(e) => setStudentPhone(e.target.value)}
+                          required={role === 'student'} 
+                        />
                       </div>
 
-                      {selectedGrade && (
-                        <div className="form-group">
-                          <label>{t.selectGroupLabel}</label>
-                          <select 
-                            className="form-control" 
-                            value={selectedGroup} 
-                            onChange={(e) => setSelectedGroup(e.target.value)}
-                            required
-                            style={{ appearance: 'auto' }}
-                          >
-                            <option value="">{t.selectGroupLabel}...</option>
-                            {instructors.find(i => String(i.id) === String(selectedInstructor))
-                              ?.grades?.find(g => String(g.id) === String(selectedGrade))
-                              ?.groups?.map(g => (
-                              <option key={g.id} value={g.id}>{lang === 'ar' ? g.nameAr : g.nameEn}</option>
-                            ))}
-                          </select>
+                      {/* Parent Phone Input */}
+                      <div className="form-group">
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <User size={14} />
+                          <span>{t.parentPhoneLabel}</span>
+                        </label>
+                        <input 
+                          type="tel" 
+                          className="form-control" 
+                          placeholder={t.parentPhonePlaceholder}
+                          value={parentPhone}
+                          onChange={(e) => setParentPhone(e.target.value)}
+                          required={role === 'student'} 
+                        />
+                      </div>
+
+                      {/* Invitation Code Input */}
+                      <div className="form-group">
+                        <label>{lang === 'ar' ? 'كود الدعوة الخاص بالمعلم (اختياري)' : 'Teacher Invitation Code (Optional)'}</label>
+                        <input 
+                          type="text" 
+                          className="form-control" 
+                          placeholder="e.g. IE-101"
+                          value={invitationCode}
+                          onChange={(e) => setInvitationCode(e.target.value)}
+                          style={{ border: inviteTeacherId ? '1px solid var(--accent-green)' : '1px solid var(--border-glass)' }}
+                        />
+                        {inviteTeacherId && (
+                          <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.8rem', color: 'var(--accent-green)', fontWeight: 'bold' }}>
+                            ✓ {lang === 'ar' ? `دعوة صالحة من المعلم: ${instructors.find(i => i.id === inviteTeacherId)?.nameAr}` : `Valid invitation from: ${instructors.find(i => i.id === inviteTeacherId)?.nameEn}`}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Action buttons Step 1 */}
+                      <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                        <button 
+                          type="button" 
+                          onClick={() => setShowModal(false)}
+                          className="config-btn" 
+                          style={{ flex: 1, justifyContent: 'center' }}
+                        >
+                          {t.cancelBtn}
+                        </button>
+                        <button 
+                          type="submit" 
+                          className="btn-primary" 
+                          style={{ flex: 1 }}
+                        >
+                          {inviteTeacherId ? t.submitBtn : (lang === 'ar' ? 'التالي (اختر المعلم)' : 'Next (Choose Teacher)')}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ animation: 'slide-in 0.2s ease-out' }}>
+                      <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '1rem', textAlign: 'start' }}>
+                        {lang === 'ar' ? 'اختر معلم المادة:' : 'Select Your Teacher:'}
+                      </h4>
+                      
+                      {/* Teacher Cards Grid */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1.5rem', maxHeight: '240px', overflowY: 'auto', padding: '0.25rem' }}>
+                        {instructors.filter(i => i.isSubscribed).map(inst => {
+                          const isSelected = selectedInstructor === inst.id.toString();
+                          return (
+                            <div 
+                              key={inst.id}
+                              onClick={() => { setSelectedInstructor(inst.id.toString()); setSelectedGrade(''); setSelectedGroup(''); }}
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                padding: '1rem',
+                                borderRadius: '12px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                border: isSelected ? '2px solid var(--accent-primary)' : '1px solid var(--border-glass)',
+                                backgroundColor: isSelected ? 'rgba(99, 102, 241, 0.1)' : 'var(--bg-glass)',
+                                boxShadow: isSelected ? '0 4px 12px rgba(99, 102, 241, 0.2)' : 'none',
+                                transform: isSelected ? 'scale(1.03)' : 'none'
+                              }}
+                            >
+                              <img 
+                                src={inst.avatar} 
+                                alt={inst.nameAr} 
+                                style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', marginBottom: '0.75rem', border: '2px solid var(--border-glass)' }}
+                              />
+                              <h5 style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', fontWeight: 800 }}>{lang === 'ar' ? inst.nameAr : inst.nameEn}</h5>
+                              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{lang === 'ar' ? inst.subjectAr : inst.subjectEn}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {selectedInstructor && (
+                        <div style={{ animation: 'slide-in 0.2s ease-out', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'start' }}>
+                          <div className="form-group">
+                            <label>{t.selectGradeLabel}</label>
+                            <select 
+                              className="form-control" 
+                              value={selectedGrade} 
+                              onChange={(e) => { setSelectedGrade(e.target.value); setSelectedGroup(''); }}
+                              required
+                              style={{ appearance: 'auto' }}
+                            >
+                              <option value="">{t.selectGradeLabel}...</option>
+                              {instructors.find(i => String(i.id) === String(selectedInstructor))?.grades?.map(g => (
+                                <option key={g.id} value={g.id}>{lang === 'ar' ? g.nameAr : g.nameEn}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {selectedGrade && (
+                            <div className="form-group">
+                              <label>{t.selectGroupLabel}</label>
+                              <select 
+                                className="form-control" 
+                                value={selectedGroup} 
+                                onChange={(e) => setSelectedGroup(e.target.value)}
+                                required
+                                style={{ appearance: 'auto' }}
+                              >
+                                <option value="">{t.selectGroupLabel}...</option>
+                                {instructors.find(i => String(i.id) === String(selectedInstructor))
+                                  ?.grades?.find(g => String(g.id) === String(selectedGrade))
+                                  ?.groups?.map(g => (
+                                  <option key={g.id} value={g.id}>{lang === 'ar' ? g.nameAr : g.nameEn}</option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </>
+
+                      {/* Action buttons Step 2 */}
+                      <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                        <button 
+                          type="button" 
+                          onClick={() => setStudentStep(1)}
+                          className="config-btn" 
+                          style={{ flex: 1, justifyContent: 'center' }}
+                        >
+                          {lang === 'ar' ? 'السابق' : 'Back'}
+                        </button>
+                        <button 
+                          type="submit" 
+                          className="btn-primary" 
+                          style={{ flex: 1 }}
+                          disabled={!selectedInstructor || !selectedGroup}
+                        >
+                          {t.submitBtn}
+                        </button>
+                      </div>
+                    </div>
                   )}
-                  <div className="form-group" style={{ marginTop: '1rem' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <User size={14} />
-                      <span>{t.parentPhoneLabel}</span>
-                    </label>
-                  <input 
-                    type="tel" 
-                    className="form-control" 
-                    placeholder={t.parentPhonePlaceholder}
-                    value={parentPhone}
-                    onChange={(e) => setParentPhone(e.target.value)}
-                    required={role === 'student'} 
-                  />
-                </div>
+
                 </div>
               )}
-
               {/* Action buttons */}
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                <button 
-                  type="button" 
-                  onClick={() => setShowModal(false)}
-                  className="config-btn" 
-                  style={{ flex: 1, justifyContent: 'center' }}
-                >
-                  {t.cancelBtn}
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn-primary" 
-                  style={{ flex: 1 }}
-                >
-                  {t.submitBtn}
-                </button>
-              </div>
+              {role !== 'student' && (
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowModal(false)}
+                    className="config-btn" 
+                    style={{ flex: 1, justifyContent: 'center' }}
+                  >
+                    {t.cancelBtn}
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn-primary" 
+                    style={{ flex: 1 }}
+                  >
+                    {t.submitBtn}
+                  </button>
+                </div>
+              )}
 
             </form>
           </div>
