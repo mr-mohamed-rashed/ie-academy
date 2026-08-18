@@ -52,6 +52,7 @@ const InstructorDashboard = ({
   const [quizNameEn, setQuizNameEn] = useState('');
   const [score, setScore] = useState('');
   const [selectedStudentForAnalytics, setSelectedStudentForAnalytics] = useState(null);
+  const [showInviteQrModal, setShowInviteQrModal] = useState(false);
 
   // Session State
   const [sessionTitleAr, setSessionTitleAr] = useState('');
@@ -224,7 +225,7 @@ const InstructorDashboard = ({
 
   // Copy referral invite link
   const copyInviteLink = () => {
-    const inviteLink = `${window.location.origin}/signup?teacher=${instructor.id}&grade=${activeGradeId}&group=${activeGroupId}`;
+    const inviteLink = `${window.location.origin}${window.location.pathname}?invite=IE-${instructor.id}`;
     navigator.clipboard.writeText(inviteLink).then(() => {
       triggerToast(t.toastCopied, 'success');
     });
@@ -531,15 +532,23 @@ const InstructorDashboard = ({
         </div>
 
         {/* Invite Student Card */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderInlineStart: '2px solid var(--border-glass)', paddingInlineStart: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderInlineStart: '2px solid var(--border-glass)', paddingInlineStart: '1.5rem', flexWrap: 'wrap' }}>
           <div>
-            <h4 style={{ fontSize: '0.95rem', fontWeight: 700 }}>{t.inviteTitle}</h4>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{t.inviteDesc}</p>
+            <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
+              {lang === 'ar' ? `كود دعوة الطلاب: IE-${instructor.id}` : `Student Invite Code: IE-${instructor.id}`}
+            </h4>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0.15rem 0 0 0' }}>{t.inviteDesc}</p>
           </div>
-          <button className="config-btn" onClick={copyInviteLink} style={{ borderColor: 'var(--accent-primary)', color: 'var(--accent-primary)', padding: '0.6rem 1rem' }}>
-            <Share2 size={16} />
-            <span>{t.copyBtn}</span>
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button className="config-btn" onClick={copyInviteLink} style={{ borderColor: 'var(--accent-primary)', color: 'var(--accent-primary)', padding: '0.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <Share2 size={15} />
+              <span>{t.copyBtn}</span>
+            </button>
+            <button className="config-btn" onClick={() => setShowInviteQrModal(true)} style={{ borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)', padding: '0.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <QrCode size={15} />
+              <span>{lang === 'ar' ? 'كود QR' : 'QR Code'}</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1366,6 +1375,35 @@ const InstructorDashboard = ({
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showInviteQrModal && (
+        <div className="modal-overlay" style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.65)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div className="glass-card" style={{ maxWidth: '400px', width: '100%', padding: '2rem', textAlign: 'center', position: 'relative' }}>
+            <button onClick={() => setShowInviteQrModal(false)} className="close-btn" style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><X size={24} /></button>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
+              {lang === 'ar' ? 'رمز دعوة الطلاب الـ QR' : 'Student Invite QR Code'}
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+              {lang === 'ar' ? 'دع طلابك يمسحون هذا الكود للانتقال الفوري إلى صفحة التسجيل الخاصة بك.' : 'Let students scan this QR code to join your classroom immediately.'}
+            </p>
+            <div style={{ display: 'inline-block', padding: '1rem', backgroundColor: '#fff', borderRadius: '12px', marginBottom: '1.5rem' }}>
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`${window.location.origin}${window.location.pathname}?invite=IE-${instructor.id}`)}`} 
+                alt="Invite QR Code" 
+                style={{ display: 'block', width: '200px', height: '200px' }} 
+              />
+            </div>
+            <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--accent-primary)', padding: '0.5rem 1rem', border: '1px dashed var(--accent-primary)', borderRadius: '8px', display: 'inline-block' }}>
+              {lang === 'ar' ? `كود الدعوة: IE-${instructor.id}` : `Invite Code: IE-${instructor.id}`}
             </div>
           </div>
         </div>

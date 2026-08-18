@@ -10,16 +10,46 @@ const PRESET_AVATARS = [
   "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=120"
 ];
 
-const Login = ({ onLogin, lang, instructors = [], initialRole }) => {
+const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
   const [showModal, setShowModal] = useState(false);
-  const [inviteTeacherId, setInviteTeacherId] = useState(() => new URLSearchParams(window.location.search).get('teacher'));
+  const [inviteTeacherId, setInviteTeacherId] = useState(null);
   const [isAdminMode, setIsAdminMode] = useState(false);
-  const [selectedInstructor, setSelectedInstructor] = useState(() => new URLSearchParams(window.location.search).get('teacher') || '');
-  const [selectedGrade, setSelectedGrade] = useState(() => new URLSearchParams(window.location.search).get('grade') || '');
-  const [selectedGroup, setSelectedGroup] = useState(() => new URLSearchParams(window.location.search).get('group') || '');
+  const [selectedInstructor, setSelectedInstructor] = useState('');
+  const [selectedGrade, setSelectedGrade] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState('');
+
+  const [invitationCode, setInvitationCode] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const teacherId = urlParams.get('teacher') || urlParams.get('invite') || '';
+    return teacherId ? `IE-${teacherId}` : '';
+  });
+
+  // Resolve Invitation Code to Teacher ID
+  useEffect(() => {
+    if (invitationCode) {
+      const match = invitationCode.match(/IE-(\d+)/i) || invitationCode.match(/^(\d+)$/);
+      if (match) {
+        const id = Number(match[1]);
+        const exists = instructors.some(i => i.id === id);
+        if (exists) {
+          setInviteTeacherId(id);
+          setSelectedInstructor(id.toString());
+          const teacher = instructors.find(i => i.id === id);
+          if (teacher && teacher.grades && teacher.grades.length > 0) {
+            setSelectedGrade(teacher.grades[0].id);
+            if (teacher.grades[0].groups && teacher.grades[0].groups.length > 0) {
+              setSelectedGroup(teacher.grades[0].groups[0].id);
+            }
+          }
+          return;
+        }
+      }
+    }
+    setInviteTeacherId(null);
+  }, [invitationCode, instructors]);
 
   const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState(initialRole || (isAdminMode ? 'admin' : (inviteTeacherId ? 'student' : 'instructor')));
+  const [role, setRole] = useState(initialRole || (inviteTeacherId ? 'student' : 'instructor'));
   const [avatarUrl, setAvatarUrl] = useState(PRESET_AVATARS[0]);
   const [subject, setSubject] = useState('');
   const [year, setYear] = useState('');
@@ -179,9 +209,29 @@ const Login = ({ onLogin, lang, instructors = [], initialRole }) => {
     });
   };
 
-  return (
     <div className="login-screen-container">
-      <div className="glass-card" style={{ maxWidth: '460px', width: '100%', textAlign: 'center', padding: '3rem 2rem' }}>
+      <div className="glass-card" style={{ maxWidth: '460px', width: '100%', textAlign: 'center', padding: '3rem 2rem', position: 'relative' }}>
+        
+        {/* Back Button */}
+        {onClose && (
+          <button 
+            onClick={onClose}
+            className="config-btn"
+            style={{ 
+              position: 'absolute', 
+              top: '1rem', 
+              right: lang === 'ar' ? 'auto' : '1.5rem', 
+              left: lang === 'ar' ? '1.5rem' : 'auto', 
+              padding: '0.4rem 0.8rem', 
+              fontSize: '0.8rem', 
+              borderColor: 'var(--accent-red)', 
+              color: 'var(--accent-red)',
+              borderRadius: '8px'
+            }}
+          >
+            {lang === 'ar' ? 'رجوع' : 'Back'}
+          </button>
+        )}
         
         {/* Brand Logo */}
         <div 
@@ -353,9 +403,28 @@ const Login = ({ onLogin, lang, instructors = [], initialRole }) => {
               {/* Parent Phone Input: visible only if student is toggled */}
               {role === 'student' && (
                 <div style={{ animation: 'slide-in 0.2s ease-out' }}>
+                  
+                  {/* Invitation Code Input */}
+                  <div className="form-group">
+                    <label>{lang === 'ar' ? 'كود الدعوة الخاص بالمعلم (اختياري)' : 'Teacher Invitation Code (Optional)'}</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      placeholder="e.g. IE-101"
+                      value={invitationCode}
+                      onChange={(e) => setInvitationCode(e.target.value)}
+                      style={{ border: inviteTeacherId ? '1px solid var(--accent-green)' : '1px solid var(--border-glass)' }}
+                    />
+                    {inviteTeacherId && (
+                      <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.8rem', color: 'var(--accent-green)', fontWeight: 'bold' }}>
+                        ✓ {lang === 'ar' ? `دعوة صالحة من المعلم: ${instructors.find(i => i.id === inviteTeacherId)?.nameAr}` : `Valid invitation from: ${instructors.find(i => i.id === inviteTeacherId)?.nameEn}`}
+                      </p>
+                    )}
+                  </div>
+
                   {inviteTeacherId ? (
-                    <div className="form-group" style={{ backgroundColor: 'rgba(99, 102, 241, 0.1)', padding: '1rem', borderRadius: '12px' }}>
-                      <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--accent-primary)', fontWeight: 'bold' }}>
+                    <div className="form-group" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '1rem', borderRadius: '12px', marginBottom: '1rem' }}>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--accent-green)', fontWeight: 'bold' }}>
                         {t.invitedBy}: {instructors.find(i => String(i.id) === String(inviteTeacherId))?.nameAr || inviteTeacherId}
                       </p>
                     </div>

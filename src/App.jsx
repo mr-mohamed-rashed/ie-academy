@@ -941,7 +941,7 @@ function App() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             backdropFilter: 'blur(10px)'
           }}>
-            <Login onLogin={handleLogin} lang={lang} instructors={instructors} initialRole={loginModalRole} />
+            <Login onLogin={handleLogin} lang={lang} instructors={instructors} initialRole={loginModalRole} onClose={() => setShowLoginModal(false)} />
           </div>
         )}
 
