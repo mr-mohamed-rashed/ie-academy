@@ -414,6 +414,7 @@ function App() {
     setInstructors((prev) =>
       prev.map((inst) => (inst.id === requestData.instructorId ? { ...inst, isSubscribed: true } : inst))
     );
+    setCurrentUser(prev => prev && prev.role === 'instructor' ? { ...prev, isSubscribed: true } : prev);
     
     setPendingPayments((prev) => [...prev, newRequest]);
     addPendingPayment(newRequest); // Sync to Supabase
@@ -856,7 +857,7 @@ function App() {
                     <img 
                       src={teacher.avatar} 
                       alt={teacher.nameEn} 
-                      style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--accent-primary)', boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)' }}
+                      style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--color-gold)', boxShadow: '0 4px 15px rgba(251, 191, 36, 0.4)' }}
                     />
                     <div>
                       <h3 style={{ fontSize: '1.15rem', fontWeight: 800 }}>{lang === 'ar' ? teacher.nameAr : teacher.nameEn}</h3>
@@ -1221,7 +1222,14 @@ function App() {
                   <img 
                     src={activeInstructor.avatar} 
                     alt="Avatar" 
-                    style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} 
+                    style={{ 
+                      width: '60px', 
+                      height: '60px', 
+                      borderRadius: '50%', 
+                      objectFit: 'cover', 
+                      border: activeInstructor.isSubscribed ? '3px solid var(--color-gold)' : '2px solid var(--accent-primary)',
+                      boxShadow: activeInstructor.isSubscribed ? '0 0 12px var(--color-gold)' : 'none'
+                    }} 
                   />
                   {activeInstructor.videoUrl && (
                     <div style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: 'var(--accent-primary)', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-app)' }}>

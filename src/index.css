@@ -1366,7 +1366,7 @@ body.rtl .visitor-hero h1 {
     display: none !important;
   }
   body {
-    background-size: 100% 320px !important;
+    background-size: 100% 100vh !important;
     background-attachment: scroll !important;
     background-repeat: no-repeat !important;
   }

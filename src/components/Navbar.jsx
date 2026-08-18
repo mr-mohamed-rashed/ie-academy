@@ -221,7 +221,14 @@ const Navbar = ({
                 src={currentUser.avatar} 
                 alt={currentUser.name} 
                 className="user-badge-img" 
-                style={{ width: '32px', height: '32px' }}
+                style={{ 
+                  width: '32px', 
+                  height: '32px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: (currentUser.role === 'instructor' && currentUser.isSubscribed) ? '2px solid var(--color-gold)' : 'none',
+                  boxShadow: (currentUser.role === 'instructor' && currentUser.isSubscribed) ? '0 0 8px var(--color-gold)' : 'none'
+                }}
               />
               <div className="user-badge-info" style={{ flexGrow: 1 }}>
                 <p className="user-badge-name" style={{ fontSize: '0.8rem', margin: 0 }}>{currentUser.name}</p>
