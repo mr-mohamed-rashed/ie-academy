@@ -71,6 +71,13 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
   const [showFacebookAuth, setShowFacebookAuth] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
 
+  // Visual Cropper States
+  const [rawImage, setRawImage] = useState(null);
+  const [zoom, setZoom] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
   // Load saved credentials on mount
   useEffect(() => {
     const savedEmail = localStorage.getItem('edu_saved_email');
@@ -88,10 +95,79 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatarUrl(reader.result);
+        setRawImage(reader.result);
+        setZoom(1);
+        setPosition({ x: 0, y: 0 });
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    setPosition({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    setIsDragging(true);
+    setDragStart({ x: touch.clientX - position.x, y: touch.clientY - position.y });
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    setPosition({
+      x: touch.clientX - dragStart.x,
+      y: touch.clientY - dragStart.y
+    });
+  };
+
+  const handleCropSave = () => {
+    if (!rawImage) return;
+    const img = new Image();
+    img.src = rawImage;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 200;
+      canvas.height = 200;
+      const ctx = canvas.getContext('2d');
+      
+      // Draw circular mask
+      ctx.beginPath();
+      ctx.arc(100, 100, 100, 0, Math.PI * 2);
+      ctx.clip();
+      
+      // Calculate drawing dimensions to maintain aspect ratio and fill the 200x200 circle
+      const aspect = img.width / img.height;
+      let drawWidth = 200;
+      let drawHeight = 200;
+      if (aspect > 1) {
+        drawWidth = 200 * aspect;
+      } else {
+        drawHeight = 200 / aspect;
+      }
+      
+      // Translate to center, apply zoom and position offset
+      ctx.translate(100 + position.x, 100 + position.y);
+      ctx.scale(zoom, zoom);
+      ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+      
+      setAvatarUrl(canvas.toDataURL('image/jpeg', 0.9));
+      setRawImage(null);
+    };
   };
 
   // Manage step-by-step back button navigation for student signup wizard
@@ -941,6 +1017,107 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Visual Image Cropper Modal */}
+      {rawImage && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.95)',
+          zIndex: 5000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(10px)',
+          direction: lang === 'ar' ? 'rtl' : 'ltr'
+        }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '380px', padding: '1.75rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.25rem', alignItems: 'center' }}>
+            <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>
+              {lang === 'ar' ? 'ضبط وقص الصورة الشخصية' : 'Adjust & Crop Profile Picture'}
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              {lang === 'ar' ? 'اسحب الصورة لتحريكها واستخدم المؤشر لتكبيرها وتوسيط وجهك داخل الدائرة' : 'Drag the image to move and use the slider to zoom and center your face inside the circle'}
+            </p>
+
+            {/* Circular Crop Container */}
+            <div 
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleMouseUp}
+              style={{
+                width: '200px',
+                height: '200px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                position: 'relative',
+                cursor: 'move',
+                border: '3px solid var(--accent-primary)',
+                boxShadow: '0 0 15px rgba(0,0,0,0.6)',
+                backgroundColor: '#111',
+                userSelect: 'none',
+                touchAction: 'none'
+              }}
+            >
+              <img 
+                src={rawImage} 
+                alt="Raw Crop" 
+                draggable="false"
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: `translate(-50%, -50%) translate(${position.x}px, ${position.y}px) scale(${zoom})`,
+                  transformOrigin: 'center center',
+                  maxWidth: 'none',
+                  pointerEvents: 'none'
+                }}
+              />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, border: '2px dashed rgba(255,255,255,0.4)', borderRadius: '50%', pointerEvents: 'none' }}></div>
+            </div>
+
+            {/* Slider */}
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                <span>{lang === 'ar' ? 'تصغير' : 'Zoom Out'}</span>
+                <span>{lang === 'ar' ? 'تكبير' : 'Zoom In'}</span>
+              </div>
+              <input 
+                type="range" 
+                min="1" 
+                max="3.5" 
+                step="0.05" 
+                value={zoom} 
+                onChange={(e) => setZoom(parseFloat(e.target.value))}
+                style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
+              />
+            </div>
+
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
+              <button 
+                type="button"
+                onClick={() => setRawImage(null)}
+                className="config-btn"
+                style={{ flex: 1, justifyContent: 'center' }}
+              >
+                {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+              </button>
+              <button 
+                type="button"
+                onClick={handleCropSave}
+                className="btn-primary"
+                style={{ flex: 1, justifyContent: 'center' }}
+              >
+                {lang === 'ar' ? 'قص وحفظ' : 'Crop & Save'}
+              </button>
+            </div>
           </div>
         </div>
       )}
