@@ -196,6 +196,7 @@ function App() {
   const [showInstallBanner, setShowInstallBanner] = useState(false);
 
   const [toasts, setToasts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Lock background scroll when modal overlays are active
   useEffect(() => {
@@ -869,7 +870,7 @@ function App() {
               onClick={() => setVisitorTab('teachers')}
               style={{ fontSize: '1.05rem', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
             >
-              {lang === 'ar' ? 'المدرسين المشتركين' : 'Subscribed Instructors'}
+              {lang === 'ar' ? 'المدرسين' : 'Instructors'}
             </button>
           </div>
 
@@ -913,71 +914,113 @@ function App() {
           )}
 
           {visitorTab === 'teachers' && (
-            <div className="visitor-teachers-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-              {subscribedTeachers.length > 0 ? (
-                subscribedTeachers.map((teacher) => (
-                  <div key={teacher.id} className="glass-card visitor-teacher-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '1rem', border: '1px solid var(--border-glass)', transition: 'transform 0.3s ease' }}>
-                    <img 
-                      src={teacher.avatar} 
-                      alt={teacher.nameEn} 
-                      style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--color-gold)', boxShadow: '0 4px 15px rgba(251, 191, 36, 0.4)' }}
-                    />
-                    <div>
-                      <h3 style={{ fontSize: '1.15rem', fontWeight: 800 }}>{lang === 'ar' ? teacher.nameAr : teacher.nameEn}</h3>
-                      <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-primary)', display: 'block', marginTop: '0.25rem' }}>
-                        {lang === 'ar' ? teacher.subjectAr : teacher.subjectEn}
-                      </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', width: '100%' }}>
+              {/* Search Bar */}
+              <div style={{ display: 'flex', justifyContent: 'center', width: '100%', maxWidth: '500px', margin: '0 auto 0.5rem auto', position: 'relative', zIndex: 5 }}>
+                <input
+                  type="text"
+                  placeholder={lang === 'ar' ? '🔍 ابحث عن مدرس بالاسم أو المادة أو الصف...' : '🔍 Search teachers by name, subject or grade...'}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.8rem 1.5rem',
+                    borderRadius: '50px',
+                    border: '1px solid var(--border-glass)',
+                    backgroundColor: 'var(--bg-card)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.95rem',
+                    outline: 'none',
+                    textAlign: 'center',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+                    transition: 'all 0.3s ease'
+                  }}
+                />
+              </div>
+
+              {/* Grid */}
+              <div className="visitor-teachers-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+                {subscribedTeachers.filter(t => {
+                  const q = searchQuery.toLowerCase().trim();
+                  if (!q) return true;
+                  const nameAr = (t.nameAr || '').toLowerCase();
+                  const nameEn = (t.nameEn || '').toLowerCase();
+                  const subjectAr = (t.subjectAr || '').toLowerCase();
+                  const subjectEn = (t.subjectEn || '').toLowerCase();
+                  const yearAr = (t.yearAr || '').toLowerCase();
+                  const yearEn = (t.yearEn || '').toLowerCase();
+                  return nameAr.includes(q) || nameEn.includes(q) || subjectAr.includes(q) || subjectEn.includes(q) || yearAr.includes(q) || yearEn.includes(q);
+                }).length > 0 ? (
+                  subscribedTeachers.filter(t => {
+                    const q = searchQuery.toLowerCase().trim();
+                    if (!q) return true;
+                    const nameAr = (t.nameAr || '').toLowerCase();
+                    const nameEn = (t.nameEn || '').toLowerCase();
+                    const subjectAr = (t.subjectAr || '').toLowerCase();
+                    const subjectEn = (t.subjectEn || '').toLowerCase();
+                    const yearAr = (t.yearAr || '').toLowerCase();
+                    const yearEn = (t.yearEn || '').toLowerCase();
+                    return nameAr.includes(q) || nameEn.includes(q) || subjectAr.includes(q) || subjectEn.includes(q) || yearAr.includes(q) || yearEn.includes(q);
+                  }).map((teacher) => (
+                    <div key={teacher.id} className="glass-card visitor-teacher-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '1rem', border: '1px solid var(--border-glass)', transition: 'transform 0.3s ease' }}>
+                      <img 
+                        src={teacher.avatar} 
+                        alt={teacher.nameEn} 
+                        style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--color-gold)', boxShadow: '0 4px 15px rgba(251, 191, 36, 0.4)' }}
+                      />
+                      <div>
+                        <h3 style={{ fontSize: '1.15rem', fontWeight: 800 }}>{lang === 'ar' ? teacher.nameAr : teacher.nameEn}</h3>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-primary)', display: 'block', marginTop: '0.25rem' }}>
+                          {lang === 'ar' ? teacher.subjectAr : teacher.subjectEn}
+                        </span>
+                      </div>
+                      
+                      <div style={{ backgroundColor: 'rgba(255,255,255,0.03)', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.8rem', width: '100%', color: 'var(--text-secondary)' }}>
+                        <span>{lang === 'ar' ? teacher.yearAr : teacher.yearEn}</span>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', marginTop: 'auto' }}>
+                        <button 
+                          className="btn-primary" 
+                          onClick={() => {
+                            setLandingPodiumTeacherId(teacher.id);
+                            setShowPodiumModal(true);
+                          }}
+                          style={{ width: '100%', fontSize: '0.8rem', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}
+                        >
+                          <Award size={14} />
+                          <span>{lang === 'ar' ? 'عرض لوحة شرف المادة' : 'View Course Honors Podium'}</span>
+                        </button>
+
+                        <button 
+                          className="btn-primary" 
+                          onClick={() => setSelectedTeacherProfile(teacher)}
+                          style={{ width: '100%', fontSize: '0.8rem', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', backgroundColor: 'var(--accent-purple)' }}
+                        >
+                          <User size={14} />
+                          <span>{lang === 'ar' ? 'عرض صفحة المدرس' : 'View Teacher Profile'}</span>
+                        </button>
+
+                        <button 
+                          className="btn-primary" 
+                          onClick={() => setSelectedTeacherDetails(teacher)}
+                          style={{ width: '100%', fontSize: '0.8rem', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', backgroundColor: '#10b981', borderColor: '#10b981' }}
+                        >
+                          <Info size={14} />
+                          <span>{lang === 'ar' ? 'التواصل والتفاصيل' : 'Details & Contact'}</span>
+                        </button>
+                      </div>
                     </div>
-                    
-                    <div style={{ backgroundColor: 'rgba(255,255,255,0.03)', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.8rem', width: '100%', color: 'var(--text-secondary)' }}>
-                      <span>{lang === 'ar' ? teacher.yearAr : teacher.yearEn}</span>
-                    </div>
-
-
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', marginTop: 'auto' }}>
-                      <button 
-                        className="btn-primary" 
-                        onClick={() => {
-                          setLandingPodiumTeacherId(teacher.id);
-                          setShowPodiumModal(true);
-                        }}
-                        style={{ width: '100%', fontSize: '0.8rem', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}
-                      >
-                        <Award size={14} />
-                        <span>{lang === 'ar' ? 'عرض لوحة شرف المادة' : 'View Course Honors Podium'}</span>
-                      </button>
-
-                      <button 
-                        className="btn-primary" 
-                        onClick={() => setSelectedTeacherProfile(teacher)}
-                        style={{ width: '100%', fontSize: '0.8rem', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', backgroundColor: 'var(--accent-purple)' }}
-                      >
-                        <User size={14} />
-                        <span>{lang === 'ar' ? 'عرض صفحة المدرس' : 'View Teacher Profile'}</span>
-                      </button>
-                      <button 
-                        className="btn-primary" 
-                        onClick={() => setSelectedTeacherDetails(teacher)}
-                        style={{ width: '100%', fontSize: '0.8rem', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', backgroundColor: '#10b981', borderColor: '#10b981' }}
-                      >
-                        <Info size={14} />
-                        <span>{lang === 'ar' ? 'التواصل والتفاصيل' : 'Details & Contact'}</span>
-                      </button>
-                    </div>
+                  ))
+                ) : (
+                  <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                    <AlertCircle size={48} style={{ margin: '0 auto 1rem auto', color: 'var(--text-muted)' }} />
+                    <p style={{ fontSize: '1rem', fontWeight: 600 }}>
+                      {lang === 'ar' ? 'لا يوجد نتائج تطابق بحثك حالياً.' : 'No teachers matches your search query.'}
+                    </p>
                   </div>
-                ))
-              ) : (
-                <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                  <AlertCircle size={48} style={{ margin: '0 auto 1rem auto', color: 'var(--text-muted)' }} />
-                  <p style={{ fontSize: '1rem', fontWeight: 600 }}>
-                    {lang === 'ar' ? 'لا يوجد مدرسون مشتركون في الظهور في الدليل العام حالياً.' : 'No subscribed instructors are currently available in the directory.'}
-                  </p>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                    {lang === 'ar' ? 'يمكن للمدرسين الاشتراك من خلال ترقية النظام' : 'Instructors can subscribe by upgrading the system.'}
-                  </p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
 
