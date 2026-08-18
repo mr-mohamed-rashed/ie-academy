@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X, Camera } from 'lucide-react';
+import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X, Camera, Copy } from 'lucide-react';
 import { calculateGPA, calculateAttendanceRate } from '../mockData';
 import StudentAnalyticsModal from './StudentAnalyticsModal';
 import Podium from './Podium';
@@ -1241,7 +1241,7 @@ const InstructorDashboard = ({
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999,
           padding: '1rem'
         }}>
-          <div className="glass-card" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+          <div id="payment-modal-scroll-container" className="glass-card" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}>
             <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', borderBottom: '1px solid var(--border-glass)' }}>
               <h2 style={{ margin: 0 }}>{lang === 'ar' ? 'الترقية للنظام المدفوع' : 'Upgrade to Premium'}</h2>
               <button onClick={() => { setShowPaymentModal(false); setPaymentSuccess(false); setScreenshot(null); }} className="close-btn" style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><X size={24} /></button>
@@ -1286,14 +1286,28 @@ const InstructorDashboard = ({
                     <h4 style={{ margin: 0, fontSize: '1rem' }}>{lang === 'ar' ? 'اختر باقة الاشتراك:' : 'Select Subscription Package:'}</h4>
                     <div style={{ display: 'flex', gap: '1rem' }}>
                       <button 
-                        onClick={() => { setSelectedPlan('monthly'); setPaymentMethod(''); }}
+                        onClick={() => { 
+                          setSelectedPlan('monthly'); 
+                          setPaymentMethod(''); 
+                          setTimeout(() => {
+                            const c = document.getElementById('payment-modal-scroll-container');
+                            if (c) c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
+                          }, 80);
+                        }}
                         className="role-tab"
                         style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', backgroundColor: selectedPlan === 'monthly' ? 'var(--accent-primary)' : 'transparent', color: selectedPlan === 'monthly' ? '#fff' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600 }}
                       >
                         {lang === 'ar' ? 'باقة شهرية' : 'Monthly'} ({systemFee} {lang === 'ar' ? 'جنيه' : 'EGP'})
                       </button>
                       <button 
-                        onClick={() => { setSelectedPlan('yearly'); setPaymentMethod(''); }}
+                        onClick={() => { 
+                          setSelectedPlan('yearly'); 
+                          setPaymentMethod(''); 
+                          setTimeout(() => {
+                            const c = document.getElementById('payment-modal-scroll-container');
+                            if (c) c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
+                          }, 80);
+                        }}
                         className="role-tab"
                         style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', backgroundColor: selectedPlan === 'yearly' ? 'var(--color-gold)' : 'transparent', color: selectedPlan === 'yearly' ? '#000' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600 }}
                       >
@@ -1316,14 +1330,26 @@ const InstructorDashboard = ({
                     <h4 style={{ margin: 0, fontSize: '1rem' }}>{lang === 'ar' ? 'اختر طريقة الدفع:' : 'Select Payment Method:'}</h4>
                     <div style={{ display: 'flex', gap: '1rem' }}>
                       <button 
-                        onClick={() => setPaymentMethod('instapay')}
+                        onClick={() => {
+                          setPaymentMethod('instapay');
+                          setTimeout(() => {
+                            const c = document.getElementById('payment-modal-scroll-container');
+                            if (c) c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
+                          }, 80);
+                        }}
                         className="glass-card"
                         style={{ flex: 1, padding: '1rem', border: paymentMethod === 'instapay' ? '2px solid var(--accent-primary)' : '1px solid var(--border-glass)', cursor: 'pointer', textAlign: 'center' }}
                       >
                         <strong style={{ display: 'block', marginBottom: '0.25rem', color: paymentMethod === 'instapay' ? 'var(--accent-primary)' : 'inherit' }}>{lang === 'ar' ? 'انستاباي (InstaPay)' : 'InstaPay'}</strong>
                       </button>
                       <button 
-                        onClick={() => setPaymentMethod('cash')}
+                        onClick={() => {
+                          setPaymentMethod('cash');
+                          setTimeout(() => {
+                            const c = document.getElementById('payment-modal-scroll-container');
+                            if (c) c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
+                          }, 80);
+                        }}
                         className="glass-card"
                         style={{ flex: 1, padding: '1rem', border: paymentMethod === 'cash' ? '2px solid var(--accent-red)' : '1px solid var(--border-glass)', cursor: 'pointer', textAlign: 'center' }}
                       >
@@ -1339,8 +1365,34 @@ const InstructorDashboard = ({
                   <p style={{ margin: 0, color: 'var(--text-secondary)' }}>
                     {lang === 'ar' ? 'يرجى تحويل مبلغ الاشتراك إلى الرقم التالي:' : 'Please transfer the subscription amount to the following number:'}
                   </p>
-                  <div style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '2px', color: paymentMethod === 'instapay' ? 'var(--accent-primary)' : 'var(--accent-red)', margin: '0.5rem 0', userSelect: 'all' }}>
-                    {paymentMethod === 'instapay' ? '01005144500' : '01020906262'}
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', margin: '0.5rem 0' }}>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '2px', color: paymentMethod === 'instapay' ? 'var(--accent-primary)' : 'var(--accent-red)', userSelect: 'all' }}>
+                      {paymentMethod === 'instapay' ? '01005144500' : '01020906262'}
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const num = paymentMethod === 'instapay' ? '01005144500' : '01020906262';
+                        navigator.clipboard.writeText(num);
+                        alert(lang === 'ar' ? 'تم نسخ الرقم بنجاح!' : 'Number copied successfully!');
+                      }}
+                      style={{
+                        background: 'rgba(255,255,255,0.1)',
+                        border: '1px solid var(--border-glass)',
+                        borderRadius: '8px',
+                        padding: '0.5rem',
+                        cursor: 'pointer',
+                        color: 'var(--text-primary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'background 0.2s'
+                      }}
+                      title={lang === 'ar' ? 'نسخ الرقم' : 'Copy Number'}
+                    >
+                      <Copy size={18} />
+                    </button>
                   </div>
 
                   {/* Screenshot Uploader */}
