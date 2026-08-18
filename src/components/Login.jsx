@@ -26,7 +26,7 @@ const Login = ({ onLogin, lang, instructors = [], initialRole }) => {
   const [parentPhone, setParentPhone] = useState('');
 
   // Email login states
-  const [loginTab, setLoginTab] = useState('quick'); // 'quick' | 'email'
+  const [loginTab, setLoginTab] = useState(initialRole === 'admin' ? 'email' : 'quick'); // 'quick' | 'email'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);

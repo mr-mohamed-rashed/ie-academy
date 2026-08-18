@@ -923,9 +923,8 @@ function App() {
             <span style={{ color: 'var(--border-glass)' }}>|</span>
             <button 
               onClick={() => {
-                setUserRole('admin');
-                setIsLoggedIn(true);
-                setCurrentUser({ role: 'admin', name: lang === 'ar' ? 'مدير النظام' : 'System Admin', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120' });
+                setLoginModalRole('admin');
+                setShowLoginModal(true);
               }}
               style={{ background: 'none', border: 'none', color: 'var(--color-gold)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}
             >
