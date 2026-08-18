@@ -8,7 +8,7 @@ import AdminDashboard from './components/AdminDashboard';
 import TeacherProfileModal from './components/TeacherProfileModal';
 import TeacherDetailsModal from './components/TeacherDetailsModal';
 import { initialStudents, initialSessions, initialInstructors } from './mockData';
-import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info, Play, X } from 'lucide-react';
+import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info, Play, X, Pencil, Ruler, Lightbulb } from 'lucide-react';
 import { 
   getInstructors, getStudents, getSessions, getPendingPayments, 
   saveInstructor, saveStudent, saveSession, addPendingPayment, deletePendingPayment 
@@ -16,7 +16,7 @@ import {
 
 function App() {
   const [lang, setLang] = useState('ar'); // Default to Arabic
-  const [theme, setTheme] = useState('dark'); // Default to dark
+  const [theme, setTheme] = useState('light'); // Default to light
   
   // Simulated Google Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -815,20 +815,43 @@ function App() {
         {/* Hero Section */}
         <section className="visitor-hero">
           <div className="visitor-hero-overlay"></div>
-          <div className="visitor-hero-content" style={{ animation: 'slide-in 0.4s ease-out' }}>
+          
+          {/* Floating Educational Background Elements */}
+          <div className="hero-decorations" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
+            <Pencil className="floating-shape" style={{ top: '15%', left: '8%', transform: 'rotate(-45deg)', animationDelay: '0s' }} size={42} />
+            <Ruler className="floating-shape" style={{ top: '25%', right: '10%', transform: 'rotate(30deg)', animationDelay: '1.5s' }} size={38} />
+            <Lightbulb className="floating-shape" style={{ top: '65%', left: '6%', transform: 'rotate(15deg)', animationDelay: '3s' }} size={45} />
+            <GraduationCap className="floating-shape" style={{ top: '10%', right: '22%', transform: 'rotate(-10deg)', animationDelay: '0.8s' }} size={48} />
+            <BookOpen className="floating-shape" style={{ bottom: '20%', right: '8%', transform: 'rotate(20deg)', animationDelay: '2.3s' }} size={40} />
+            <Pencil className="floating-shape" style={{ bottom: '15%', left: '28%', transform: 'rotate(60deg)', animationDelay: '4s' }} size={34} />
+            <Lightbulb className="floating-shape" style={{ top: '50%', right: '25%', transform: 'rotate(-20deg)', animationDelay: '5s' }} size={36} />
+            <Ruler className="floating-shape" style={{ bottom: '35%', left: '12%', transform: 'rotate(-15deg)', animationDelay: '2.7s' }} size={42} />
+          </div>
+
+          <div className="visitor-hero-content" style={{ animation: 'slide-in 0.4s ease-out', zIndex: 5, width: '100%' }}>
             <span className="hero-badge">{lang === 'ar' ? 'منصة الربط الأكاديمي والتعليم التفاعلي' : 'Interactive Academic Linking Platform'}</span>
             <h1>{lang === 'ar' ? 'أكاديمية التعليم المتكاملة' : 'Integrated EduAcademy Hub'}</h1>
             <p>{lang === 'ar' ? 'منظومة إلكترونية متطورة تربط المدرسين بطلاب السنتر. تابع مستواك الدراسي، تفاعل مع الدروس المصورة، وسجّل حضورك اليومي بالـ QR code بكل سهولة.' : 'An advanced electronic ecosystem linking tutors with center students. Track your performance, engage with recorded lecture modules, and log daily attendance via QR codes.'}</p>
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginTop: '2rem' }}>
-              <button className="btn-primary" onClick={() => { setLoginModalRole('student'); setShowLoginModal(true); }} style={{ width: 'auto', padding: '0.75rem 1.75rem', fontSize: '1rem', backgroundColor: 'var(--accent-purple)' }}>
-                {lang === 'ar' ? 'ابدأ كطالب الآن' : 'Start as Student'}
-              </button>
-              <button className="btn-primary" onClick={() => { setLoginModalRole('instructor'); setShowLoginModal(true); }} style={{ width: 'auto', padding: '0.75rem 1.75rem', fontSize: '1rem' }}>
-                {lang === 'ar' ? 'ابدأ كمعلم الآن' : 'Start as Teacher'}
-              </button>
-              <button className="config-btn" onClick={() => document.getElementById('explore-section').scrollIntoView({ behavior: 'smooth' })} style={{ padding: '0.75rem 1.75rem', fontSize: '1rem' }}>
-                {lang === 'ar' ? 'استكشف المزايا' : 'Explore Features'}
-              </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', alignItems: 'center', marginTop: '2.5rem' }}>
+              {/* New Registrations Row */}
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <button className="btn-primary" onClick={() => { setLoginModalRole('student'); setShowLoginModal(true); }} style={{ width: 'auto', padding: '0.75rem 1.75rem', fontSize: '1rem', backgroundColor: 'var(--accent-purple)' }}>
+                  {lang === 'ar' ? 'ابدأ كطالب (حساب جديد)' : 'Start as Student (New)'}
+                </button>
+                <button className="btn-primary" onClick={() => { setLoginModalRole('instructor'); setShowLoginModal(true); }} style={{ width: 'auto', padding: '0.75rem 1.75rem', fontSize: '1rem' }}>
+                  {lang === 'ar' ? 'ابدأ كمعلم (حساب جديد)' : 'Start as Teacher (New)'}
+                </button>
+              </div>
+              
+              {/* Existing Accounts Row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <button className="btn-primary" onClick={() => { setLoginModalRole('landing'); setShowLoginModal(true); }} style={{ width: 'auto', padding: '0.75rem 2rem', fontSize: '1.05rem', backgroundColor: 'transparent', border: '2px solid var(--accent-primary)', color: 'var(--text-primary)', boxShadow: '0 0 15px rgba(99, 102, 241, 0.25)' }}>
+                  {lang === 'ar' ? 'تسجيل الدخول (حساب قديم / Google)' : 'Log In (Existing Account / Google)'}
+                </button>
+                <button className="config-btn" onClick={() => document.getElementById('explore-section').scrollIntoView({ behavior: 'smooth' })} style={{ padding: '0.75rem 1.75rem', fontSize: '1rem' }}>
+                  {lang === 'ar' ? 'استكشف المزايا' : 'Explore Features'}
+                </button>
+              </div>
             </div>
           </div>
         </section>

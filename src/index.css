@@ -1135,7 +1135,8 @@ body.rtl .visitor-landing-page {
 
 .visitor-hero {
   position: relative;
-  padding: 8rem 2rem;
+  min-height: 100vh;
+  padding: 6rem 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1144,12 +1145,40 @@ body.rtl .visitor-landing-page {
               radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
               #070a13;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 [data-theme="light"] .visitor-hero {
   background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
               radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
-              #f8fafc;
+              #f1f5f9; /* Soft light slate background */
+}
+
+/* Floating Educational Background Shapes */
+.floating-shape {
+  position: absolute;
+  opacity: 0.07;
+  color: var(--text-primary);
+  pointer-events: none;
+  animation: float-around-hero 16s infinite ease-in-out;
+  transition: opacity 0.3s ease;
+}
+
+[data-theme="light"] .floating-shape {
+  opacity: 0.14; /* Slightly more visible on light theme background */
+  color: #4f46e5; /* Primary accent indigo color on light mode */
+}
+
+@keyframes float-around-hero {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-25px) rotate(15deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
 }
 
 .visitor-hero-content {
