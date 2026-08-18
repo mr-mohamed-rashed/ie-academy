@@ -1346,7 +1346,24 @@ body.rtl .visitor-hero h1 {
 
 @media (max-width: 768px) {
   .visitor-header {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+  }
+  .visitor-header .brand-logo span {
+    font-size: 1.1rem !important;
+  }
+  .visitor-header-actions {
+    gap: 0.4rem !important;
+  }
+  .visitor-header-actions .btn-primary {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.8rem !important;
+  }
+  .visitor-header-actions .config-btn {
+    padding: 0.4rem 0.6rem !important;
+  }
+  .hide-on-mobile {
+    display: none !important;
   }
   .visitor-hero h1 {
     font-size: 2.2rem;

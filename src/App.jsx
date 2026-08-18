@@ -703,7 +703,7 @@ function App() {
           <div className="visitor-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button className="config-btn" onClick={handleLangToggle}>
               <Globe size={16} />
-              <span>{lang === 'ar' ? 'English' : 'العربية'}</span>
+              <span className="hide-on-mobile">{lang === 'ar' ? 'English' : 'العربية'}</span>
             </button>
             <button className="config-btn" onClick={handleThemeToggle}>
               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
@@ -873,7 +873,7 @@ function App() {
               </p>
             </div>
 
-            <div className="visitor-teachers-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '2rem' }}>
+            <div className="visitor-teachers-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
               {/* Classroom Card */}
               <div className="glass-card visitor-teacher-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-glass)' }}>
                 <img 
