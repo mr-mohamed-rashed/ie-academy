@@ -1133,7 +1133,9 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                   left: '50%',
                   transform: `translate(-50%, -50%) translate(${position.x}px, ${position.y}px) scale(${zoom})`,
                   transformOrigin: 'center center',
-                  maxWidth: 'none',
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
                   pointerEvents: 'none'
                 }}
               />
@@ -1148,9 +1150,9 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
               </div>
               <input 
                 type="range" 
-                min="1" 
-                max="3.5" 
-                step="0.05" 
+                min="0.1" 
+                max="3" 
+                step="0.02" 
                 value={zoom} 
                 onChange={(e) => setZoom(parseFloat(e.target.value))}
                 style={{ width: '100%', accentColor: 'var(--accent-primary)' }}
