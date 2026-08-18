@@ -123,6 +123,18 @@ function App() {
     localStorage.setItem('edu_pending_payments', JSON.stringify(pendingPayments));
   }, [pendingPayments]);
 
+  // Lock background scroll when modal overlays are active
+  useEffect(() => {
+    if (showLoginModal || showPaymentModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showLoginModal, showPaymentModal]);
+
   useEffect(() => {
     localStorage.setItem('edu_is_logged_in', isLoggedIn);
     localStorage.setItem('edu_user_role', userRole);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BookOpen, Globe, Moon, Sun, UserCheck, Settings, LogOut, Camera, Check, Menu, X } from 'lucide-react';
 import { PRESET_AVATARS } from './Login';
 
@@ -173,6 +173,18 @@ const Navbar = ({
       setRawImage(null);
     };
   };
+
+  // Prevent background scrolling when modals are open
+  useEffect(() => {
+    if (showEditModal || rawImage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showEditModal, rawImage]);
 
   // Initialize form fields when opening modal
   const openModal = () => {
@@ -364,14 +376,16 @@ const Navbar = ({
           backdropFilter: 'blur(10px)',
           direction: lang === 'ar' ? 'rtl' : 'ltr'
         }}>
-          <div className="glass-card" style={{ width: '90%', maxWidth: '450px', padding: '2rem', animation: 'slide-in 0.3s ease-out' }}>
-            <div style={{ marginBottom: '1.5rem', textAlign: 'start' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.25rem', color: 'var(--text-primary)' }}>{t.modalTitle}</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{t.modalSubtitle}</p>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '450px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column', animation: 'slide-in 0.3s ease-out' }}>
+            <div style={{ marginBottom: '1rem', textAlign: 'start' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>{t.modalTitle}</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0.25rem 0 0 0' }}>{t.modalSubtitle}</p>
             </div>
 
-            <form onSubmit={handleUpdateSubmit} style={{ textAlign: 'start' }}>
-              {/* Name field */}
+            <form onSubmit={handleUpdateSubmit} style={{ textAlign: 'start', display: 'flex', flexDirection: 'column', flexGrow: 1, overflow: 'hidden' }}>
+              {/* Scrollable form fields body container */}
+              <div style={{ overflowY: 'auto', flexGrow: 1, paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1rem' }}>
+                {/* Name field */}
               <div className="form-group">
                 <label>{t.nameLabel}</label>
                 <input 
@@ -495,8 +509,10 @@ const Navbar = ({
                 </div>
               )}
 
-              {/* Actions */}
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+              </div>
+
+              {/* Actions Footer (Fixed at the bottom) */}
+              <div style={{ display: 'flex', gap: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-glass)' }}>
                 <button 
                   type="button" 
                   onClick={() => setShowEditModal(false)}
