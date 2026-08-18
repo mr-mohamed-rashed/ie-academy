@@ -600,7 +600,7 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
 
                           if (filtered.length === 0) {
                             return (
-                              <div style={{ gridColumn: 'span 12', textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
                                 <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700 }}>
                                   {lang === 'ar' ? 'لا يوجد مدرسين مشتركين في الدليل العام حالياً.' : 'No subscribed instructors are currently available in the public directory.'}
                                 </p>

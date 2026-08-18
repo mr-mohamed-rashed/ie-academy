@@ -873,7 +873,7 @@ function App() {
                   </div>
                 ))
               ) : (
-                <div style={{ gridColumn: 'span 12', padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
                   <AlertCircle size={48} style={{ margin: '0 auto 1rem auto', color: 'var(--text-muted)' }} />
                   <p style={{ fontSize: '1rem', fontWeight: 600 }}>
                     {lang === 'ar' ? 'لا يوجد مدرسون مشتركون في الظهور في الدليل العام حالياً.' : 'No subscribed instructors are currently available in the directory.'}
