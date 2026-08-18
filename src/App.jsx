@@ -86,23 +86,29 @@ function App() {
 
   // Sync state to local storage and Supabase database
   useEffect(() => {
-    localStorage.setItem('edu_students', JSON.stringify(students));
-    if (!isLoading && students.length > 0) {
-      students.forEach(s => saveStudent(s));
+    if (!isLoading) {
+      localStorage.setItem('edu_students', JSON.stringify(students));
+      if (students.length > 0) {
+        students.forEach(s => saveStudent(s));
+      }
     }
   }, [students, isLoading]);
 
   useEffect(() => {
-    localStorage.setItem('edu_sessions', JSON.stringify(sessions));
-    if (!isLoading && sessions.length > 0) {
-      sessions.forEach(s => saveSession(s));
+    if (!isLoading) {
+      localStorage.setItem('edu_sessions', JSON.stringify(sessions));
+      if (sessions.length > 0) {
+        sessions.forEach(s => saveSession(s));
+      }
     }
   }, [sessions, isLoading]);
 
   useEffect(() => {
-    localStorage.setItem('edu_instructors', JSON.stringify(instructors));
-    if (!isLoading && instructors.length > 0) {
-      instructors.forEach(i => saveInstructor(i));
+    if (!isLoading) {
+      localStorage.setItem('edu_instructors', JSON.stringify(instructors));
+      if (instructors.length > 0) {
+        instructors.forEach(i => saveInstructor(i));
+      }
     }
   }, [instructors, isLoading]);
 

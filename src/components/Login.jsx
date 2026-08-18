@@ -66,6 +66,11 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Simulated OAuth Auth Modals
+  const [showGoogleAuth, setShowGoogleAuth] = useState(false);
+  const [showFacebookAuth, setShowFacebookAuth] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+
   // Load saved credentials on mount
   useEffect(() => {
     const savedEmail = localStorage.getItem('edu_saved_email');
@@ -187,8 +192,11 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
   }[lang];
 
   const handleGoogleClick = () => {
-    // Simulates the auth popup by showing profile completion modal
-    setShowModal(true);
+    setShowGoogleAuth(true);
+  };
+
+  const handleFacebookClick = () => {
+    setShowFacebookAuth(true);
   };
 
   const handleEmailLoginSubmit = (e) => {
@@ -341,7 +349,7 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
             </button>
 
             {/* Facebook Sign In Button */}
-            <button onClick={handleGoogleClick} className="google-btn" style={{ backgroundColor: '#1877F2', color: 'white', borderColor: '#1877F2' }}>
+            <button onClick={handleFacebookClick} className="google-btn" style={{ backgroundColor: '#1877F2', color: 'white', borderColor: '#1877F2' }}>
               <svg className="google-icon-svg" viewBox="0 0 24 24" style={{ fill: 'white' }}>
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
@@ -773,6 +781,166 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
               )}
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Simulated Google Authentication Choose Account Modal */}
+      {showGoogleAuth && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.85)',
+          zIndex: 3000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(8px)',
+          direction: lang === 'ar' ? 'rtl' : 'ltr'
+        }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '400px', padding: '2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.5rem', backgroundColor: '#ffffff', color: '#1f2937' }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <svg style={{ width: '40px', height: '40px' }} viewBox="0 0 24 24">
+                <path fill="#ea4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2A11.95 11.95 0 0 0 12 0 11.94 11.94 0 0 0 1.29 6.29l3.73 2.9A7.12 7.12 0 0 1 12 5.04z"/>
+                <path fill="#4285f4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46a5.53 5.53 0 0 1-2.4 3.63l3.73 2.9a11.92 11.92 0 0 0 3.7-8.68z"/>
+                <path fill="#fbbc05" d="M5.02 8.78A7.13 7.13 0 0 1 12 5.04a7.12 7.12 0 0 1 6.98 3.74l3.73-2.9A11.94 11.94 0 0 0 12 0C7.8 0 4.19 2.05 2.02 5.24l3.73 2.9.27.64z"/>
+                <path fill="#34a853" d="M12 18.96c-1.92 0-3.63-.64-4.98-1.74l-3.73 2.9C5.46 21.95 8.54 24 12 24c4.14 0 7.73-1.4 10.3-3.8l-3.73-2.9a7.12 7.12 0 0 1-6.57 1.66z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#111827' }}>
+                {lang === 'ar' ? 'اختر حساباً للمتابعة' : 'Choose an account'}
+              </h3>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#6b7280' }}>
+                {lang === 'ar' ? 'للمتابعة إلى منصة أكاديمية التعليم' : 'to continue to EduAcademy Portal'}
+              </p>
+            </div>
+
+            {authLoading ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '1rem' }}>
+                <div className="loader" style={{ width: '30px', height: '30px', borderTopColor: '#4285f4' }}></div>
+                <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>{lang === 'ar' ? 'جاري التحقق والمتابعة...' : 'Verifying account...'}</span>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', textAlign: 'start' }}>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setAuthLoading(true);
+                    setTimeout(() => {
+                      setAuthLoading(false);
+                      setShowGoogleAuth(false);
+                      setFullName('Mohamed Rashed');
+                      setAvatarUrl(PRESET_AVATARS[0]);
+                      setShowModal(true);
+                    }, 1200);
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: '1px solid #e5e7eb', borderRadius: '8px', backgroundColor: '#f9fafb', cursor: 'pointer', transition: 'background-color 0.2s', textDecoration: 'none' }}
+                >
+                  <img src={PRESET_AVATARS[0]} style={{ width: '32px', height: '32px', borderRadius: '50%' }} alt="Mohamed" />
+                  <div>
+                    <strong style={{ display: 'block', fontSize: '0.85rem', color: '#1f2937' }}>Mohamed Rashed (أ/ محمد راشد)</strong>
+                    <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>rishobeh@gmail.com</span>
+                  </div>
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setAuthLoading(true);
+                    setTimeout(() => {
+                      setAuthLoading(false);
+                      setShowGoogleAuth(false);
+                      setFullName('Test Student');
+                      setAvatarUrl(PRESET_AVATARS[1]);
+                      setShowModal(true);
+                    }, 1200);
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: '1px solid #e5e7eb', borderRadius: '8px', backgroundColor: '#f9fafb', cursor: 'pointer', transition: 'background-color 0.2s', textDecoration: 'none' }}
+                >
+                  <img src={PRESET_AVATARS[1]} style={{ width: '32px', height: '32px', borderRadius: '50%' }} alt="Student" />
+                  <div>
+                    <strong style={{ display: 'block', fontSize: '0.85rem', color: '#1f2937' }}>Test Student (طالب تجريبي)</strong>
+                    <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>student.test@gmail.com</span>
+                  </div>
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={() => setShowGoogleAuth(false)}
+                  style={{ padding: '0.65rem', border: 'none', borderRadius: '8px', backgroundColor: '#e5e7eb', color: '#374151', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', marginTop: '1rem', width: '100%' }}
+                >
+                  {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Simulated Facebook Authentication Authorization Modal */}
+      {showFacebookAuth && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.85)',
+          zIndex: 3000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(8px)',
+          direction: lang === 'ar' ? 'rtl' : 'ltr'
+        }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '400px', padding: '2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.5rem', backgroundColor: '#ffffff', color: '#1f2937' }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <svg style={{ width: '40px', height: '40px', fill: '#1877F2' }} viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#111827' }}>
+                {lang === 'ar' ? 'تفويض تطبيق EduAcademy' : 'Authorize EduAcademy App'}
+              </h3>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#6b7280', lineHeight: '1.5' }}>
+                {lang === 'ar' 
+                  ? 'يطلب تطبيق EduAcademy الحصول على إذن للوصول إلى اسمك وصورتك الشخصية والبريد الإلكتروني المسجل.' 
+                  : 'EduAcademy is requesting permission to access your profile name, picture, and email address.'}
+              </p>
+            </div>
+
+            {authLoading ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '1rem' }}>
+                <div className="loader" style={{ width: '30px', height: '30px', borderTopColor: '#1877F2' }}></div>
+                <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>{lang === 'ar' ? 'جاري الاتصال بـ Facebook...' : 'Connecting to Facebook...'}</span>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setAuthLoading(true);
+                    setTimeout(() => {
+                      setAuthLoading(false);
+                      setShowFacebookAuth(false);
+                      setFullName('Mohamed Rashed');
+                      setAvatarUrl(PRESET_AVATARS[0]);
+                      setShowModal(true);
+                    }, 1200);
+                  }}
+                  style={{ padding: '0.75rem', border: 'none', borderRadius: '8px', backgroundColor: '#1877F2', color: 'white', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', transition: 'background-color 0.2s', width: '100%' }}
+                >
+                  {lang === 'ar' ? 'متابعة باسم محمد راشد' : 'Continue as Mohamed Rashed'}
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={() => setShowFacebookAuth(false)}
+                  style={{ padding: '0.65rem', border: 'none', borderRadius: '8px', backgroundColor: '#e5e7eb', color: '#374151', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', marginTop: '0.25rem', width: '100%' }}
+                >
+                  {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
