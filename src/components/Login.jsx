@@ -195,7 +195,16 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (role === 'student') {
+      if (!/^\d{11}$/.test(studentPhone)) {
+        setErrorMessage(lang === 'ar' ? 'رقم هاتف الطالب يجب أن يتكون من 11 رقماً!' : 'Student phone number must be exactly 11 digits!');
+        return;
+      }
+      if (!/^\d{11}$/.test(parentPhone)) {
+        setErrorMessage(lang === 'ar' ? 'رقم هاتف ولي الأمر يجب أن يتكون من 11 رقماً!' : 'Parent phone number must be exactly 11 digits!');
+        return;
+      }
       if (studentStep === 1 && !inviteTeacherId) {
+        setErrorMessage('');
         setStudentStep(2);
         return;
       }
@@ -428,9 +437,12 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                           type="tel" 
                           className="form-control" 
                           placeholder="01xxxxxxxxx"
+                          placeholder="01xxxxxxxxx"
                           value={studentPhone}
-                          onChange={(e) => setStudentPhone(e.target.value)}
+                          onChange={(e) => setStudentPhone(e.target.value.replace(/\D/g, '').slice(0, 11))}
                           required={role === 'student'} 
+                          pattern="[0-9]{11}"
+                          title={lang === 'ar' ? 'رقم الهاتف يجب أن يتكون من 11 رقماً' : 'Phone number must be exactly 11 digits'}
                         />
                       </div>
 
@@ -445,8 +457,10 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                           className="form-control" 
                           placeholder={t.parentPhonePlaceholder}
                           value={parentPhone}
-                          onChange={(e) => setParentPhone(e.target.value)}
+                          onChange={(e) => setParentPhone(e.target.value.replace(/\D/g, '').slice(0, 11))}
                           required={role === 'student'} 
+                          pattern="[0-9]{11}"
+                          title={lang === 'ar' ? 'رقم الهاتف يجب أن يتكون من 11 رقماً' : 'Phone number must be exactly 11 digits'}
                         />
                       </div>
 
@@ -463,8 +477,10 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                           required
                           style={{ appearance: 'auto' }}
                         >
-                          <option value="sec">{lang === 'ar' ? 'ثانوي' : 'High School'}</option>
+                          <option value="primary">{lang === 'ar' ? 'ابتدائي' : 'Primary'}</option>
                           <option value="prep">{lang === 'ar' ? 'إعدادي' : 'Middle School / Prep'}</option>
+                          <option value="sec">{lang === 'ar' ? 'ثانوي / بكالوريا' : 'High School / Baccalaureate'}</option>
+                          <option value="univ">{lang === 'ar' ? 'جامعي' : 'University'}</option>
                         </select>
                       </div>
 
