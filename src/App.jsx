@@ -846,10 +846,10 @@ function App() {
                 <div style={{ gridColumn: 'span 12', padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
                   <AlertCircle size={48} style={{ margin: '0 auto 1rem auto', color: 'var(--text-muted)' }} />
                   <p style={{ fontSize: '1rem', fontWeight: 600 }}>
-                    {lang === 'ar' ? 'لا يوجد مدرسون مشتركون (مفعلون بالدفع) متاحون في الدليل العام حالياً.' : 'No subscribed (paid visibility) instructors are currently available.'}
+                    {lang === 'ar' ? 'لا يوجد مدرسون مشتركون في الظهور في الدليل العام حالياً.' : 'No subscribed instructors are currently available in the directory.'}
                   </p>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                    {lang === 'ar' ? 'يمكن لمدير المنصة تفعيل ظهور المدرسين من خلال لوحة التحكم.' : 'The system admin can approve teachers from the admin panel to display them here.'}
+                    {lang === 'ar' ? 'يمكن للمدرسين الاشتراك من خلال ترقية النظام' : 'Instructors can subscribe by upgrading the system.'}
                   </p>
                 </div>
               )}
