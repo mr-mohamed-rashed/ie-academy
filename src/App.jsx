@@ -19,12 +19,25 @@ function App() {
   const [theme, setTheme] = useState('dark'); // Default to dark
   
   // Simulated Google Authentication State
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null); // { role: 'student'|'instructor'|'admin', name, avatar, subject }
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('edu_is_logged_in') === 'true';
+  });
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('edu_current_user');
+    return saved ? JSON.parse(saved) : null;
+  });
 
-  const [userRole, setUserRole] = useState('landing'); // 'landing' | 'instructor' | 'student' | 'admin'
-  const [activeStudentId, setActiveStudentId] = useState(1);
-  const [activeInstructorId, setActiveInstructorId] = useState(null);
+  const [userRole, setUserRole] = useState(() => {
+    return localStorage.getItem('edu_user_role') || 'landing';
+  });
+  const [activeStudentId, setActiveStudentId] = useState(() => {
+    const saved = localStorage.getItem('edu_active_student_id');
+    return saved ? parseInt(saved, 10) : 1;
+  });
+  const [activeInstructorId, setActiveInstructorId] = useState(() => {
+    const saved = localStorage.getItem('edu_active_instructor_id');
+    return saved ? parseInt(saved, 10) : null;
+  });
 
   // System subscription fee for instructors (Persisted)
   const [systemFee, setSystemFee] = useState(() => {
@@ -103,6 +116,24 @@ function App() {
   useEffect(() => {
     localStorage.setItem('edu_pending_payments', JSON.stringify(pendingPayments));
   }, [pendingPayments]);
+
+  useEffect(() => {
+    localStorage.setItem('edu_is_logged_in', isLoggedIn);
+    localStorage.setItem('edu_user_role', userRole);
+    if (currentUser) {
+      localStorage.setItem('edu_current_user', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('edu_current_user');
+    }
+    if (activeStudentId) {
+      localStorage.setItem('edu_active_student_id', activeStudentId);
+    }
+    if (activeInstructorId) {
+      localStorage.setItem('edu_active_instructor_id', activeInstructorId);
+    } else {
+      localStorage.removeItem('edu_active_instructor_id');
+    }
+  }, [isLoggedIn, currentUser, userRole, activeStudentId, activeInstructorId]);
   
   // PWA BeforeInstallPrompt Listener
   useEffect(() => {

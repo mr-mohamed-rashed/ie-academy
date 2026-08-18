@@ -78,6 +78,17 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
     }
   }, []);
 
+  const handleAvatarFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Manage step-by-step back button navigation for student signup wizard
   useEffect(() => {
     if (studentStep === 2) {
@@ -420,7 +431,39 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                 />
               </div>
 
-
+              {/* Profile Avatar Field */}
+              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.5rem' }}>
+                  <User size={14} />
+                  <span>{lang === 'ar' ? 'صورة البروفايل الشخصية' : 'Profile Picture'}</span>
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid var(--border-glass)' }}>
+                  <img 
+                    src={avatarUrl} 
+                    alt="Preview" 
+                    style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} 
+                  />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: 1, textAlign: 'start' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      {lang === 'ar' ? 'اختر ملف من جهازك أو الصق رابط صورة:' : 'Upload from device or paste image link:'}
+                    </span>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleAvatarFileChange} 
+                      style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}
+                    />
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      placeholder="https://example.com/photo.jpg" 
+                      value={avatarUrl.startsWith('data:') ? '' : avatarUrl} 
+                      onChange={(e) => setAvatarUrl(e.target.value || PRESET_AVATARS[0])}
+                      style={{ fontSize: '0.8rem', padding: '0.35rem 0.65rem', marginTop: '0.25rem' }}
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* Subject Input: visible only if instructor is toggled */}
               {role === 'instructor' && (

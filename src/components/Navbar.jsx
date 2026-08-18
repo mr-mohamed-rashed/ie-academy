@@ -87,6 +87,17 @@ const Navbar = ({
     }
   }[lang];
 
+  const handleEditAvatarFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditAvatar(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Initialize form fields when opening modal
   const openModal = () => {
     setEditName(currentUser?.name || '');
@@ -319,14 +330,32 @@ const Navbar = ({
                     </div>
                   ))}
                 </div>
-                <div style={{ marginTop: '0.75rem' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t.avatarOrPaste}</span>
+                 <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <img 
+                      src={editAvatar} 
+                      alt="Preview" 
+                      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--accent-primary)' }} 
+                    />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem', flex: 1 }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                        {lang === 'ar' ? 'رفع صورة من جهازك:' : 'Upload from your device:'}
+                      </span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleEditAvatarFileChange} 
+                        style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}
+                      />
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.35rem' }}>{t.avatarOrPaste}</span>
                   <input 
-                    type="url" 
+                    type="text" 
                     className="form-control" 
-                    value={editAvatar}
+                    value={editAvatar.startsWith('data:') ? '' : editAvatar}
                     onChange={(e) => setEditAvatar(e.target.value)}
-                    style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem', marginTop: '0.25rem' }}
+                    style={{ fontSize: '0.8rem', padding: '0.5rem 0.75rem', marginTop: '0.15rem' }}
                   />
                 </div>
               </div>

@@ -458,70 +458,6 @@ const InstructorDashboard = ({
   return (
     <div className="dashboard-grid" style={{ animation: 'slide-in 0.3s ease-out' }}>
       
-      {/* Upgrade/Status Banner for Accounts */}
-      {instructor.isSubscribed ? (
-        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid var(--accent-green)', backgroundColor: 'rgba(16, 185, 129, 0.05)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '50px', height: '50px', backgroundColor: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-green)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <CheckCircle size={28} />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--accent-green)' }}>
-                  {lang === 'ar' ? 'حسابك مفعل على النظام المميز (VIP)' : 'Your account is active on VIP Premium'}
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
-                  {lang === 'ar' ? 'يظهر حسابك الآن للطلاب في صفحات البحث الرئيسية للمنصة ويستفيد من كامل الدعم الإعلاني.' : 'Your account is now visible to students on the main search pages and benefits from full ad support.'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : hasPendingRequest ? (
-        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid var(--color-gold)', backgroundColor: 'rgba(251, 191, 36, 0.05)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '50px', height: '50px', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: 'var(--color-gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Clock size={28} />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-gold)' }}>
-                  {lang === 'ar' ? 'طلب الترقية قيد المراجعة حالياً' : 'Upgrade Request Under Review'}
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
-                  {lang === 'ar' 
-                    ? 'لقد قمت برفع صورة التحويل بنجاح. يتم الآن مراجعة الطلب من قبل الإدارة لتفعيل حسابك كـ VIP في أسرع وقت.' 
-                    : 'You have uploaded the transfer screenshot successfully. The admin is currently reviewing your request to activate VIP status.'}
-                </p>
-              </div>
-            </div>
-            <span style={{ fontSize: '0.9rem', color: 'var(--color-gold)', fontWeight: 700, border: '1px solid var(--color-gold)', padding: '0.5rem 1rem', borderRadius: '8px' }}>
-              {lang === 'ar' ? 'قيد الانتظار' : 'Pending'}
-            </span>
-          </div>
-        </div>
-      ) : (
-        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid var(--accent-gold)', backgroundColor: 'rgba(251, 191, 36, 0.05)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '50px', height: '50px', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: 'var(--color-gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <DollarSign size={28} />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-gold)' }}>
-                  {lang === 'ar' ? 'أنت الآن على النظام المجاني (صلاحيات محدودة)' : 'You are on the Free Plan (Limited Access)'}
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
-                  {lang === 'ar' ? 'قم بالترقية للنظام المدفوع للظهور على المنصة الرئيسية للطلاب والاستفادة من ميزات إضافية.' : 'Upgrade to the paid plan to appear on the main platform to students and unlock premium features.'}
-                </p>
-              </div>
-            </div>
-            <button onClick={() => setShowPaymentModal(true)} className="btn-primary" style={{ padding: '0.75rem 1.5rem', backgroundColor: 'var(--color-gold)', color: '#000', fontWeight: 800 }}>
-              {lang === 'ar' ? 'ترقية الحساب الآن' : 'Upgrade Account Now'}
-            </button>
-          </div>
-        </div>
-      )}
       {/* Group selector and Referral Link header */}
       <div className="glass-card" style={{ gridColumn: 'span 12', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
@@ -993,6 +929,74 @@ const InstructorDashboard = ({
         </>
       )}
 
+
+      {/* Upgrade/Status Banner for Accounts (Moved to the bottom) */}
+      {instructor.isSubscribed ? (
+        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', border: '1px solid var(--accent-green)', backgroundColor: 'rgba(16, 185, 129, 0.05)', marginTop: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '40px', height: '40px', backgroundColor: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-green)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CheckCircle size={22} />
+              </div>
+              <div style={{ textAlign: 'start' }}>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--accent-green)', fontWeight: 700 }}>
+                  {lang === 'ar' 
+                    ? (instructor.subscriptionPlan === 'monthly' ? 'حسابك مفعل على النظام الشهري المميز VIP' : 'حسابك مفعل على النظام السنوي المميز VIP') 
+                    : (instructor.subscriptionPlan === 'monthly' ? 'Your account is active on VIP Monthly Premium' : 'Your account is active on VIP Academic Year Premium')
+                  }
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.15rem' }}>
+                  {lang === 'ar' ? 'يظهر حسابك الآن للطلاب في صفحات البحث الرئيسية للمنصة ويستفيد من كامل الدعم الإعلاني.' : 'Your account is now visible to students on the main search pages and benefits from full ad support.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : hasPendingRequest ? (
+        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', border: '1px solid var(--color-gold)', backgroundColor: 'rgba(251, 191, 36, 0.05)', marginTop: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '40px', height: '40px', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: 'var(--color-gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Clock size={22} />
+              </div>
+              <div style={{ textAlign: 'start' }}>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--color-gold)', fontWeight: 700 }}>
+                  {lang === 'ar' ? 'طلب الترقية قيد المراجعة حالياً' : 'Upgrade Request Under Review'}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.15rem' }}>
+                  {lang === 'ar' 
+                    ? 'لقد قمت برفع صورة التحويل بنجاح. يتم الآن مراجعة الطلب من قبل الإدارة لتفعيل حسابك كـ VIP في أسرع وقت.' 
+                    : 'You have uploaded the transfer screenshot successfully. The admin is currently reviewing your request to activate VIP status.'}
+                </p>
+              </div>
+            </div>
+            <span style={{ fontSize: '0.8rem', color: 'var(--color-gold)', fontWeight: 700, border: '1px solid var(--color-gold)', padding: '0.4rem 0.8rem', borderRadius: '8px' }}>
+              {lang === 'ar' ? 'قيد الانتظار' : 'Pending'}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', border: '1px solid var(--accent-gold)', backgroundColor: 'rgba(251, 191, 36, 0.05)', marginTop: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '40px', height: '40px', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: 'var(--color-gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <DollarSign size={22} />
+              </div>
+              <div style={{ textAlign: 'start' }}>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--color-gold)', fontWeight: 700 }}>
+                  {lang === 'ar' ? 'أنت الآن على النظام المجاني (صلاحيات محدودة)' : 'You are on the Free Plan (Limited Access)'}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.15rem' }}>
+                  {lang === 'ar' ? 'قم بالترقية للنظام المدفوع للظهور على المنصة الرئيسية للطلاب والاستفادة من ميزات إضافية.' : 'Upgrade to the paid plan to appear on the main platform to students and unlock premium features.'}
+                </p>
+              </div>
+            </div>
+            <button onClick={() => setShowPaymentModal(true)} className="btn-primary" style={{ padding: '0.6rem 1.2rem', backgroundColor: 'var(--color-gold)', color: '#000', fontWeight: 800, fontSize: '0.85rem' }}>
+              {lang === 'ar' ? 'ترقية الحساب الآن' : 'Upgrade Account Now'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Custom Scan Line Animation for QR Mockup */}
       <style>{`
