@@ -53,9 +53,10 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
   const [avatarUrl, setAvatarUrl] = useState(PRESET_AVATARS[0]);
   const [subject, setSubject] = useState('');
   const [year, setYear] = useState('');
+  const [selectedStages, setSelectedStages] = useState([]); // for instructor stages selection
   const [studentPhone, setStudentPhone] = useState('');
   const [parentPhone, setParentPhone] = useState('');
-  const [studentGradeType, setStudentGradeType] = useState('sec'); // 'sec' | 'prep'
+  const [studentGradeType, setStudentGradeType] = useState('sec'); // 'sec' | 'prep' | 'primary' | 'univ'
   const [studentStep, setStudentStep] = useState(1);
 
   // Email login states
@@ -213,13 +214,23 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
       }
     }
 
+    const yearString = role === 'instructor' 
+      ? selectedStages.map(s => {
+          if (s === 'primary') return lang === 'ar' ? 'ابتدائي' : 'Primary';
+          if (s === 'prep') return lang === 'ar' ? 'إعدادي' : 'Middle School';
+          if (s === 'sec') return lang === 'ar' ? 'ثانوي' : 'High School';
+          if (s === 'univ') return lang === 'ar' ? 'جامعي' : 'University';
+          return s;
+        }).join(', ')
+      : '';
+
     onLogin({
       name: fullName,
       role: role,
       avatar: avatarUrl,
       subject: role === 'instructor' ? subject : '',
-      yearAr: role === 'instructor' ? year : undefined,
-      yearEn: role === 'instructor' ? year : undefined,
+      yearAr: role === 'instructor' ? (yearString || year) : undefined,
+      yearEn: role === 'instructor' ? (yearString || year) : undefined,
       studentPhone: role === 'student' ? studentPhone : undefined,
       parentPhone: role === 'student' ? parentPhone : undefined,
       studentGradeType: role === 'student' ? studentGradeType : undefined,
@@ -405,18 +416,37 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                     />
                   </div>
                   <div className="form-group" style={{ animation: 'slide-in 0.2s ease-out' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.5rem' }}>
                       <Briefcase size={14} />
-                      <span>{t.yearLabel}</span>
+                      <span>{lang === 'ar' ? 'المراحل الدراسية التي تدرسها' : 'Stages You Teach'}</span>
                     </label>
-                    <input 
-                      type="text" 
-                      className="form-control" 
-                      placeholder={t.yearPlaceholder}
-                      value={year}
-                      onChange={(e) => setYear(e.target.value)}
-                      required={role === 'instructor'} 
-                    />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', padding: '0.25rem' }}>
+                      {[
+                        { value: 'primary', labelAr: 'ابتدائي', labelEn: 'Primary' },
+                        { value: 'prep', labelAr: 'إعدادي', labelEn: 'Middle School' },
+                        { value: 'sec', labelAr: 'ثانوي / بكالوريا', labelEn: 'High School' },
+                        { value: 'univ', labelAr: 'جامعي', labelEn: 'University' }
+                      ].map(stage => {
+                        const isChecked = selectedStages.includes(stage.value);
+                        return (
+                          <label key={stage.value} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
+                            <input 
+                              type="checkbox" 
+                              checked={isChecked}
+                              style={{ accentColor: 'var(--accent-primary)' }}
+                              onChange={() => {
+                                setSelectedStages(prev => 
+                                  prev.includes(stage.value)
+                                    ? prev.filter(x => x !== stage.value)
+                                    : [...prev, stage.value]
+                                );
+                              }}
+                            />
+                            <span>{lang === 'ar' ? stage.labelAr : stage.labelEn}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
                   </div>
                 </>
               )}
@@ -529,44 +559,65 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                       
                       {/* Teacher Cards Grid */}
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1.5rem', maxHeight: '240px', overflowY: 'auto', padding: '0.25rem' }}>
-                        {instructors.filter(i => {
-                          if (!i.isSubscribed) return false;
-                          const hasPrep = i.yearAr?.includes('إعدادي') || i.yearAr?.includes('اعدادي') || i.yearEn?.toLowerCase().includes('middle') || i.yearEn?.toLowerCase().includes('prep');
-                          const hasSec = i.yearAr?.includes('ثانوي') || i.yearEn?.toLowerCase().includes('high') || i.yearEn?.toLowerCase().includes('sec') || i.yearEn?.toLowerCase().includes('secondary');
-                          
-                          if (studentGradeType === 'prep') return hasPrep;
-                          if (studentGradeType === 'sec') return hasSec;
-                          return true;
-                        }).map(inst => {
-                          const isSelected = selectedInstructor === inst.id.toString();
-                          return (
-                            <div 
-                              key={inst.id}
-                              onClick={() => { setSelectedInstructor(inst.id.toString()); setSelectedGrade(''); setSelectedGroup(''); }}
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                padding: '1rem',
-                                borderRadius: '12px',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                border: isSelected ? '2px solid var(--accent-primary)' : '1px solid var(--border-glass)',
-                                backgroundColor: isSelected ? 'rgba(99, 102, 241, 0.1)' : 'var(--bg-glass)',
-                                boxShadow: isSelected ? '0 4px 12px rgba(99, 102, 241, 0.2)' : 'none',
-                                transform: isSelected ? 'scale(1.03)' : 'none'
-                              }}
-                            >
-                              <img 
-                                src={inst.avatar} 
-                                alt={inst.nameAr} 
-                                style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', marginBottom: '0.75rem', border: '2px solid var(--border-glass)' }}
-                              />
-                              <h5 style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', fontWeight: 800 }}>{lang === 'ar' ? inst.nameAr : inst.nameEn}</h5>
-                              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{lang === 'ar' ? inst.subjectAr : inst.subjectEn}</span>
-                            </div>
-                          );
-                        })}
+                        {(() => {
+                          const filtered = instructors.filter(i => {
+                            if (!i.isSubscribed) return false;
+                            const hasPrimary = i.yearAr?.includes('ابتدائي') || i.yearAr?.includes('ابتدائى') || i.yearEn?.toLowerCase().includes('primary') || i.yearEn?.toLowerCase().includes('elem');
+                            const hasPrep = i.yearAr?.includes('إعدادي') || i.yearAr?.includes('اعدادي') || i.yearEn?.toLowerCase().includes('middle') || i.yearEn?.toLowerCase().includes('prep');
+                            const hasSec = i.yearAr?.includes('ثانوي') || i.yearAr?.includes('بكالوريا') || i.yearEn?.toLowerCase().includes('high') || i.yearEn?.toLowerCase().includes('sec') || i.yearEn?.toLowerCase().includes('secondary') || i.yearEn?.toLowerCase().includes('bac');
+                            const hasUniv = i.yearAr?.includes('جامعي') || i.yearAr?.includes('جامعى') || i.yearEn?.toLowerCase().includes('university') || i.yearEn?.toLowerCase().includes('univ');
+
+                            if (studentGradeType === 'primary') return hasPrimary;
+                            if (studentGradeType === 'prep') return hasPrep;
+                            if (studentGradeType === 'sec') return hasSec;
+                            if (studentGradeType === 'univ') return hasUniv;
+                            return true;
+                          });
+
+                          if (filtered.length === 0) {
+                            return (
+                              <div style={{ gridColumn: 'span 12', textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                                <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700 }}>
+                                  {lang === 'ar' ? 'لا يوجد مدرسين مشتركين في الدليل العام حالياً.' : 'No subscribed instructors are currently available in the public directory.'}
+                                </p>
+                                <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                  {lang === 'ar' ? 'يمكن للمدرسين الاشتراك من خلال ترقية النظام.' : 'Instructors can register by upgrading the system.'}
+                                </p>
+                              </div>
+                            );
+                          }
+
+                          return filtered.map(inst => {
+                            const isSelected = selectedInstructor === inst.id.toString();
+                            return (
+                              <div 
+                                key={inst.id}
+                                onClick={() => { setSelectedInstructor(inst.id.toString()); setSelectedGrade(''); setSelectedGroup(''); }}
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  padding: '1rem',
+                                  borderRadius: '12px',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease',
+                                  border: isSelected ? '2px solid var(--accent-primary)' : '1px solid var(--border-glass)',
+                                  backgroundColor: isSelected ? 'rgba(99, 102, 241, 0.1)' : 'var(--bg-glass)',
+                                  boxShadow: isSelected ? '0 4px 12px rgba(99, 102, 241, 0.2)' : 'none',
+                                  transform: isSelected ? 'scale(1.03)' : 'none'
+                                }}
+                              >
+                                <img 
+                                  src={inst.avatar} 
+                                  alt={inst.nameAr} 
+                                  style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', marginBottom: '0.75rem', border: '2px solid var(--border-glass)' }}
+                                />
+                                <h5 style={{ margin: '0 0 0.25rem 0', fontSize: '0.85rem', fontWeight: 800 }}>{lang === 'ar' ? inst.nameAr : inst.nameEn}</h5>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{lang === 'ar' ? inst.subjectAr : inst.subjectEn}</span>
+                              </div>
+                            );
+                          });
+                        })()}
                       </div>
 
                       {selectedInstructor && (
