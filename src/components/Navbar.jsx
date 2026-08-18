@@ -38,6 +38,20 @@ const Navbar = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [imgDims, setImgDims] = useState({ width: 200, height: 200 });
+
+  const handleImageLoad = (e) => {
+    const { naturalWidth, naturalHeight } = e.target;
+    const aspect = naturalWidth / naturalHeight;
+    let w = 200;
+    let h = 200;
+    if (aspect > 1) {
+      w = 200 * aspect;
+    } else {
+      h = 200 / aspect;
+    }
+    setImgDims({ width: w, height: h });
+  };
 
   const t = {
     en: {
@@ -583,15 +597,15 @@ const Navbar = ({
                 src={rawImage} 
                 alt="Raw Crop" 
                 draggable="false"
+                onLoad={handleImageLoad}
                 style={{
                   position: 'absolute',
                   top: '50%',
                   left: '50%',
                   transform: `translate(-50%, -50%) translate(${position.x}px, ${position.y}px) scale(${zoom})`,
                   transformOrigin: 'center center',
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
+                  width: `${imgDims.width}px`,
+                  height: `${imgDims.height}px`,
                   pointerEvents: 'none'
                 }}
               />
