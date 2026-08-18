@@ -212,6 +212,30 @@ function App() {
     );
   };
 
+  // Manage browser history back button for login modal
+  useEffect(() => {
+    if (showLoginModal) {
+      if (window.history.state?.modal !== 'login') {
+        window.history.pushState({ modal: 'login' }, '');
+      }
+    } else {
+      if (window.history.state?.modal === 'login') {
+        window.history.back();
+      }
+    }
+
+    const handlePopState = (event) => {
+      if (showLoginModal) {
+        setShowLoginModal(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [showLoginModal]);
+
   // Apply language (dir) and theme (data-theme) to document elements
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);

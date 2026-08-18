@@ -78,6 +78,30 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
     }
   }, []);
 
+  // Manage step-by-step back button navigation for student signup wizard
+  useEffect(() => {
+    if (studentStep === 2) {
+      if (window.history.state?.step !== 2) {
+        window.history.pushState({ modal: 'login', step: 2 }, '');
+      }
+    } else {
+      if (window.history.state?.step === 2) {
+        window.history.back();
+      }
+    }
+
+    const handlePopState = (event) => {
+      if (studentStep === 2) {
+        setStudentStep(1);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [studentStep]);
+
   const t = {
     en: {
       headline: "Welcome to EduAcademy Portal",
