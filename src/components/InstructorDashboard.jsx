@@ -4,6 +4,11 @@ import { calculateGPA, calculateAttendanceRate } from '../mockData';
 import StudentAnalyticsModal from './StudentAnalyticsModal';
 import Podium from './Podium';
 
+/**
+ * InstructorDashboard component.
+ * Serves as the primary panel for subscribed educators, permitting student list management,
+ * grades input, session posting, classroom stats, and referral/invite tracking via code and QR.
+ */
 const InstructorDashboard = ({ 
   instructor, 
   students, 
@@ -335,6 +340,7 @@ const InstructorDashboard = ({
       setIsPaying(false);
       setPaymentSuccess(true);
       setHasSkippedPlan(true);
+      setShowPaymentModal(false); // Close the modal
       
       if (onSubmitPaymentRequest) {
         onSubmitPaymentRequest({
@@ -346,6 +352,7 @@ const InstructorDashboard = ({
         });
       }
       
+      setScreenshot(null); // Clear screenshot for next use
       triggerToast(lang === 'ar' ? 'تم إرسال لقطة شاشة التحويل للإدارة بنجاح!' : 'Transfer screenshot submitted to administration successfully!', 'success');
     }, 1000);
   };

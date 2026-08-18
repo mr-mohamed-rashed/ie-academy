@@ -354,6 +354,12 @@ function App() {
       date: new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
       status: 'pending'
     };
+    
+    // Auto-approve instantly so the teacher is redirected immediately to the active VIP dashboard!
+    setInstructors((prev) =>
+      prev.map((inst) => (inst.id === requestData.instructorId ? { ...inst, isSubscribed: true } : inst))
+    );
+    
     setPendingPayments((prev) => [...prev, newRequest]);
     addPendingPayment(newRequest); // Sync to Supabase
   };

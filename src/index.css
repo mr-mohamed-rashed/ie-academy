@@ -74,6 +74,11 @@
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease;
 }
 
+html, body, #root {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
 body {
   background-color: var(--bg-app);
   background-image: var(--bg-image);
