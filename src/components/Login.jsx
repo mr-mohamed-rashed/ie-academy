@@ -25,6 +25,25 @@ const Login = ({ onLogin, lang, instructors = [], initialRole }) => {
   const [year, setYear] = useState('');
   const [parentPhone, setParentPhone] = useState('');
 
+  // Email login states
+  const [loginTab, setLoginTab] = useState('quick'); // 'quick' | 'email'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Load saved credentials on mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('edu_saved_email');
+    const savedPassword = localStorage.getItem('edu_saved_password');
+    if (savedEmail && savedPassword) {
+      setEmail(savedEmail);
+      setPassword(savedPassword);
+      setRememberMe(true);
+      setLoginTab('email');
+    }
+  }, []);
+
   const t = {
     en: {
       headline: "Welcome to EduAcademy Portal",
@@ -54,6 +73,12 @@ const Login = ({ onLogin, lang, instructors = [], initialRole }) => {
       invitedBy: "Invited by Teacher",
       submitBtn: "Create Profile & Login",
       cancelBtn: "Cancel",
+      tabQuick: "Quick Access",
+      tabEmail: "Email Login",
+      emailLabel: "Email Address",
+      passwordLabel: "Password",
+      rememberMeLabel: "Remember Me",
+      loginBtn: "Sign In",
     },
     ar: {
       headline: "مرحباً بكم في أكاديمية التعليم",
@@ -83,12 +108,55 @@ const Login = ({ onLogin, lang, instructors = [], initialRole }) => {
       invitedBy: "دعوة انضمام من المعلم",
       submitBtn: "حفظ الملف ودخول المنصة",
       cancelBtn: "إلغاء",
+      tabQuick: "الدخول السريع",
+      tabEmail: "تسجيل الدخول بالبريد",
+      emailLabel: "البريد الإلكتروني",
+      passwordLabel: "كلمة المرور",
+      rememberMeLabel: "تذكر بياناتي",
+      loginBtn: "تسجيل الدخول",
     }
   }[lang];
 
   const handleGoogleClick = () => {
     // Simulates the auth popup by showing profile completion modal
     setShowModal(true);
+  };
+
+  const handleEmailLoginSubmit = (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+    
+    // Check Super Admin Credentials
+    if (email === 'rishobeh@gmail.com' && password === 'Ri$ho123m@n') {
+      if (rememberMe) {
+        localStorage.setItem('edu_saved_email', email);
+        localStorage.setItem('edu_saved_password', password);
+      } else {
+        localStorage.removeItem('edu_saved_email');
+        localStorage.removeItem('edu_saved_password');
+      }
+      onLogin({
+        name: lang === 'ar' ? 'أ/ ريشو' : 'Super Admin',
+        role: 'admin',
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120'
+      });
+      return;
+    }
+    
+    // Simulators for demo logins
+    if (email === 'teacher@ie.com' && password === '123') {
+      onLogin({
+        name: lang === 'ar' ? 'أ/ محمد راشد' : 'Mr. Mohamed Rashed',
+        role: 'instructor',
+        avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=120',
+        subject: lang === 'ar' ? 'الرياضيات' : 'Mathematics',
+        yearAr: 'ثانوي',
+        yearEn: 'High School'
+      });
+      return;
+    }
+    
+    setErrorMessage(lang === 'ar' ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة!' : 'Invalid email or password!');
   };
 
   const handleSubmit = (e) => {
@@ -124,26 +192,90 @@ const Login = ({ onLogin, lang, instructors = [], initialRole }) => {
         </div>
 
         <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.75rem' }}>{t.headline}</h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2.5rem' }}>{t.tagline}</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem' }}>{t.tagline}</p>
 
-        {/* Google Sign In Button */}
-        <button onClick={handleGoogleClick} className="google-btn" style={{ marginBottom: '1rem' }}>
-          <svg className="google-icon-svg" viewBox="0 0 24 24">
-            <path fill="#ea4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2A11.95 11.95 0 0 0 12 0 11.94 11.94 0 0 0 1.29 6.29l3.73 2.9A7.12 7.12 0 0 1 12 5.04z"/>
-            <path fill="#4285f4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46a5.53 5.53 0 0 1-2.4 3.63l3.73 2.9a11.92 11.92 0 0 0 3.7-8.68z"/>
-            <path fill="#fbbc05" d="M5.02 8.78A7.13 7.13 0 0 1 12 5.04a7.12 7.12 0 0 1 6.98 3.74l3.73-2.9A11.94 11.94 0 0 0 12 0C7.8 0 4.19 2.05 2.02 5.24l3.73 2.9.27.64z"/>
-            <path fill="#34a853" d="M12 18.96c-1.92 0-3.63-.64-4.98-1.74l-3.73 2.9C5.46 21.95 8.54 24 12 24c4.14 0 7.73-1.4 10.3-3.8l-3.73-2.9a7.12 7.12 0 0 1-6.57 1.66z"/>
-          </svg>
-          <span>{t.googleBtn}</span>
-        </button>
+        {/* Tab Selector */}
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--border-glass)', marginBottom: '2rem' }}>
+          <button 
+            onClick={() => setLoginTab('quick')}
+            style={{ flex: 1, padding: '0.75rem', background: 'transparent', border: 'none', borderBottom: loginTab === 'quick' ? '2px solid var(--accent-primary)' : 'none', color: loginTab === 'quick' ? 'var(--text-primary)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
+          >
+            {t.tabQuick}
+          </button>
+          <button 
+            onClick={() => setLoginTab('email')}
+            style={{ flex: 1, padding: '0.75rem', background: 'transparent', border: 'none', borderBottom: loginTab === 'email' ? '2px solid var(--accent-primary)' : 'none', color: loginTab === 'email' ? 'var(--text-primary)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
+          >
+            {t.tabEmail}
+          </button>
+        </div>
 
-        {/* Facebook Sign In Button */}
-        <button onClick={handleGoogleClick} className="google-btn" style={{ backgroundColor: '#1877F2', color: 'white', borderColor: '#1877F2' }}>
-          <svg className="google-icon-svg" viewBox="0 0 24 24" style={{ fill: 'white' }}>
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-          <span style={{ color: 'white' }}>{t.facebookBtn}</span>
-        </button>
+        {loginTab === 'quick' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Google Sign In Button */}
+            <button onClick={handleGoogleClick} className="google-btn">
+              <svg className="google-icon-svg" viewBox="0 0 24 24">
+                <path fill="#ea4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2A11.95 11.95 0 0 0 12 0 11.94 11.94 0 0 0 1.29 6.29l3.73 2.9A7.12 7.12 0 0 1 12 5.04z"/>
+                <path fill="#4285f4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46a5.53 5.53 0 0 1-2.4 3.63l3.73 2.9a11.92 11.92 0 0 0 3.7-8.68z"/>
+                <path fill="#fbbc05" d="M5.02 8.78A7.13 7.13 0 0 1 12 5.04a7.12 7.12 0 0 1 6.98 3.74l3.73-2.9A11.94 11.94 0 0 0 12 0C7.8 0 4.19 2.05 2.02 5.24l3.73 2.9.27.64z"/>
+                <path fill="#34a853" d="M12 18.96c-1.92 0-3.63-.64-4.98-1.74l-3.73 2.9C5.46 21.95 8.54 24 12 24c4.14 0 7.73-1.4 10.3-3.8l-3.73-2.9a7.12 7.12 0 0 1-6.57 1.66z"/>
+              </svg>
+              <span>{t.googleBtn}</span>
+            </button>
+
+            {/* Facebook Sign In Button */}
+            <button onClick={handleGoogleClick} className="google-btn" style={{ backgroundColor: '#1877F2', color: 'white', borderColor: '#1877F2' }}>
+              <svg className="google-icon-svg" viewBox="0 0 24 24" style={{ fill: 'white' }}>
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              <span style={{ color: 'white' }}>{t.facebookBtn}</span>
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleEmailLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', textAlign: 'start' }}>
+            {errorMessage && (
+              <div style={{ padding: '0.75rem', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.15)', color: 'var(--accent-red)', fontSize: '0.85rem', fontWeight: 600, border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                {errorMessage}
+              </div>
+            )}
+            <div className="form-group" style={{ margin: 0 }}>
+              <label>{t.emailLabel}</label>
+              <input 
+                type="email" 
+                required 
+                className="form-control" 
+                placeholder="example@mail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="form-group" style={{ margin: 0 }}>
+              <label>{t.passwordLabel}</label>
+              <input 
+                type="password" 
+                required 
+                className="form-control" 
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+              <input 
+                type="checkbox" 
+                checked={rememberMe} 
+                onChange={(e) => setRememberMe(e.target.checked)} 
+                style={{ accentColor: 'var(--accent-primary)' }}
+              />
+              <span>{t.rememberMeLabel}</span>
+            </label>
+
+            <button type="submit" className="btn-primary" style={{ marginTop: '0.5rem' }}>
+              {t.loginBtn}
+            </button>
+          </form>
+        )}
       </div>
 
       {/* Profile Completion Modal Overlay */}
