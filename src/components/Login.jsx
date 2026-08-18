@@ -55,6 +55,7 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
   const [year, setYear] = useState('');
   const [studentPhone, setStudentPhone] = useState('');
   const [parentPhone, setParentPhone] = useState('');
+  const [studentGradeType, setStudentGradeType] = useState('sec'); // 'sec' | 'prep'
   const [studentStep, setStudentStep] = useState(1);
 
   // Email login states
@@ -212,6 +213,7 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
       yearEn: role === 'instructor' ? year : undefined,
       studentPhone: role === 'student' ? studentPhone : undefined,
       parentPhone: role === 'student' ? parentPhone : undefined,
+      studentGradeType: role === 'student' ? studentGradeType : undefined,
       instructorId: role === 'student' ? Number(selectedInstructor) : undefined,
       gradeId: role === 'student' ? selectedGrade : undefined,
       groupId: role === 'student' ? selectedGroup : undefined
@@ -448,6 +450,24 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                         />
                       </div>
 
+                      {/* Grade Level Stage Selector */}
+                      <div className="form-group">
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <Briefcase size={14} />
+                          <span>{lang === 'ar' ? 'المرحلة الدراسية للطالب' : 'Student Grade Level Stage'}</span>
+                        </label>
+                        <select 
+                          className="form-control" 
+                          value={studentGradeType} 
+                          onChange={(e) => setStudentGradeType(e.target.value)}
+                          required
+                          style={{ appearance: 'auto' }}
+                        >
+                          <option value="sec">{lang === 'ar' ? 'ثانوي' : 'High School'}</option>
+                          <option value="prep">{lang === 'ar' ? 'إعدادي' : 'Middle School / Prep'}</option>
+                        </select>
+                      </div>
+
                       {/* Invitation Code Input */}
                       <div className="form-group">
                         <label>{lang === 'ar' ? 'كود الدعوة الخاص بالمعلم (اختياري)' : 'Teacher Invitation Code (Optional)'}</label>
@@ -493,7 +513,15 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                       
                       {/* Teacher Cards Grid */}
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1.5rem', maxHeight: '240px', overflowY: 'auto', padding: '0.25rem' }}>
-                        {instructors.filter(i => i.isSubscribed).map(inst => {
+                        {instructors.filter(i => {
+                          if (!i.isSubscribed) return false;
+                          const hasPrep = i.yearAr?.includes('إعدادي') || i.yearAr?.includes('اعدادي') || i.yearEn?.toLowerCase().includes('middle') || i.yearEn?.toLowerCase().includes('prep');
+                          const hasSec = i.yearAr?.includes('ثانوي') || i.yearEn?.toLowerCase().includes('high') || i.yearEn?.toLowerCase().includes('sec') || i.yearEn?.toLowerCase().includes('secondary');
+                          
+                          if (studentGradeType === 'prep') return hasPrep;
+                          if (studentGradeType === 'sec') return hasSec;
+                          return true;
+                        }).map(inst => {
                           const isSelected = selectedInstructor === inst.id.toString();
                           return (
                             <div 
