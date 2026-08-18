@@ -125,7 +125,7 @@ function App() {
 
   // Lock background scroll when modal overlays are active
   useEffect(() => {
-    if (showLoginModal || showPaymentModal) {
+    if (showLoginModal) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -133,7 +133,7 @@ function App() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [showLoginModal, showPaymentModal]);
+  }, [showLoginModal]);
 
   useEffect(() => {
     localStorage.setItem('edu_is_logged_in', isLoggedIn);

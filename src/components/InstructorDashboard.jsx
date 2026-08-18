@@ -76,6 +76,18 @@ const InstructorDashboard = ({
   const [screenshot, setScreenshot] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
+  // Prevent background scrolling when payment modal is open
+  React.useEffect(() => {
+    if (showPaymentModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showPaymentModal]);
+
   // Add Group State
   const [showAddGroup, setShowAddGroup] = useState(false);
   const [showEditGroup, setShowEditGroup] = useState(false);
