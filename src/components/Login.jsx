@@ -646,7 +646,6 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                           type="tel" 
                           className="form-control" 
                           placeholder="01xxxxxxxxx"
-                          placeholder="01xxxxxxxxx"
                           value={studentPhone}
                           onChange={(e) => setStudentPhone(e.target.value.replace(/\D/g, '').slice(0, 11))}
                           required={role === 'student'} 
