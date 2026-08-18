@@ -1135,7 +1135,7 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                   transformOrigin: 'center center',
                   width: '100%',
                   height: '100%',
-                  objectFit: 'contain',
+                  objectFit: 'cover',
                   pointerEvents: 'none'
                 }}
               />
