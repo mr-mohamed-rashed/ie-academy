@@ -58,7 +58,7 @@ const Navbar = ({
 
   const t = {
     en: {
-      logo: "EduAcademy",
+      logo: "I E ACADEMY",
       role: "Current Role",
       visitor: "Homepage (Visitor)",
       instructor: "Instructor View",
@@ -84,7 +84,7 @@ const Navbar = ({
       videoLabel: "Introductory Video Link (YouTube/Direct)"
     },
     ar: {
-      logo: "أكاديمية التعليم",
+      logo: "I E ACADEMY",
       role: "الدور الحالي",
       visitor: "الرئيسية (زائر)",
       instructor: "بوابة المعلم",
