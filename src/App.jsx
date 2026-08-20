@@ -8,7 +8,7 @@ import AdminDashboard from './components/AdminDashboard';
 import TeacherProfileModal from './components/TeacherProfileModal';
 import TeacherDetailsModal from './components/TeacherDetailsModal';
 import { initialStudents, initialSessions, initialInstructors } from './mockData';
-import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info, Play, X, Pencil, Ruler, Lightbulb } from 'lucide-react';
+import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info, Play, X, Pencil, Ruler, Lightbulb, QrCode, MessageSquare, TrendingUp, BarChart3, Link, Activity, FileText, Users } from 'lucide-react';
 import { 
   getInstructors, getStudents, getSessions, getPendingPayments, 
   saveInstructor, saveStudent, saveSession, addPendingPayment, deletePendingPayment 
@@ -925,41 +925,141 @@ function App() {
           </div>
 
           {visitorTab === 'guide' && (
-            <div className="guide-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+            <div className="guide-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem', width: '100%' }}>
               
-              {/* Student Guide Card */}
-              <div className="glass-card guide-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', borderTop: '4px solid var(--accent-purple)' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '14px', backgroundColor: 'rgba(139, 92, 246, 0.15)', color: 'var(--accent-purple)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <GraduationCap size={28} />
+              {/* Column 1: Student & Parent Gate (3 Cards) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                  <GraduationCap size={28} color="var(--accent-purple)" />
+                  <h3 style={{ fontSize: '1.35rem', fontWeight: 850, margin: 0 }}>
+                    {lang === 'ar' ? 'بوابة حساب الطلاب وأولياء الأمور' : 'Student & Parent Portal'}
+                  </h3>
                 </div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{lang === 'ar' ? 'بوابة حساب الطلاب' : 'For Student Accounts'}</h3>
-                <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.9rem', lineHeight: '1.8' }}>
-                  <li>{lang === 'ar' ? 'تلقي دعوة المدرسين للانضمام المباشر للمجموعات الدراسية وبدء رحلة التعلم.' : 'Receive direct classroom group registration invitations.'}</li>
-                  <li>{lang === 'ar' ? 'مسح كود الـ QR الخاص بالحصة في القاعة لتسجيل الحضور، مع إشعار ولي الأمر تلقائياً عبر الواتساب.' : 'Scan QR to record attendance with automated WhatsApp notifications to parents.'}</li>
-                  <li>{lang === 'ar' ? 'توفر شروحات الفيديو التفاعلية والمراجعات المستمرة دائماً في حسابك للرجوع إليها وقتما تشاء لضمان فهمك الكامل.' : 'Constant access to interactive video tutorials and revision materials anytime you need them.'}</li>
-                  <li>{lang === 'ar' ? 'مساعد ذكي متوفر على مدار الساعة للإجابة على أسئلتك بأسلوب معلمك الخاص بناءً على ملخصات الدروس.' : '24/7 AI assistant to answer your questions in your teacher\'s exact style based on lesson summaries.'}</li>
-                  <li>{lang === 'ar' ? 'أداء الكويزات والاختبارات والحصول على التصحيح الفوري الدقيق بالذكاء الاصطناعي لمعرفة أخطائك فوراً.' : 'Take quizzes with instant, precise AI grading to know your mistakes immediately.'}</li>
-                  <li>{lang === 'ar' ? 'استلام درجات الواجبات والاختبارات ومشاهدة منحنى التطور الشخصي وتقارير الأداء التفصيلية.' : 'Receive assignment scores and monitor your dynamic personal progress and performance reports.'}</li>
-                  <li>{lang === 'ar' ? 'استعراض لوحة شرف المادة (Podium) لأوائل المتفوقين والمنافسة بقوة لتصدر الترتيب.' : 'View honors podiums recognizing top classmates and compete for the top rank.'}</li>
-                </ul>
+
+                {/* Card 1: Registration & Search */}
+                <div className="glass-card" style={{ 
+                  padding: '1.5rem', 
+                  borderRadius: '20px', 
+                  border: '1px solid rgba(139, 92, 246, 0.3)', 
+                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.04) 0%, rgba(99, 102, 241, 0.08) 100%)',
+                  boxShadow: '0 4px 20px rgba(139, 92, 246, 0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1rem',
+                  textAlign: 'start'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'rgba(139, 92, 246, 0.15)', color: 'var(--accent-purple)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Link size={20} />
+                    </div>
+                    <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-purple)' }}>
+                      {lang === 'ar' ? '1. التسجيل والبحث عن المدرسين' : '1. Registration & Search'}
+                    </h4>
+                  </div>
+                  <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <li>{lang === 'ar' ? 'التسجيل الفوري والمباشر عن طريق الرابط الخاص بالمدرس (Invitation Link).' : 'Register instantly via the instructor\'s invitation link.'}</li>
+                    <li>{lang === 'ar' ? 'التسجيل السريع بمسح كود الـ QR الخاص بالمدرس أو إدخال كود الدعوة (Invitation Code) المرسل منه.' : 'Scan QR code or enter the teacher\'s specific invitation code to join.'}</li>
+                    <li>{lang === 'ar' ? 'البحث الذكي عن المدرسين المتميزين واختيار الدروس (أونلاين أو أوفلاين بالسنتر) مع المتابعة المستمرة لمجموعاتهم.' : 'Search top teachers, choose online/offline center lessons and follow their groups.'}</li>
+                  </ul>
+                </div>
+
+                {/* Card 2: Student Learning & Benefits */}
+                <div className="glass-card" style={{ 
+                  padding: '1.5rem', 
+                  borderRadius: '20px', 
+                  border: '1px solid rgba(16, 185, 129, 0.3)', 
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(20, 184, 166, 0.08) 100%)',
+                  boxShadow: '0 4px 20px rgba(16, 185, 129, 0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1rem',
+                  textAlign: 'start'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-green)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Activity size={20} />
+                    </div>
+                    <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-green)' }}>
+                      {lang === 'ar' ? '2. رحلتك التعليمية واستفادتك من المنصة' : '2. Student Learning & Benefits'}
+                    </h4>
+                  </div>
+                  <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <li>{lang === 'ar' ? 'مكتبة دروس مسجلة متكاملة في حسابك للرجوع للشروحات والمراجعات في أي وقت لضمان فهمك.' : 'Access a library of recorded sessions and revisions anytime to guarantee full comprehension.'}</li>
+                    <li>{lang === 'ar' ? 'أداء الكويزات القصيرة (Mini Quizzes) بعد الحصص والواجبات المنزلية مع تصحيح ذكي فوري.' : 'Take quick mini-quizzes after lessons and assignments with instant smart grading.'}</li>
+                    <li>{lang === 'ar' ? 'لوحة تحكم تفصيلية تسجل جميع درجات الاختبارات، ونسب الحضور، ودرجات التاسكات والواجبات بدقة.' : 'Detailed report dashboard recording quiz scores, attendance logs, and task completions.'}</li>
+                    <li>{lang === 'ar' ? 'الوصول المباشر، التحدث، والتفاعل الفوري مع المدرس لمناقشة الأسئلة الصعبة بكل سهولة.' : 'Direct chat and instant interaction with the teacher to discuss complex topics.'}</li>
+                  </ul>
+                </div>
+
+                {/* Card 3: Parent Tracking & Reports */}
+                <div className="glass-card" style={{ 
+                  padding: '1.5rem', 
+                  borderRadius: '20px', 
+                  border: '1px solid rgba(245, 158, 11, 0.3)', 
+                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.04) 0%, rgba(251, 146, 60, 0.08) 100%)',
+                  boxShadow: '0 4px 20px rgba(245, 158, 11, 0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1rem',
+                  textAlign: 'start'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <TrendingUp size={20} />
+                    </div>
+                    <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-gold)' }}>
+                      {lang === 'ar' ? '3. بوابة ولي الأمر والمتابعة الذكية' : '3. Parent Tracking & Reports'}
+                    </h4>
+                  </div>
+                  <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <li>{lang === 'ar' ? 'إرسال تقارير دورية وفورية مباشرة لولي الأمر توضح سلوك الطالب ومدى التزامه بالحضور.' : 'Receive periodic and instant reports detailing student behavior and attendance.'}</li>
+                    <li>{lang === 'ar' ? 'رسوم بيانية توضح مؤشرات تطور مستوى الطالب الدراسي أو تراجعه مع تحليلات ذكية للمستوى.' : 'Progress graphs plotting the student\'s development metrics or regressions with smart analytical logs.'}</li>
+                    <li>{lang === 'ar' ? 'إشعارات تلقائية عبر الواتساب فور رصد الغياب أو تسجيل درجات كويز جديد لإبقاء ولي الأمر في الصورة.' : 'Automated WhatsApp alerts for absences or graded homework, keeping parents constantly involved.'}</li>
+                  </ul>
+                </div>
               </div>
 
-              {/* Teacher Guide Card */}
-              <div className="glass-card guide-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', borderTop: '4px solid var(--accent-primary)' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '14px', backgroundColor: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <BookOpen size={28} />
+              {/* Column 2: Teacher Gate (1 Card) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                  <BookOpen size={28} color="var(--accent-primary)" />
+                  <h3 style={{ fontSize: '1.35rem', fontWeight: 850, margin: 0 }}>
+                    {lang === 'ar' ? 'بوابة حساب المعلم' : 'Instructor Portal'}
+                  </h3>
                 </div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{lang === 'ar' ? 'بوابة حساب المعلم' : 'For Instructor Accounts'}</h3>
-                <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.9rem', lineHeight: '1.8' }}>
-                  <li>{lang === 'ar' ? 'إنشاء مجموعات دراسية نشطة وإدارتها بالكامل بشكل مستقل عبر مختلف المراحل التعليمية.' : 'Establish and manage class groups across all educational phases independently.'}</li>
-                  <li>{lang === 'ar' ? 'توليد كود الـ QR لتسجيل الحضور للطلاب في القاعة، مع إرسال إشعارات واتساب تلقائية لولي الأمر فوراً في حال الغياب.' : 'Generate QR for attendance, with immediate automated WhatsApp notifications to parents for absences.'}</li>
-                  <li>{lang === 'ar' ? 'توفير مساعد ذكاء اصطناعي يتواصل مع الطلاب ويرد على أسئلتهم بأسلوبك الخاص بناءً على الشرح لتخفيف العبء عنك.' : 'Provide an AI assistant that answers student questions in your style based on your summaries to reduce your workload.'}</li>
-                  <li>{lang === 'ar' ? 'تصحيح الاختبارات والكويزات فورياً بالذكاء الاصطناعي مع التسجيل والتحليل الآلي للدرجات لتوفير الجهد والوقت.' : 'Instant AI grading for quizzes with automated score recording and analysis to save time and effort.'}</li>
-                  <li>{lang === 'ar' ? 'إضافة دروس ومواد تعليمية مرئية مسجلة ومذكرات بحرية تامة لإنشاء مكتبة مراجعات متكاملة لطلابك.' : 'Publish video tutorials and curriculum description blocks to build a comprehensive revision library.'}</li>
-                  <li>{lang === 'ar' ? 'رصد وتحديث درجات الواجبات ومتابعة منحنى تطور كل طالب لتحديد نقاط الضعف والقوة بدقة.' : 'Record assignment scores and track each student\'s progress curve to precisely identify strengths and weaknesses.'}</li>
-                  <li>{lang === 'ar' ? 'التحلي بصلاحيات عمل كاملة في البوابة الشخصية الخاصة بك بشكل مجاني تماماً.' : 'Enjoy full portal capabilities and absolute control free of charge.'}</li>
-                </ul>
+
+                <div className="glass-card" style={{ 
+                  padding: '2rem', 
+                  borderRadius: '20px', 
+                  border: '1px solid rgba(99, 102, 241, 0.3)', 
+                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.08) 100%)',
+                  boxShadow: '0 4px 20px rgba(99, 102, 241, 0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1.25rem',
+                  height: '100%',
+                  textAlign: 'start'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Users size={24} />
+                    </div>
+                    <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
+                      {lang === 'ar' ? 'إدارة ذكية ومستقلة للمعلمين' : 'Smart Independent Classroom Management'}
+                    </h4>
+                  </div>
+                  <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.9rem', lineHeight: '1.8', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                    <li>{lang === 'ar' ? 'إنشاء مجموعات دراسية نشطة وإدارتها بالكامل بشكل مستقل عبر مختلف المراحل التعليمية.' : 'Establish and manage class groups across all educational phases independently.'}</li>
+                    <li>{lang === 'ar' ? 'توليد كود الـ QR لتسجيل الحضور للطلاب في القاعة، مع إرسال إشعارات واتساب تلقائية لولي الأمر فوراً في حال الغياب.' : 'Generate QR for attendance, with immediate automated WhatsApp notifications to parents for absences.'}</li>
+                    <li>{lang === 'ar' ? 'توفير مساعد ذكاء اصطناعي يتواصل مع الطلاب ويرد على أسئلتهم بأسلوبك الخاص بناءً على الشرح لتخفيف العبء عنك.' : 'Provide an AI assistant that answers student questions in your style based on your summaries to reduce your workload.'}</li>
+                    <li>{lang === 'ar' ? 'تصحيح الاختبارات والكويزات فورياً بالذكاء الاصطناعي مع التسجيل والتحليل الآلي للدرجات لتوفير الجهد والوقت.' : 'Instant AI grading for quizzes with automated score recording and analysis to save time and effort.'}</li>
+                    <li>{lang === 'ar' ? 'إضافة دروس ومواد تعليمية مرئية مسجلة ومذكرات بحرية تامة لإنشاء مكتبة مراجعات متكاملة لطلابك.' : 'Publish video tutorials and curriculum description blocks to build a comprehensive revision library.'}</li>
+                    <li>{lang === 'ar' ? 'رصد وتحديث درجات الواجبات ومتابعة منحنى تطور كل طالب لتحديد نقاط الضعف والقوة بدقة.' : 'Record assignment scores and track each student\'s progress curve to precisely identify strengths and weaknesses.'}</li>
+                    <li>{lang === 'ar' ? 'التحلي بصلاحيات عمل كاملة في البوابة الشخصية الخاصة بك بشكل مجاني تماماً.' : 'Enjoy full portal capabilities and absolute control free of charge.'}</li>
+                  </ul>
+                </div>
               </div>
+
             </div>
           )}
 
