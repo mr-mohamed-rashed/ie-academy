@@ -1078,9 +1078,36 @@ function App() {
                   </div>
                   <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <li>{lang === 'ar' ? 'تصحيح تلقائي فوري للكويزات والاختبارات بالذكاء الاصطناعي مع رصد آلي للدرجات لتوفير الوقت.' : 'Instant AI grading for quizzes with automated score logging to save time and effort.'}</li>
-                    <li>{lang === 'ar' ? 'مساعد ذكاء اصطناعي ذكي يتواصل مع طلابك ويرد بأسلوبك وشرحك الخاص لتخفيف العبء.' : 'Custom AI assistant answering student questions in your exact tone based on summaries.'}</li>
+                    <li>{lang === 'ar' ? 'مساعد ذكاء اصطناعي ذكي يتواصل مع طلابك ويرد بأسلوبك وشرحك الخاص لتخفيف العبء.' : 'Custom AI assistant answering student questions in your tone based on summaries.'}</li>
                     <li>{lang === 'ar' ? 'رصد آلي ومتابعة مستمرة لمنحنى تطور كل طالب لتحديد نقاط الضعف والقوة بدقة.' : 'Track student learning curve metrics and highlight academic strengths or weaknesses.'}</li>
                     <li>{lang === 'ar' ? 'إرسال تقارير الغياب، السلوك، والدرجات لولي الأمر تلقائياً عبر الواتساب لضمان التواصل.' : 'Automated WhatsApp alerts to parents detailing absences, scores, and behavioral milestones.'}</li>
+                  </ul>
+                </div>
+
+                {/* Card 3: VIP Upgrade & Promotion */}
+                <div className="glass-card" style={{ 
+                  padding: '1.5rem', 
+                  borderRadius: '20px', 
+                  border: '1px solid rgba(245, 158, 11, 0.3)', 
+                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.04) 0%, rgba(251, 146, 60, 0.08) 100%)',
+                  boxShadow: '0 4px 20px rgba(245, 158, 11, 0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1rem',
+                  textAlign: 'start'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Star size={20} />
+                    </div>
+                    <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-gold)' }}>
+                      {lang === 'ar' ? '3. ترقية النظام والظهور الترويجي' : '3. VIP Upgrade & Platform Promotion'}
+                    </h4>
+                  </div>
+                  <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <li>{lang === 'ar' ? 'الترقية إلى نظام VIP للظهور المميز والمباشر في لوحة أفضل 10 مدرسين بالصفحة الرئيسية للمنصة.' : 'Upgrade to VIP for direct premier placement in the top 10 teachers row on the landing page.'}</li>
+                    <li>{lang === 'ar' ? 'الاستفادة من العروض الترويجية والحملات التسويقية والاعلانية لرفع اسمك على محركات البحث.' : 'Take advantage of our platform-wide promotional ad campaigns to feature your profile.'}</li>
+                    <li>{lang === 'ar' ? 'الظهور لعدد أكبر من الطلاب وأولياء الأمور في صفحات البحث الرئيسية، مما يضاعف معدل تسجيلات المشتركين.' : 'Ensure maximum exposure to new students and parents, scaling your student base and subscriptions.'}</li>
                   </ul>
                 </div>
               </div>
