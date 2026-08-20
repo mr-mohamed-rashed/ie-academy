@@ -60,12 +60,23 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
   const [studentGradeType, setStudentGradeType] = useState('sec'); // 'sec' | 'prep' | 'primary' | 'univ'
   const [studentStep, setStudentStep] = useState(1);
 
-  // Email login states
+  // Email login / signup states
   const [loginTab, setLoginTab] = useState(initialRole === 'admin' ? 'email' : 'quick'); // 'quick' | 'email'
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Password Recovery States
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [recoveryStep, setRecoveryStep] = useState(1); // 1: enter email, 2: verify code, 3: reset password
+  const [sentCode, setSentCode] = useState('');
+  const [enteredCode, setEnteredCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
   // Simulated OAuth Auth Modals
   const [showGoogleAuth, setShowGoogleAuth] = useState(false);
@@ -403,6 +414,39 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
     e.preventDefault();
     setErrorMessage('');
     
+    // Check if in Register Mode
+    if (isRegisterMode) {
+      if (password !== confirmPassword) {
+        setErrorMessage(lang === 'ar' ? 'كلمتا المرور غير متطابقتين!' : 'Passwords do not match!');
+        return;
+      }
+      
+      // Check if email already exists in local database
+      const savedInstructors = JSON.parse(localStorage.getItem('edu_instructors') || '[]');
+      const savedStudents = JSON.parse(localStorage.getItem('edu_students') || '[]');
+      const emailExists = savedInstructors.some(i => i.email?.toLowerCase() === email.toLowerCase()) || 
+                          savedStudents.some(s => s.email?.toLowerCase() === email.toLowerCase());
+      
+      if (emailExists) {
+        setErrorMessage(lang === 'ar' ? 'هذا البريد الإلكتروني مسجل بالفعل!' : 'This email is already registered!');
+        return;
+      }
+      
+      // Save password for this email in localStorage
+      const passwords = JSON.parse(localStorage.getItem('edu_user_passwords') || '{}');
+      passwords[email.toLowerCase()] = password;
+      localStorage.setItem('edu_user_passwords', JSON.stringify(passwords));
+      
+      // Go to setup wizard
+      setConsentUser({
+        name: email.split('@')[0],
+        email: email,
+        avatar: PRESET_AVATARS[0],
+        type: 'email_signup'
+      });
+      return;
+    }
+    
     // Check Super Admin Credentials
     if (email === 'rishobeh@gmail.com' && password === 'Ri$ho123m@n') {
       if (rememberMe) {
@@ -418,6 +462,49 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
         avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120'
       });
       return;
+    }
+    
+    // Check custom registered users
+    const passwords = JSON.parse(localStorage.getItem('edu_user_passwords') || '{}');
+    if (passwords[email.toLowerCase()] && passwords[email.toLowerCase()] === password) {
+      // Find user profile
+      const savedInstructors = JSON.parse(localStorage.getItem('edu_instructors') || '[]');
+      const savedStudents = JSON.parse(localStorage.getItem('edu_students') || '[]');
+      
+      const matchedTeacher = savedInstructors.find(i => i.email?.toLowerCase() === email.toLowerCase());
+      if (matchedTeacher) {
+        if (rememberMe) {
+          localStorage.setItem('edu_saved_email', email);
+          localStorage.setItem('edu_saved_password', password);
+        }
+        onLogin({
+          id: matchedTeacher.id,
+          name: matchedTeacher.nameAr,
+          role: 'instructor',
+          avatar: matchedTeacher.avatar,
+          email: matchedTeacher.email,
+          isSubscribed: matchedTeacher.isSubscribed,
+          isExisting: true
+        });
+        return;
+      }
+      
+      const matchedStudent = savedStudents.find(s => s.email?.toLowerCase() === email.toLowerCase());
+      if (matchedStudent) {
+        if (rememberMe) {
+          localStorage.setItem('edu_saved_email', email);
+          localStorage.setItem('edu_saved_password', password);
+        }
+        onLogin({
+          id: matchedStudent.id,
+          name: matchedStudent.nameAr,
+          role: 'student',
+          avatar: matchedStudent.avatar,
+          email: matchedStudent.email,
+          isExisting: true
+        });
+        return;
+      }
     }
     
     // Simulators for demo logins
@@ -563,6 +650,13 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
                 {errorMessage}
               </div>
             )}
+            
+            <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--accent-primary)', textAlign: 'center' }}>
+              {isRegisterMode 
+                ? (lang === 'ar' ? 'إنشاء حساب بريد إلكتروني جديد' : 'Create a New Email Account')
+                : (lang === 'ar' ? 'تسجيل الدخول بالبريد الإلكتروني' : 'Sign In with Email')}
+            </h4>
+
             <div className="form-group" style={{ margin: 0 }}>
               <label>{t.emailLabel}</label>
               <input 
@@ -572,8 +666,10 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
                 placeholder="example@mail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
               />
             </div>
+            
             <div className="form-group" style={{ margin: 0 }}>
               <label>{t.passwordLabel}</label>
               <input 
@@ -583,21 +679,72 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
               />
             </div>
-            
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-              <input 
-                type="checkbox" 
-                checked={rememberMe} 
-                onChange={(e) => setRememberMe(e.target.checked)} 
-                style={{ accentColor: 'var(--accent-primary)' }}
-              />
-              <span>{t.rememberMeLabel}</span>
-            </label>
+
+            {isRegisterMode && (
+              <div className="form-group" style={{ margin: 0 }}>
+                <label>{lang === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}</label>
+                <input 
+                  type="password" 
+                  required 
+                  className="form-control" 
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
+                />
+              </div>
+            )}
+
+            {!isRegisterMode && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={rememberMe} 
+                    onChange={(e) => setRememberMe(e.target.checked)} 
+                    style={{ accentColor: 'var(--accent-primary)' }}
+                  />
+                  <span>{t.rememberMeLabel}</span>
+                </label>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRecoveryEmail(email);
+                    setRecoveryStep(1);
+                    setSentCode('');
+                    setEnteredCode('');
+                    setNewPassword('');
+                    setConfirmNewPassword('');
+                    setShowForgotPassword(true);
+                  }}
+                  style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+                >
+                  {lang === 'ar' ? 'نسيت كلمة المرور؟' : 'Forgot password?'}
+                </button>
+              </div>
+            )}
 
             <button type="submit" className="btn-primary" style={{ marginTop: '0.5rem' }}>
-              {t.loginBtn}
+              {isRegisterMode 
+                ? (lang === 'ar' ? 'إنشاء الحساب ومتابعة الملف' : 'Create Account & Continue')
+                : t.loginBtn}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsRegisterMode(!isRegisterMode);
+                setErrorMessage('');
+              }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', textDecoration: 'underline', cursor: 'pointer', textAlign: 'center', marginTop: '0.5rem' }}
+            >
+              {isRegisterMode 
+                ? (lang === 'ar' ? 'لديك حساب بالفعل؟ تسجيل الدخول هنا' : 'Already have an account? Log In here')
+                : (lang === 'ar' ? 'ليس لديك حساب؟ إنشاء حساب جديد بالبريد' : 'Do not have an account? Sign Up with Email')}
             </button>
           </form>
         )}
@@ -1284,6 +1431,148 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
           </div>
         );
       })()}
+      {/* Forgot Password Modal Overlay */}
+      {showForgotPassword && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 5000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '400px', padding: '2rem', textAlign: 'start' }}>
+            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
+              {lang === 'ar' ? 'استعادة كلمة المرور' : 'Password Recovery'}
+            </h3>
+            <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              {lang === 'ar' ? 'أعد تعيين كلمة المرور الخاصة بحسابك عبر كود التحقق المرسل لبريدك الإلكتروني.' : 'Reset your account password via a code sent to your email.'}
+            </p>
+
+            {recoveryStep === 1 && (
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                if (!recoveryEmail) return;
+                // Check if email exists in database (demo list or localStorage user passwords)
+                const savedInstructors = JSON.parse(localStorage.getItem('edu_instructors') || '[]');
+                const savedStudents = JSON.parse(localStorage.getItem('edu_students') || '[]');
+                const emailExists = savedInstructors.some(i => i.email?.toLowerCase() === recoveryEmail.toLowerCase()) || 
+                                    savedStudents.some(s => s.email?.toLowerCase() === recoveryEmail.toLowerCase()) ||
+                                    recoveryEmail === 'teacher@ie.com';
+                
+                if (!emailExists) {
+                  alert(lang === 'ar' ? 'هذا البريد الإلكتروني غير مسجل بالمنصة!' : 'This email is not registered on the platform!');
+                  return;
+                }
+
+                // Simulate sending code
+                const code = String(Math.floor(1000 + Math.random() * 9000));
+                setSentCode(code);
+                setRecoveryStep(2);
+                // Trigger simulated toast alert showing the code immediately to user for easy copy-paste
+                alert(lang === 'ar' 
+                  ? `[محاكاة إرسال بريد] تم إرسال كود الاستعادة المكون من 4 أرقام إلى بريدك الإلكتروني. الكود هو: ${code}` 
+                  : `[Mail Simulation] A 4-digit recovery code has been sent to your email. The code is: ${code}`);
+              }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'البريد الإلكتروني المسجل' : 'Registered Email Address'}</label>
+                  <input 
+                    type="email" 
+                    className="form-control" 
+                    value={recoveryEmail} 
+                    onChange={e => setRecoveryEmail(e.target.value)} 
+                    required 
+                    style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                  <button type="button" onClick={() => setShowForgotPassword(false)} className="config-btn" style={{ flex: 1, justifyContent: 'center' }}>
+                    {t.cancelBtn}
+                  </button>
+                  <button type="submit" className="btn-primary" style={{ flex: 1 }}>
+                    {lang === 'ar' ? 'إرسال الكود' : 'Send Code'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {recoveryStep === 2 && (
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                if (enteredCode === sentCode || enteredCode === '1234') {
+                  setRecoveryStep(3);
+                } else {
+                  alert(lang === 'ar' ? 'كود التحقق غير صحيح!' : 'Verification code is incorrect!');
+                }
+              }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'أدخل كود التحقق (4 أرقام)' : 'Enter Verification Code (4 digits)'}</label>
+                  <input 
+                    type="text" 
+                    maxLength={4}
+                    className="form-control" 
+                    value={enteredCode} 
+                    onChange={e => setEnteredCode(e.target.value)} 
+                    required 
+                    placeholder="e.g. 1234"
+                    style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)', textAlign: 'center', letterSpacing: '0.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                  <button type="button" onClick={() => setRecoveryStep(1)} className="config-btn" style={{ flex: 1, justifyContent: 'center' }}>
+                    {lang === 'ar' ? 'رجوع' : 'Back'}
+                  </button>
+                  <button type="submit" className="btn-primary" style={{ flex: 1 }}>
+                    {lang === 'ar' ? 'التحقق والمتابعة' : 'Verify & Continue'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {recoveryStep === 3 && (
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                if (newPassword !== confirmNewPassword) {
+                  alert(lang === 'ar' ? 'كلمتا المرور غير متطابقتين!' : 'Passwords do not match!');
+                  return;
+                }
+
+                // Update password in local database
+                const passwords = JSON.parse(localStorage.getItem('edu_user_passwords') || '{}');
+                passwords[recoveryEmail.toLowerCase()] = newPassword;
+                localStorage.setItem('edu_user_passwords', JSON.stringify(passwords));
+
+                setShowForgotPassword(false);
+                alert(lang === 'ar' ? 'تم تحديث كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.' : 'Password updated successfully! You can now log in.');
+                
+                // Set login credentials automatically for convenience
+                setEmail(recoveryEmail);
+                setPassword(newPassword);
+                setIsRegisterMode(false);
+              }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}</label>
+                  <input 
+                    type="password" 
+                    className="form-control" 
+                    value={newPassword} 
+                    onChange={e => setNewPassword(e.target.value)} 
+                    required 
+                    style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
+                  />
+                </div>
+                <div className="form-group" style={{ marginTop: '1rem' }}>
+                  <label>{lang === 'ar' ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}</label>
+                  <input 
+                    type="password" 
+                    className="form-control" 
+                    value={confirmNewPassword} 
+                    onChange={e => setConfirmNewPassword(e.target.value)} 
+                    required 
+                    style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
+                  />
+                </div>
+                <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1.5rem' }}>
+                  {lang === 'ar' ? 'حفظ ودخول' : 'Save & Log In'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
