@@ -125,6 +125,18 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
       const name = supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || email.split('@')[0] || 'User';
       const avatar = supabaseUser.user_metadata?.avatar_url || supabaseUser.user_metadata?.picture || PRESET_AVATARS[0];
       
+      const ADMIN_EMAILS = ['rishobeh@gmail.com', 'admin@ie-academy.com', 'admin@ie.com'];
+      if (ADMIN_EMAILS.includes(email.toLowerCase())) {
+        onLogin({
+          name: lang === 'ar' ? 'أ/ ريشو' : 'Super Admin',
+          role: 'admin',
+          avatar: avatar,
+          email: email
+        });
+        onClose();
+        return;
+      }
+
       const accounts = getExistingAccounts(email);
       if (accounts.length === 1) {
         // Log in directly!
@@ -1582,6 +1594,19 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
                   <button 
                     type="button"
                     onClick={() => {
+                      const ADMIN_EMAILS = ['rishobeh@gmail.com', 'admin@ie-academy.com', 'admin@ie.com'];
+                      if (ADMIN_EMAILS.includes(consentUser.email.toLowerCase())) {
+                        onLogin({
+                          name: lang === 'ar' ? 'أ/ ريشو' : 'Super Admin',
+                          role: 'admin',
+                          avatar: consentUser.avatar,
+                          email: consentUser.email
+                        });
+                        setConsentUser(null);
+                        setShowGoogleAuth(false);
+                        setShowFacebookAuth(false);
+                        return;
+                      }
                       setFullName(consentUser.name);
                       setEmail(consentUser.email);
                       setAvatarUrl(consentUser.avatar);
