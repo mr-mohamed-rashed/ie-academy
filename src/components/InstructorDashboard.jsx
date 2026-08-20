@@ -562,80 +562,9 @@ const InstructorDashboard = ({
 
       {activeTab === 'students' && (
         <>
-          <div style={{ gridColumn: 'span 8' }}>
+          <div style={{ gridColumn: 'span 12' }}>
             <Podium students={students} lang={lang} instructorId={instructor.id} gradeId={activeGradeId} groupId={activeGroupId} />
           </div>
-          {/* Grade entry form */}
-      <div className="glass-card grade-entry-card" style={{ gridColumn: 'span 4' }}>
-        <div className="card-title-group">
-          <h3>{t.gradeTitle}</h3>
-        </div>
-        {groupStudents.length > 0 ? (
-          <form onSubmit={handleGradeSubmit}>
-            <div className="form-group">
-              <label>{t.selectStudent}</label>
-              <select 
-                value={selectedStudentId} 
-                onChange={(e) => setSelectedStudentId(e.target.value)} 
-                className="form-control"
-              >
-                {groupStudents.map(s => (
-                  <option key={s.id} value={s.id}>
-                    {lang === 'ar' ? s.nameAr : s.nameEn}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>{t.quizTitleAr}</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="مثال: واجب الهندسة التحليلية" 
-                value={quizNameAr} 
-                onChange={(e) => setQuizNameAr(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>{t.quizTitleEn}</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="e.g. Geometry Homework" 
-                value={quizNameEn} 
-                onChange={(e) => setQuizNameEn(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>{t.scoreLabel}</label>
-              <input 
-                type="number" 
-                min="0" 
-                max="100" 
-                className="form-control" 
-                placeholder="95" 
-                value={score} 
-                onChange={(e) => setScore(e.target.value)}
-                required
-              />
-            </div>
-
-            <button type="submit" className="btn-primary">
-              <CheckCircle size={18} />
-              <span>{t.submitGrade}</span>
-            </button>
-          </form>
-        ) : (
-          <div style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--text-muted)' }}>
-            {lang === 'ar' ? 'لا يوجد طلاب مسجلين في هذه المجموعة حالياً.' : 'No students enrolled in this group yet.'}
-          </div>
-        )}
-      </div>
       {/* Classroom Grade Table */}
       <div className="glass-card" style={{ gridColumn: 'span 12' }}>
         <div className="card-title-group" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -673,77 +602,147 @@ const InstructorDashboard = ({
             </div>
           )}
         </div>
-        <div style={{ overflowX: 'auto' }}>
-          <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-glass)', textAlign: 'start' }}>
-                <th style={{ padding: '0.75rem', textAlign: 'start' }}>{t.tblName}</th>
-                <th style={{ padding: '0.75rem', textAlign: 'start' }}>{t.tblGPA}</th>
-                <th style={{ padding: '0.75rem', textAlign: 'start' }}>{t.tblAttendance}</th>
-                <th style={{ padding: '0.75rem', textAlign: 'start' }}>{t.tblStatus}</th>
-                <th style={{ padding: '0.75rem', textAlign: 'center' }}>{lang === 'ar' ? 'إجراءات' : 'Actions'}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {groupStudents.length > 0 ? (
-                groupStudents.map(s => {
-                  const gpaVal = calculateGPA(s.grades, instructor.id);
-                  const standing = getStandings(gpaVal);
-                  return (
-                    <tr 
-                      key={s.id} 
-                      onClick={() => setSelectedStudentForAnalytics(s)}
-                      style={{ borderBottom: '1px solid var(--border-glass)', cursor: 'pointer', transition: 'background-color 0.2s' }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      <td style={{ padding: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <img src={s.avatar} alt={s.nameEn} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
-                        <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{lang === 'ar' ? s.nameAr : s.nameEn}</span>
-                      </td>
-                      <td style={{ padding: '0.75rem', fontWeight: 700, color: 'var(--color-gold)', fontSize: '0.9rem' }}>{gpaVal}%</td>
-                      <td style={{ padding: '0.75rem', fontSize: '0.9rem' }}>{calculateAttendanceRate(s.attendance, instructor.id)}%</td>
-                      <td style={{ padding: '0.75rem' }}>
-                        <span style={{ 
-                          color: standing.color, 
-                          fontWeight: 700, 
-                          backgroundColor: `${standing.color}15`,
-                          padding: '0.2rem 0.5rem',
-                          borderRadius: '20px',
-                          fontSize: '0.75rem',
-                          border: `1px solid ${standing.color}20`
-                        }}>
-                          {standing.text}
-                        </span>
-                      </td>
-                      <td style={{ padding: '0.75rem', textAlign: 'center' }}>
-                        <button 
-                          className="config-btn"
-                          style={{ padding: '0.4rem', borderColor: 'var(--accent-red)', color: 'var(--accent-red)', margin: '0 auto' }}
-                          title={lang === 'ar' ? 'حذف الطالب من المجموعة' : 'Remove student from group'}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (window.confirm(lang === 'ar' ? `هل أنت متأكد من حذف ${s.nameAr} من المجموعة؟` : `Are you sure you want to remove ${s.nameEn} from this group?`)) {
-                              onRemoveStudent(s.id, instructor.id, activeGradeId, activeGroupId);
-                              triggerToast(lang === 'ar' ? 'تم الحذف بنجاح' : 'Successfully removed', 'success');
-                            }
-                          }}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                    {lang === 'ar' ? 'لا يوجد طلاب مضافين.' : 'No students found.'}
-                  </td>
+        <div className="desktop-only-table">
+          <div style={{ overflowX: 'auto' }}>
+            <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border-glass)', textAlign: 'start' }}>
+                  <th style={{ padding: '0.75rem', textAlign: 'start' }}>{t.tblName}</th>
+                  <th style={{ padding: '0.75rem', textAlign: 'start' }}>{t.tblGPA}</th>
+                  <th style={{ padding: '0.75rem', textAlign: 'start' }}>{t.tblAttendance}</th>
+                  <th style={{ padding: '0.75rem', textAlign: 'start' }}>{t.tblStatus}</th>
+                  <th style={{ padding: '0.75rem', textAlign: 'center' }}>{lang === 'ar' ? 'إجراءات' : 'Actions'}</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {groupStudents.length > 0 ? (
+                  groupStudents.map(s => {
+                    const gpaVal = calculateGPA(s.grades, instructor.id);
+                    const standing = getStandings(gpaVal);
+                    return (
+                      <tr 
+                        key={s.id} 
+                        onClick={() => setSelectedStudentForAnalytics(s)}
+                        style={{ borderBottom: '1px solid var(--border-glass)', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        <td style={{ padding: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <img src={s.avatar} alt={s.nameEn} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                          <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{lang === 'ar' ? s.nameAr : s.nameEn}</span>
+                        </td>
+                        <td style={{ padding: '0.75rem', fontWeight: 700, color: 'var(--color-gold)', fontSize: '0.9rem' }}>{gpaVal}%</td>
+                        <td style={{ padding: '0.75rem', fontSize: '0.9rem' }}>{calculateAttendanceRate(s.attendance, instructor.id)}%</td>
+                        <td style={{ padding: '0.75rem' }}>
+                          <span style={{ 
+                            color: standing.color, 
+                            fontWeight: 700, 
+                            backgroundColor: `${standing.color}15`,
+                            padding: '0.2rem 0.5rem',
+                            borderRadius: '20px',
+                            fontSize: '0.75rem',
+                            border: `1px solid ${standing.color}20`
+                          }}>
+                            {standing.text}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.75rem', textAlign: 'center' }}>
+                          <button 
+                            className="config-btn"
+                            style={{ padding: '0.4rem', borderColor: 'var(--accent-red)', color: 'var(--accent-red)', margin: '0 auto' }}
+                            title={lang === 'ar' ? 'حذف الطالب من المجموعة' : 'Remove student from group'}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(lang === 'ar' ? `هل أنت متأكد من حذف ${s.nameAr} من المجموعة؟` : `Are you sure you want to remove ${s.nameEn} from this group?`)) {
+                                onRemoveStudent(s.id, instructor.id, activeGradeId, activeGroupId);
+                                triggerToast(lang === 'ar' ? 'تم الحذف بنجاح' : 'Successfully removed', 'success');
+                              }
+                            }}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      {lang === 'ar' ? 'لا يوجد طلاب مضافين.' : 'No students found.'}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Mobile Responsive Cards View */}
+        <div className="mobile-only-cards" style={{ display: 'none', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
+          {groupStudents.length > 0 ? (
+            groupStudents.map(s => {
+              const gpaVal = calculateGPA(s.grades, instructor.id);
+              const standing = getStandings(gpaVal);
+              return (
+                <div 
+                  key={s.id} 
+                  onClick={() => setSelectedStudentForAnalytics(s)}
+                  style={{ 
+                    padding: '1rem', 
+                    borderRadius: '12px', 
+                    backgroundColor: 'rgba(255,255,255,0.02)', 
+                    border: '1px solid var(--border-glass)',
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    gap: '0.75rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <img src={s.avatar} alt={s.nameEn} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--accent-primary)' }} />
+                    <div style={{ textAlign: 'start' }}>
+                      <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700 }}>{lang === 'ar' ? s.nameAr : s.nameEn}</h4>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                        {lang === 'ar' ? 'المعدل: ' : 'GPA: '} {gpaVal}% | {lang === 'ar' ? 'الحضور: ' : 'Att: '} {calculateAttendanceRate(s.attendance, instructor.id)}%
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                    <span style={{ 
+                      color: standing.color, 
+                      fontWeight: 700, 
+                      backgroundColor: `${standing.color}15`,
+                      padding: '0.15rem 0.5rem',
+                      borderRadius: '20px',
+                      fontSize: '0.7rem',
+                      border: `1px solid ${standing.color}20`
+                    }}>
+                      {standing.text}
+                    </span>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm(lang === 'ar' ? `هل أنت متأكد من حذف ${s.nameAr} من المجموعة؟` : `Are you sure you want to remove ${s.nameEn} from this group?`)) {
+                          onRemoveStudent(s.id, instructor.id, activeGradeId, activeGroupId);
+                          triggerToast(lang === 'ar' ? 'تم الحذف بنجاح' : 'Successfully removed', 'success');
+                        }
+                      }}
+                      style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', backgroundColor: 'transparent', border: '1px solid var(--accent-red)', color: 'var(--accent-red)', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.2rem' }}
+                    >
+                      <Trash2 size={12} />
+                      <span>{lang === 'ar' ? 'حذف' : 'Remove'}</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--text-muted)' }}>
+              {lang === 'ar' ? 'لا يوجد طلاب مضافين.' : 'No students found.'}
+            </div>
+          )}
         </div>
       </div>
         </>
@@ -944,48 +943,36 @@ const InstructorDashboard = ({
 
       {/* Upgrade/Status Banner for Accounts (Moved to the bottom) */}
       {instructor.isSubscribed ? (
-        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', border: '1px solid var(--accent-green)', backgroundColor: 'rgba(16, 185, 129, 0.05)', marginTop: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: '40px', height: '40px', backgroundColor: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-green)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <CheckCircle size={22} />
-              </div>
-              <div style={{ textAlign: 'start' }}>
-                <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--accent-green)', fontWeight: 700 }}>
-                  {lang === 'ar' 
-                    ? (instructor.subscriptionPlan === 'monthly' ? 'حسابك مفعل على النظام الشهري المميز VIP' : 'حسابك مفعل على النظام السنوي المميز VIP') 
-                    : (instructor.subscriptionPlan === 'monthly' ? 'Your account is active on VIP Monthly Premium' : 'Your account is active on VIP Academic Year Premium')
-                  }
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.15rem' }}>
-                  {lang === 'ar' ? 'يظهر حسابك الآن للطلاب في صفحات البحث الرئيسية للمنصة ويستفيد من كامل الدعم الإعلاني.' : 'Your account is now visible to students on the main search pages and benefits from full ad support.'}
-                </p>
-              </div>
-            </div>
+        <div style={{ gridColumn: 'span 12', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', backgroundColor: 'rgba(16, 185, 129, 0.05)', marginTop: '1.5rem', width: '100%' }}>
+          <CheckCircle size={18} color="var(--accent-green)" />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', textAlign: 'start' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--accent-green)', fontWeight: 700 }}>
+              {lang === 'ar' 
+                ? (instructor.subscriptionPlan === 'monthly' ? 'حسابك مفعل على النظام الشهري المميز VIP' : 'حسابك مفعل على النظام السنوي المميز VIP') 
+                : (instructor.subscriptionPlan === 'monthly' ? 'Your account is active on VIP Monthly Premium' : 'Your account is active on VIP Academic Year Premium')
+              }
+            </span>
+            <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
+              • {lang === 'ar' ? 'يظهر حسابك الآن للطلاب في صفحات البحث الرئيسية للمنصة ويستفيد من الدعم الإعلاني.' : 'Your account is visible to students on search pages with full ad support.'}
+            </span>
           </div>
         </div>
       ) : hasPendingRequest ? (
-        <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', border: '1px solid var(--color-gold)', backgroundColor: 'rgba(251, 191, 36, 0.05)', marginTop: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: '40px', height: '40px', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: 'var(--color-gold)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Clock size={22} />
-              </div>
-              <div style={{ textAlign: 'start' }}>
-                <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--color-gold)', fontWeight: 700 }}>
-                  {lang === 'ar' ? 'طلب الترقية قيد المراجعة حالياً' : 'Upgrade Request Under Review'}
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.15rem' }}>
-                  {lang === 'ar' 
-                    ? 'لقد قمت برفع صورة التحويل بنجاح. يتم الآن مراجعة الطلب من قبل الإدارة لتفعيل حسابك كـ VIP في أسرع وقت.' 
-                    : 'You have uploaded the transfer screenshot successfully. The admin is currently reviewing your request to activate VIP status.'}
-                </p>
-              </div>
+        <div style={{ gridColumn: 'span 12', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', border: '1px solid rgba(251, 191, 36, 0.3)', borderRadius: '12px', backgroundColor: 'rgba(251, 191, 36, 0.05)', marginTop: '1.5rem', width: '100%', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+            <Clock size={18} color="var(--color-gold)" />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', textAlign: 'start' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-gold)', fontWeight: 700 }}>
+                {lang === 'ar' ? 'طلب الترقية قيد المراجعة حالياً' : 'Upgrade Request Under Review'}
+              </span>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
+                • {lang === 'ar' ? 'يتم مراجعة الطلب من قبل الإدارة لتفعيل حسابك كـ VIP.' : 'The admin is currently reviewing your request to activate VIP status.'}
+              </span>
             </div>
-            <span style={{ fontSize: '0.8rem', color: 'var(--color-gold)', fontWeight: 700, border: '1px solid var(--color-gold)', padding: '0.4rem 0.8rem', borderRadius: '8px' }}>
-              {lang === 'ar' ? 'قيد الانتظار' : 'Pending'}
-            </span>
           </div>
+          <span style={{ fontSize: '0.75rem', color: 'var(--color-gold)', fontWeight: 700, border: '1px solid var(--color-gold)', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>
+            {lang === 'ar' ? 'قيد الانتظار' : 'Pending'}
+          </span>
         </div>
       ) : (
         <div className="glass-card" style={{ gridColumn: 'span 12', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', border: '1px solid var(--accent-gold)', backgroundColor: 'rgba(251, 191, 36, 0.05)', marginTop: '1.5rem' }}>
