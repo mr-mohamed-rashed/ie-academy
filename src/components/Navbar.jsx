@@ -30,7 +30,10 @@ const Navbar = ({
   const [editSubject, setEditSubject] = useState(currentUser?.subject || '');
   const [editYear, setEditYear] = useState(currentUser?.year || currentUser?.yearAr || '');
   const [editParentPhone, setEditParentPhone] = useState(currentUser?.parentPhone || '');
-  const [editVideoUrl, setEditVideoUrl] = useState(currentUser?.videoUrl || '');
+  const [editVideoUrl, setEditVideoUrl] = useState(currentUser?.videoUrl || currentUser?.introVideo || '');
+  const [editAbout, setEditAbout] = useState(currentUser?.about || currentUser?.aboutAr || '');
+  const [editPrice, setEditPrice] = useState(currentUser?.price || '');
+  const [editPaymentMethods, setEditPaymentMethods] = useState(currentUser?.paymentMethods || '');
 
   // Visual Cropper States
   const [rawImage, setRawImage] = useState(null);
@@ -207,7 +210,10 @@ const Navbar = ({
     setEditSubject(currentUser?.subject || '');
     setEditYear(currentUser?.year || currentUser?.yearAr || '');
     setEditParentPhone(currentUser?.parentPhone || '');
-    setEditVideoUrl(currentUser?.videoUrl || '');
+    setEditVideoUrl(currentUser?.videoUrl || currentUser?.introVideo || '');
+    setEditAbout(currentUser?.about || currentUser?.aboutAr || '');
+    setEditPrice(currentUser?.price || '');
+    setEditPaymentMethods(currentUser?.paymentMethods || '');
     setShowEditModal(true);
   };
 
@@ -220,6 +226,11 @@ const Navbar = ({
       yearAr: currentUser.role === 'instructor' ? editYear : undefined,
       yearEn: currentUser.role === 'instructor' ? editYear : undefined,
       videoUrl: currentUser.role === 'instructor' ? editVideoUrl : undefined,
+      about: currentUser.role === 'instructor' ? editAbout : undefined,
+      aboutAr: currentUser.role === 'instructor' ? editAbout : undefined,
+      aboutEn: currentUser.role === 'instructor' ? editAbout : undefined,
+      price: currentUser.role === 'instructor' ? editPrice : undefined,
+      paymentMethods: currentUser.role === 'instructor' ? editPaymentMethods : undefined,
       parentPhone: currentUser.role === 'student' ? editParentPhone : undefined
     });
     setShowEditModal(false);
@@ -504,6 +515,39 @@ const Navbar = ({
                       value={editVideoUrl}
                       onChange={(e) => setEditVideoUrl(e.target.value)}
                     />
+                  </div>
+                  <div className="form-group">
+                    <label>{lang === 'ar' ? 'نبذة عن المدرس' : 'About the Teacher'}</label>
+                    <textarea 
+                      className="form-control" 
+                      rows="3"
+                      placeholder={lang === 'ar' ? 'اكتب نبذة مختصرة عن خبراتك وشهاداتك...' : 'Write a short description of your experience...'}
+                      value={editAbout}
+                      onChange={(e) => setEditAbout(e.target.value)}
+                      style={{ resize: 'vertical', width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-glass)', backgroundColor: 'var(--bg-input)' }}
+                    />
+                  </div>
+                  <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                      <label>{lang === 'ar' ? 'المبلغ المحدد' : 'Subscription Price'}</label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        placeholder={lang === 'ar' ? 'مثال: ٢٠٠ جنيه' : 'e.g. 200 EGP'}
+                        value={editPrice}
+                        onChange={(e) => setEditPrice(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label>{lang === 'ar' ? 'طرق الدفع المتاحة' : 'Payment Methods'}</label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        placeholder={lang === 'ar' ? 'فودافون كاش، دفع إلكتروني...' : 'Vodafone Cash, etc.'}
+                        value={editPaymentMethods}
+                        onChange={(e) => setEditPaymentMethods(e.target.value)}
+                      />
+                    </div>
                   </div>
                 </>
               )}

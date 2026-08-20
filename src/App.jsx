@@ -504,6 +504,11 @@ function App() {
               subjectAr: updatedData.subject,
               subjectEn: updatedData.subject,
               videoUrl: updatedData.videoUrl,
+              introVideo: updatedData.videoUrl,
+              aboutAr: updatedData.aboutAr !== undefined ? updatedData.aboutAr : inst.aboutAr,
+              aboutEn: updatedData.aboutEn !== undefined ? updatedData.aboutEn : inst.aboutEn,
+              price: updatedData.price !== undefined ? updatedData.price : inst.price,
+              paymentMethods: updatedData.paymentMethods !== undefined ? updatedData.paymentMethods : inst.paymentMethods,
               yearAr: updatedData.yearAr || inst.yearAr,
               yearEn: updatedData.yearEn || inst.yearEn
             };

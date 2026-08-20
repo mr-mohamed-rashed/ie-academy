@@ -1,10 +1,28 @@
 import React, { useState } from 'react';
 import { X, Info, CreditCard, DollarSign, MessageCircle, PlayCircle } from 'lucide-react';
 
+const getEmbedUrl = (url) => {
+  if (!url) return null;
+  // Check if it is a raw MP4/WebM video
+  if (url.match(/\.(mp4|webm|ogg)$/i) || (!url.includes('youtube.com') && !url.includes('youtu.be') && !url.includes('vimeo.com') && !url.includes('drive.google.com'))) {
+    return { type: 'video', url };
+  }
+  // YouTube parsing
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return { type: 'iframe', url: `https://www.youtube.com/embed/${match[2]}?autoplay=1` };
+  }
+  return { type: 'iframe', url };
+};
+
 const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
   const [showVideo, setShowVideo] = useState(false);
 
   if (!teacher) return null;
+
+  const introVideo = teacher.introVideo || teacher.videoUrl;
+  const media = getEmbedUrl(introVideo);
 
   return (
     <div style={{
@@ -29,7 +47,7 @@ const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
               alt={teacher.nameEn} 
               style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--accent-primary)', boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)' }}
             />
-            {teacher.introVideo && (
+            {introVideo && (
               <div 
                 onClick={() => setShowVideo(true)}
                 style={{
@@ -118,7 +136,7 @@ const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
       </div>
 
       {/* Floating Video Modal */}
-      {showVideo && (
+      {showVideo && media && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
           backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 7000,
@@ -133,15 +151,19 @@ const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
           </button>
           
           <div style={{ width: '90%', maxWidth: '900px', aspectRatio: '16/9', backgroundColor: '#000', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-glass)' }}>
-            <iframe 
-              width="100%" 
-              height="100%" 
-              src={teacher.introVideo} 
-              title="Teacher Intro" 
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowFullScreen
-            ></iframe>
+            {media.type === 'video' ? (
+              <video src={media.url} controls autoPlay style={{ width: '100%', height: '100%' }} />
+            ) : (
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src={media.url} 
+                title="Teacher Intro" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+              ></iframe>
+            )}
           </div>
         </div>
       )}

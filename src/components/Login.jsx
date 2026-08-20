@@ -70,6 +70,7 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
   const [showGoogleAuth, setShowGoogleAuth] = useState(false);
   const [showFacebookAuth, setShowFacebookAuth] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
+  const [consentUser, setConsentUser] = useState(null);
 
   // Visual Cropper States
   const [rawImage, setRawImage] = useState(null);
@@ -932,26 +933,13 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                     setAuthLoading(true);
                     setTimeout(() => {
                       setAuthLoading(false);
-                      setShowGoogleAuth(false);
-                      
-                      const existing = checkEmailExists('rishobeh@gmail.com');
-                      if (existing) {
-                        onLogin({
-                          id: existing.data.id,
-                          name: existing.role === 'instructor' ? (existing.data.nameAr || existing.data.nameEn) : (existing.data.nameEn || existing.data.nameAr),
-                          role: existing.role,
-                          avatar: existing.data.avatar,
-                          email: 'rishobeh@gmail.com',
-                          isSubscribed: existing.data.isSubscribed,
-                          isExisting: true
-                        });
-                      } else {
-                        setFullName('Mohamed Rashed');
-                        setEmail('rishobeh@gmail.com');
-                        setAvatarUrl(PRESET_AVATARS[0]);
-                        setShowModal(true);
-                      }
-                    }, 1200);
+                      setConsentUser({
+                        name: 'Mohamed Rashed',
+                        email: 'rishobeh@gmail.com',
+                        avatar: PRESET_AVATARS[0],
+                        type: 'google'
+                      });
+                    }, 800);
                   }}
                   style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: '1px solid #e5e7eb', borderRadius: '8px', backgroundColor: '#f9fafb', cursor: 'pointer', transition: 'background-color 0.2s', textDecoration: 'none' }}
                 >
@@ -968,25 +956,13 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                     setAuthLoading(true);
                     setTimeout(() => {
                       setAuthLoading(false);
-                      setShowGoogleAuth(false);
-                      
-                      const existing = checkEmailExists('student.test@gmail.com');
-                      if (existing) {
-                        onLogin({
-                          id: existing.data.id,
-                          name: existing.role === 'student' ? (existing.data.nameAr || existing.data.nameEn) : (existing.data.nameEn || existing.data.nameAr),
-                          role: existing.role,
-                          avatar: existing.data.avatar,
-                          email: 'student.test@gmail.com',
-                          isExisting: true
-                        });
-                      } else {
-                        setFullName('Test Student');
-                        setEmail('student.test@gmail.com');
-                        setAvatarUrl(PRESET_AVATARS[1]);
-                        setShowModal(true);
-                      }
-                    }, 1200);
+                      setConsentUser({
+                        name: 'Test Student',
+                        email: 'student.test@gmail.com',
+                        avatar: PRESET_AVATARS[1],
+                        type: 'google'
+                      });
+                    }, 800);
                   }}
                   style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: '1px solid #e5e7eb', borderRadius: '8px', backgroundColor: '#f9fafb', cursor: 'pointer', transition: 'background-color 0.2s', textDecoration: 'none' }}
                 >
@@ -1053,26 +1029,13 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                     setAuthLoading(true);
                     setTimeout(() => {
                       setAuthLoading(false);
-                      setShowFacebookAuth(false);
-                      
-                      const existing = checkEmailExists('rishobeh@gmail.com');
-                      if (existing) {
-                        onLogin({
-                          id: existing.data.id,
-                          name: existing.role === 'instructor' ? (existing.data.nameAr || existing.data.nameEn) : (existing.data.nameEn || existing.data.nameAr),
-                          role: existing.role,
-                          avatar: existing.data.avatar,
-                          email: 'rishobeh@gmail.com',
-                          isSubscribed: existing.data.isSubscribed,
-                          isExisting: true
-                        });
-                      } else {
-                        setFullName('Mohamed Rashed');
-                        setEmail('rishobeh@gmail.com');
-                        setAvatarUrl(PRESET_AVATARS[0]);
-                        setShowModal(true);
-                      }
-                    }, 1200);
+                      setConsentUser({
+                        name: 'Mohamed Rashed',
+                        email: 'rishobeh@gmail.com',
+                        avatar: PRESET_AVATARS[0],
+                        type: 'facebook'
+                      });
+                    }, 800);
                   }}
                   style={{ padding: '0.75rem', border: 'none', borderRadius: '8px', backgroundColor: '#1877F2', color: 'white', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', transition: 'background-color 0.2s', width: '100%' }}
                 >
@@ -1191,6 +1154,95 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                 {lang === 'ar' ? 'قص وحفظ' : 'Crop & Save'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Simulated OAuth Consent Modal */}
+      {consentUser && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.85)',
+          zIndex: 4000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(8px)',
+          direction: lang === 'ar' ? 'rtl' : 'ltr'
+        }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '380px', padding: '1.75rem', textAlign: 'start', display: 'flex', flexDirection: 'column', gap: '1.25rem', backgroundColor: '#ffffff', color: '#1f2937', borderRadius: '12px', boxShadow: '0 8px 30px rgba(0,0,0,0.3)', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+            {/* Header logos */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e5e7eb', paddingBottom: '0.75rem' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#4b5563' }}>{consentUser.type === 'facebook' ? 'Facebook Connect' : 'Google Account Access'}</span>
+              {consentUser.type === 'facebook' ? (
+                <svg style={{ width: '28px', height: '28px', fill: '#1877F2' }} viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+              ) : (
+                <svg style={{ width: '28px', height: '28px' }} viewBox="0 0 24 24">
+                  <path fill="#ea4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2A11.95 11.95 0 0 0 12 0 11.94 11.94 0 0 0 1.29 6.29l3.73 2.9A7.12 7.12 0 0 1 12 5.04z"/>
+                  <path fill="#4285f4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46a5.53 5.53 0 0 1-2.4 3.63l3.73 2.9a11.92 11.92 0 0 0 3.7-8.68z"/>
+                  <path fill="#fbbc05" d="M5.02 8.78A7.13 7.13 0 0 1 12 5.04a7.12 7.12 0 0 1 6.98 3.74l3.73-2.9A11.94 11.94 0 0 0 12 0C7.8 0 4.19 2.05 2.02 5.24l3.73 2.9.27.64z"/>
+                  <path fill="#34a853" d="M12 18.96c-1.92 0-3.63-.64-4.98-1.74l-3.73 2.9C5.46 21.95 8.54 24 12 24c4.14 0 7.73-1.4 10.3-3.8l-3.73-2.9a7.12 7.12 0 0 1-6.57 1.66z"/>
+                </svg>
+              )}
+            </div>
+
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#111827', lineHeight: '1.4' }}>
+                {lang === 'ar' ? 'منصة EduAcademy تطلب الوصول إلى:' : 'EduAcademy Hub requests access to:'}
+              </h3>
+              <ul style={{ margin: '0.75rem 0', paddingInlineStart: '1.25rem', fontSize: '0.85rem', color: '#374151', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <li>{lang === 'ar' ? 'اسمك وصورة ملفك الشخصي' : 'Your name and profile picture'}</li>
+                <li>{lang === 'ar' ? 'عنوان البريد الإلكتروني' : 'Email address'}</li>
+              </ul>
+              <span style={{ fontSize: '0.8rem', color: '#1877F2', cursor: 'pointer', fontWeight: 600 }}>{lang === 'ar' ? 'تعديل صلاحية الوصول' : 'Edit permissions'}</span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', marginTop: '0.5rem' }}>
+              <button 
+                type="button"
+                onClick={() => {
+                  const existing = checkEmailExists(consentUser.email);
+                  if (existing) {
+                    onLogin({
+                      id: existing.data.id,
+                      name: existing.role === 'instructor' ? (existing.data.nameAr || existing.data.nameEn) : (existing.data.nameEn || existing.data.nameAr),
+                      role: existing.role,
+                      avatar: existing.data.avatar,
+                      email: consentUser.email,
+                      isSubscribed: existing.data.isSubscribed,
+                      isExisting: true
+                    });
+                  } else {
+                    setFullName(consentUser.name);
+                    setEmail(consentUser.email);
+                    setAvatarUrl(consentUser.avatar);
+                    setShowModal(true);
+                  }
+                  setConsentUser(null);
+                  setShowGoogleAuth(false);
+                  setShowFacebookAuth(false);
+                }}
+                style={{ padding: '0.75rem', border: 'none', borderRadius: '8px', backgroundColor: consentUser.type === 'facebook' ? '#1877F2' : '#4285f4', color: 'white', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', width: '100%', textAlign: 'center' }}
+              >
+                {lang === 'ar' ? `متابعة باسم ${consentUser.name.split(' ')[0]}` : `Continue as ${consentUser.name.split(' ')[0]}`}
+              </button>
+
+              <button 
+                type="button"
+                onClick={() => setConsentUser(null)}
+                style={{ padding: '0.7rem', border: 'none', borderRadius: '8px', backgroundColor: '#f3f4f6', color: '#4b5563', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', width: '100%', textAlign: 'center' }}
+              >
+                {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+              </button>
+            </div>
+
+            <p style={{ margin: 0, fontSize: '0.7rem', color: '#6b7280', lineHeight: '1.4', borderTop: '1px solid #e5e7eb', paddingTop: '0.75rem' }}>
+              {lang === 'ar' 
+                ? 'بالمتابعة، سيتلقى EduAcademy صلاحية وصول مستمرة إلى المعلومات التي تشاركها، وسيسجل الحساب الأوقات التي يصل فيها. سياسة الخصوصية وشروط الخدمة.' 
+                : 'By continuing, EduAcademy will receive ongoing access to information you share. Privacy Policy and Terms of Service.'}
+            </p>
           </div>
         </div>
       )}
