@@ -1042,109 +1042,68 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
                 <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>{lang === 'ar' ? 'جاري التحقق والمتابعة...' : 'Verifying account...'}</span>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', textAlign: 'start' }}>
-                <button 
-                  type="button"
-                  onClick={() => {
-                    setAuthLoading(true);
-                    setTimeout(() => {
-                      setAuthLoading(false);
-                      setConsentUser({
-                        name: 'Mohamed Rashed',
-                        email: 'rishobeh@gmail.com',
-                        avatar: PRESET_AVATARS[0],
-                        type: 'google'
-                      });
-                    }, 800);
-                  }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: '1px solid #e5e7eb', borderRadius: '8px', backgroundColor: '#f9fafb', cursor: 'pointer', transition: 'background-color 0.2s', textDecoration: 'none' }}
-                >
-                  <img src={PRESET_AVATARS[0]} style={{ width: '32px', height: '32px', borderRadius: '50%' }} alt="Mohamed" />
-                  <div>
-                    <strong style={{ display: 'block', fontSize: '0.85rem', color: '#1f2937' }}>Mohamed Rashed (أ/ محمد راشد)</strong>
-                    <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>rishobeh@gmail.com</span>
-                  </div>
-                </button>
-
-                <button 
-                  type="button"
-                  onClick={() => {
-                    setAuthLoading(true);
-                    setTimeout(() => {
-                      setAuthLoading(false);
-                      setConsentUser({
-                        name: 'Test Student',
-                        email: 'student.test@gmail.com',
-                        avatar: PRESET_AVATARS[1],
-                        type: 'google'
-                      });
-                    }, 800);
-                  }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', width: '100%', border: '1px solid #e5e7eb', borderRadius: '8px', backgroundColor: '#f9fafb', cursor: 'pointer', transition: 'background-color 0.2s', textDecoration: 'none' }}
-                >
-                  <img src={PRESET_AVATARS[1]} style={{ width: '32px', height: '32px', borderRadius: '50%' }} alt="Student" />
-                  <div>
-                    <strong style={{ display: 'block', fontSize: '0.85rem', color: '#1f2937' }}>Test Student (طالب تجريبي)</strong>
-                    <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>student.test@gmail.com</span>
-                  </div>
-                </button>
-
-                <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '0.75rem', marginTop: '0.25rem' }}>
-                  <span style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: 600 }}>{lang === 'ar' ? 'أو سجل بحساب جوجل جديد باسمك:' : 'Or sign in with a new Google account:'}</span>
-                  <div style={{ display: 'flex', gap: '0.35rem' }}>
-                    <input 
-                      type="text" 
-                      id="custom-google-name"
-                      placeholder={lang === 'ar' ? 'اكتب اسمك الكامل...' : 'Enter your full name...'} 
-                      style={{ flex: 1, padding: '0.4rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.8rem', outline: 'none' }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && e.target.value.trim()) {
-                          const name = e.target.value.trim();
-                          setAuthLoading(true);
-                          setTimeout(() => {
-                            setAuthLoading(false);
-                            setConsentUser({
-                              name: name,
-                              email: `${name.toLowerCase().replace(/\s+/g, '')}@gmail.com`,
-                              avatar: PRESET_AVATARS[2] || PRESET_AVATARS[0],
-                              type: 'google'
-                            });
-                          }, 800);
-                        }
-                      }}
-                    />
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        const input = document.getElementById('custom-google-name');
-                        if (input && input.value.trim()) {
-                          const name = input.value.trim();
-                          setAuthLoading(true);
-                          setTimeout(() => {
-                            setAuthLoading(false);
-                            setConsentUser({
-                              name: name,
-                              email: `${name.toLowerCase().replace(/\s+/g, '')}@gmail.com`,
-                              avatar: PRESET_AVATARS[2] || PRESET_AVATARS[0],
-                              type: 'google'
-                            });
-                          }, 800);
-                        }
-                      }}
-                      style={{ padding: '0.4rem 0.75rem', border: 'none', borderRadius: '6px', backgroundColor: '#4285f4', color: 'white', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
-                    >
-                      {lang === 'ar' ? 'دخول' : 'Go'}
-                    </button>
-                  </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', textAlign: 'start' }}>
+                <span style={{ display: 'block', fontSize: '0.85rem', color: '#4b5563', fontWeight: 600 }}>
+                  {lang === 'ar' ? 'سجل الدخول بحسابك على جوجل:' : 'Sign in with your Google account:'}
+                </span>
+                
+                <div className="form-group">
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#374151', marginBottom: '0.25rem' }}>
+                    {lang === 'ar' ? 'الاسم الكامل' : 'Full Name'}
+                  </label>
+                  <input 
+                    type="text" 
+                    id="custom-google-name"
+                    placeholder={lang === 'ar' ? 'اكتب اسمك الكامل...' : 'Enter your full name...'} 
+                    style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.85rem', outline: 'none', color: '#111827', backgroundColor: '#ffffff' }}
+                  />
                 </div>
 
-                <button 
-                  type="button"
-                  onClick={() => setShowGoogleAuth(false)}
-                  style={{ padding: '0.65rem', border: 'none', borderRadius: '8px', backgroundColor: '#e5e7eb', color: '#374151', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', marginTop: '1rem', width: '100%' }}
-                >
-                  {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-                </button>
+                <div className="form-group">
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#374151', marginBottom: '0.25rem' }}>
+                    {lang === 'ar' ? 'البريد الإلكتروني' : 'Email Address'}
+                  </label>
+                  <input 
+                    type="email" 
+                    id="custom-google-email"
+                    placeholder={lang === 'ar' ? 'مثال: user@gmail.com' : 'e.g. user@gmail.com'} 
+                    style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.85rem', outline: 'none', color: '#111827', backgroundColor: '#ffffff' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <button 
+                    type="button"
+                    onClick={() => setShowGoogleAuth(false)}
+                    style={{ flex: 1, padding: '0.6rem', border: 'none', borderRadius: '8px', backgroundColor: '#e5e7eb', color: '#374151', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const nameInput = document.getElementById('custom-google-name');
+                      const emailInput = document.getElementById('custom-google-email');
+                      if (nameInput && nameInput.value.trim() && emailInput && emailInput.value.trim()) {
+                        const name = nameInput.value.trim();
+                        const email = emailInput.value.trim();
+                        setAuthLoading(true);
+                        setTimeout(() => {
+                          setAuthLoading(false);
+                          setConsentUser({
+                            name: name,
+                            email: email,
+                            avatar: PRESET_AVATARS[0],
+                            type: 'google'
+                          });
+                        }, 800);
+                      }
+                    }}
+                    style={{ flex: 1, padding: '0.6rem', border: 'none', borderRadius: '8px', backgroundColor: '#4285f4', color: 'white', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    {lang === 'ar' ? 'دخول' : 'Sign In'}
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -1187,82 +1146,68 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
                 <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>{lang === 'ar' ? 'جاري الاتصال بـ Facebook...' : 'Connecting to Facebook...'}</span>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
-                <button 
-                  type="button"
-                  onClick={() => {
-                    setAuthLoading(true);
-                    setTimeout(() => {
-                      setAuthLoading(false);
-                      setConsentUser({
-                        name: 'Mohamed Rashed',
-                        email: 'rishobeh@gmail.com',
-                        avatar: PRESET_AVATARS[0],
-                        type: 'facebook'
-                      });
-                    }, 800);
-                  }}
-                  style={{ padding: '0.75rem', border: 'none', borderRadius: '8px', backgroundColor: '#1877F2', color: 'white', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', transition: 'background-color 0.2s', width: '100%' }}
-                >
-                  {lang === 'ar' ? 'متابعة باسم محمد راشد' : 'Continue as Mohamed Rashed'}
-                </button>
-
-                <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '0.75rem', marginTop: '0.25rem' }}>
-                  <span style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: 600 }}>{lang === 'ar' ? 'أو سجل بحساب فيسبوك جديد باسمك:' : 'Or sign in with a new Facebook account:'}</span>
-                  <div style={{ display: 'flex', gap: '0.35rem' }}>
-                    <input 
-                      type="text" 
-                      id="custom-facebook-name"
-                      placeholder={lang === 'ar' ? 'اكتب اسمك الكامل...' : 'Enter your full name...'} 
-                      style={{ flex: 1, padding: '0.4rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.8rem', outline: 'none' }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && e.target.value.trim()) {
-                          const name = e.target.value.trim();
-                          setAuthLoading(true);
-                          setTimeout(() => {
-                            setAuthLoading(false);
-                            setConsentUser({
-                              name: name,
-                              email: `${name.toLowerCase().replace(/\s+/g, '')}@facebook.com`,
-                              avatar: PRESET_AVATARS[0],
-                              type: 'facebook'
-                            });
-                          }, 800);
-                        }
-                      }}
-                    />
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        const input = document.getElementById('custom-facebook-name');
-                        if (input && input.value.trim()) {
-                          const name = input.value.trim();
-                          setAuthLoading(true);
-                          setTimeout(() => {
-                            setAuthLoading(false);
-                            setConsentUser({
-                              name: name,
-                              email: `${name.toLowerCase().replace(/\s+/g, '')}@facebook.com`,
-                              avatar: PRESET_AVATARS[0],
-                              type: 'facebook'
-                            });
-                          }, 800);
-                        }
-                      }}
-                      style={{ padding: '0.4rem 0.75rem', border: 'none', borderRadius: '6px', backgroundColor: '#1877F2', color: 'white', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
-                    >
-                      {lang === 'ar' ? 'دخول' : 'Go'}
-                    </button>
-                  </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', textAlign: 'start' }}>
+                <span style={{ display: 'block', fontSize: '0.85rem', color: '#4b5563', fontWeight: 600 }}>
+                  {lang === 'ar' ? 'سجل الدخول بحسابك على فيسبوك:' : 'Sign in with your Facebook account:'}
+                </span>
+                
+                <div className="form-group">
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#374151', marginBottom: '0.25rem' }}>
+                    {lang === 'ar' ? 'الاسم الكامل' : 'Full Name'}
+                  </label>
+                  <input 
+                    type="text" 
+                    id="custom-facebook-name"
+                    placeholder={lang === 'ar' ? 'اكتب اسمك الكامل...' : 'Enter your full name...'} 
+                    style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.85rem', outline: 'none', color: '#111827', backgroundColor: '#ffffff' }}
+                  />
                 </div>
 
-                <button 
-                  type="button"
-                  onClick={() => setShowFacebookAuth(false)}
-                  style={{ padding: '0.65rem', border: 'none', borderRadius: '8px', backgroundColor: '#e5e7eb', color: '#374151', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', marginTop: '0.25rem', width: '100%' }}
-                >
-                  {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-                </button>
+                <div className="form-group">
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#374151', marginBottom: '0.25rem' }}>
+                    {lang === 'ar' ? 'البريد الإلكتروني' : 'Email Address'}
+                  </label>
+                  <input 
+                    type="email" 
+                    id="custom-facebook-email"
+                    placeholder={lang === 'ar' ? 'مثال: user@facebook.com' : 'e.g. user@facebook.com'} 
+                    style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.85rem', outline: 'none', color: '#111827', backgroundColor: '#ffffff' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <button 
+                    type="button"
+                    onClick={() => setShowFacebookAuth(false)}
+                    style={{ flex: 1, padding: '0.6rem', border: 'none', borderRadius: '8px', backgroundColor: '#e5e7eb', color: '#374151', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const nameInput = document.getElementById('custom-facebook-name');
+                      const emailInput = document.getElementById('custom-facebook-email');
+                      if (nameInput && nameInput.value.trim() && emailInput && emailInput.value.trim()) {
+                        const name = nameInput.value.trim();
+                        const email = emailInput.value.trim();
+                        setAuthLoading(true);
+                        setTimeout(() => {
+                          setAuthLoading(false);
+                          setConsentUser({
+                            name: name,
+                            email: email,
+                            avatar: PRESET_AVATARS[0],
+                            type: 'facebook'
+                          });
+                        }, 800);
+                      }
+                    }}
+                    style={{ flex: 1, padding: '0.6rem', border: 'none', borderRadius: '8px', backgroundColor: '#1877F2', color: 'white', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    {lang === 'ar' ? 'دخول' : 'Sign In'}
+                  </button>
+                </div>
               </div>
             )}
           </div>
