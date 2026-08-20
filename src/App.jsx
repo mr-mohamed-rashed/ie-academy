@@ -938,6 +938,7 @@ function App() {
 
                 {/* Card 1: Registration & Search */}
                 <div className="glass-card" style={{ 
+                  flex: 1,
                   padding: '1.5rem', 
                   borderRadius: '20px', 
                   border: '1px solid rgba(139, 92, 246, 0.3)', 
@@ -965,6 +966,7 @@ function App() {
 
                 {/* Card 2: Student Learning & Benefits */}
                 <div className="glass-card" style={{ 
+                  flex: 1,
                   padding: '1.5rem', 
                   borderRadius: '20px', 
                   border: '1px solid rgba(16, 185, 129, 0.3)', 
@@ -993,6 +995,7 @@ function App() {
 
                 {/* Card 3: Parent Tracking & Reports */}
                 <div className="glass-card" style={{ 
+                  flex: 1,
                   padding: '1.5rem', 
                   borderRadius: '20px', 
                   border: '1px solid rgba(245, 158, 11, 0.3)', 
@@ -1019,7 +1022,7 @@ function App() {
                 </div>
               </div>
 
-              {/* Column 2: Teacher Gate (2 Cards) */}
+              {/* Column 2: Teacher Gate (3 Cards) */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
                   <BookOpen size={28} color="var(--accent-primary)" />
@@ -1030,6 +1033,7 @@ function App() {
 
                 {/* Card 1: How the Instructor uses the platform */}
                 <div className="glass-card" style={{ 
+                  flex: 1,
                   padding: '1.5rem', 
                   borderRadius: '20px', 
                   border: '1px solid rgba(99, 102, 241, 0.3)', 
@@ -1058,6 +1062,7 @@ function App() {
 
                 {/* Card 2: How the Instructor benefits */}
                 <div className="glass-card" style={{ 
+                  flex: 1,
                   padding: '1.5rem', 
                   borderRadius: '20px', 
                   border: '1px solid rgba(244, 63, 94, 0.3)', 
@@ -1086,6 +1091,7 @@ function App() {
 
                 {/* Card 3: VIP Upgrade & Promotion */}
                 <div className="glass-card" style={{ 
+                  flex: 1,
                   padding: '1.5rem', 
                   borderRadius: '20px', 
                   border: '1px solid rgba(245, 158, 11, 0.3)', 
