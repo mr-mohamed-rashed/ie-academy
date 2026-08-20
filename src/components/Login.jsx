@@ -525,6 +525,37 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setErrorMessage('');
+    
+    // For direct email signup via wizard
+    const isLocalEmailSignup = !consentUser || consentUser.type === 'email_signup';
+    if (isLocalEmailSignup) {
+      if (!email) {
+        setErrorMessage(lang === 'ar' ? 'الرجاء إدخال البريد الإلكتروني!' : 'Please enter email address!');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setErrorMessage(lang === 'ar' ? 'كلمتا المرور غير متطابقتين!' : 'Passwords do not match!');
+        return;
+      }
+      
+      // Check if email already exists
+      const savedInstructors = JSON.parse(localStorage.getItem('edu_instructors') || '[]');
+      const savedStudents = JSON.parse(localStorage.getItem('edu_students') || '[]');
+      const emailExists = savedInstructors.some(i => i.email?.toLowerCase() === email.toLowerCase()) || 
+                          savedStudents.some(s => s.email?.toLowerCase() === email.toLowerCase());
+      
+      if (emailExists) {
+        setErrorMessage(lang === 'ar' ? 'هذا البريد الإلكتروني مسجل بالفعل!' : 'This email is already registered!');
+        return;
+      }
+      
+      // Save password
+      const passwords = JSON.parse(localStorage.getItem('edu_user_passwords') || '{}');
+      passwords[email.toLowerCase()] = password;
+      localStorage.setItem('edu_user_passwords', JSON.stringify(passwords));
+    }
+
     if (role === 'student') {
       if (!/^\d{11}$/.test(studentPhone)) {
         setErrorMessage(lang === 'ar' ? 'رقم هاتف الطالب يجب أن يتكون من 11 رقماً!' : 'Student phone number must be exactly 11 digits!');
@@ -556,6 +587,7 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
 
     onLogin({
       name: fullName,
+      email: isLocalEmailSignup ? email : (consentUser?.email || ''),
       role: role,
       avatar: avatarUrl,
       subject: role === 'instructor' ? subject : '',
@@ -803,6 +835,12 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
                 </div>
               )}
 
+              {errorMessage && (
+                <div style={{ padding: '0.75rem', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.15)', color: 'var(--accent-red)', fontSize: '0.85rem', fontWeight: 600, border: '1px solid rgba(239, 68, 68, 0.2)', marginBottom: '1rem' }}>
+                  {errorMessage}
+                </div>
+              )}
+
               {/* Name Input */}
               <div className="form-group">
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
@@ -816,8 +854,62 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required 
+                  style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
                 />
               </div>
+
+              {/* Local Email & Passwords Fields */}
+              {(!consentUser || consentUser.type === 'email_signup') && (
+                <>
+                  <div className="form-group" style={{ marginTop: '1rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <span style={{ fontSize: '0.9rem' }}>@</span>
+                      <span>{t.emailLabel}</span>
+                    </label>
+                    <input 
+                      type="email" 
+                      className="form-control" 
+                      placeholder="example@mail.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required 
+                      style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ marginTop: '1rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <span style={{ fontSize: '0.9rem' }}>🔑</span>
+                      <span>{t.passwordLabel}</span>
+                    </label>
+                    <input 
+                      type="password" 
+                      className="form-control" 
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required 
+                      style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ marginTop: '1rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <span style={{ fontSize: '0.9rem' }}>🔑</span>
+                      <span>{lang === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}</span>
+                    </label>
+                    <input 
+                      type="password" 
+                      className="form-control" 
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required 
+                      style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
+                    />
+                  </div>
+                </>
+              )}
 
               {/* Profile Avatar Field */}
               <div className="form-group" style={{ marginBottom: '1.25rem' }}>
@@ -1160,6 +1252,20 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
               )}
 
             </form>
+
+            {(!consentUser || consentUser.type === 'email_signup') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowModal(false);
+                  setIsRegisterMode(false);
+                  setLoginTab('email');
+                }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', textDecoration: 'underline', cursor: 'pointer', textAlign: 'center', marginTop: '1rem', width: '100%' }}
+              >
+                {lang === 'ar' ? 'لديك حساب بالفعل؟ تسجيل الدخول هنا' : 'Already have an account? Log In here'}
+              </button>
+            )}
           </div>
         </div>
       )}
