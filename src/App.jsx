@@ -1409,7 +1409,7 @@ function App() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             backdropFilter: 'blur(10px)'
           }}>
-            <Login onLogin={handleLogin} lang={lang} instructors={instructors} initialRole={loginModalRole} onClose={() => setShowLoginModal(false)} supabaseUser={supabaseUser} />
+            <Login onLogin={handleLogin} lang={lang} instructors={instructors} students={students} initialRole={loginModalRole} onClose={() => setShowLoginModal(false)} supabaseUser={supabaseUser} />
           </div>
         )}
 

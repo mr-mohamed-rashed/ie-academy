@@ -11,7 +11,7 @@ const PRESET_AVATARS = [
   "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=120"
 ];
 
-const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabaseUser }) => {
+const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, onClose, supabaseUser }) => {
   const [showModal, setShowModal] = useState(false);
   const [inviteTeacherId, setInviteTeacherId] = useState(null);
   const [isAdminMode, setIsAdminMode] = useState(false);
