@@ -61,8 +61,9 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
   const [studentStep, setStudentStep] = useState(1);
 
   // Email login / signup states
+  const [authMode, setAuthMode] = useState(initialRole ? 'signup' : 'login'); // 'login' | 'signup'
   const [loginTab, setLoginTab] = useState(initialRole === 'admin' ? 'email' : 'quick'); // 'quick' | 'email'
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
+  const [isRegisterMode, setIsRegisterMode] = useState(initialRole ? true : false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
