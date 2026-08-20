@@ -2,6 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { BookOpen, User, Briefcase, Camera, Check } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
+const decodeJwt = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error("Failed to decode JWT:", e);
+    return null;
+  }
+};
+
 const PRESET_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120",
   "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=120",
@@ -106,7 +120,7 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
     setImgDims({ width: w, height: h });
   };
 
-  // Load saved credentials on mount
+  // Load saved credentials on mount and initialize Google / Facebook SDKs
   useEffect(() => {
     const savedEmail = localStorage.getItem('edu_saved_email');
     const savedPassword = localStorage.getItem('edu_saved_password');
@@ -116,7 +130,62 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
       setRememberMe(true);
       setLoginTab('email');
     }
+
+    // 1. Load Google Identity Services SDK programmatically
+    if (!window.google) {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        initializeGoogleSDK();
+      };
+      document.body.appendChild(script);
+    } else {
+      initializeGoogleSDK();
+    }
+
+    // 2. Load Facebook SDK programmatically
+    if (!window.FB) {
+      window.fbAsyncInit = function() {
+        const fbAppId = import.meta.env.VITE_FACEBOOK_APP_ID || '1591873838289456';
+        window.FB.init({
+          appId      : fbAppId,
+          cookie     : true,
+          xfbml      : true,
+          version    : 'v18.0'
+        });
+      };
+      const script = document.createElement('script');
+      script.src = 'https://connect.facebook.net/ar_AR/sdk.js';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
   }, []);
+
+  const initializeGoogleSDK = () => {
+    if (window.google) {
+      const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1092837491-example.apps.googleusercontent.com';
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: handleGoogleCredentialResponse
+      });
+    }
+  };
+
+  const handleGoogleCredentialResponse = (response) => {
+    const decoded = decodeJwt(response.credential);
+    if (decoded) {
+      setConsentUser({
+        name: decoded.name || decoded.given_name || 'Google User',
+        email: decoded.email,
+        avatar: decoded.picture || PRESET_AVATARS[0],
+        type: 'google',
+        token: response.credential
+      });
+    }
+  };
 
   // Autofill consentUser from active Supabase session
   useEffect(() => {
@@ -387,19 +456,31 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
         setErrorMessage(error.message);
       }
     } else {
-      // Mock Google Login: prompt for details to simulate real Google Auth!
-      const testName = prompt(lang === 'ar' ? "أدخل اسم حسابك على جوجل (لمحاكاة تسجيل الدخول):" : "Enter your Google account name (to simulate login):", "محمد أحمد");
-      if (testName === null) return; // User cancelled
-      const testEmail = prompt(lang === 'ar' ? "أدخل البريد الإلكتروني لجوجل:" : "Enter your Google email:", "user.test@gmail.com");
-      if (!testEmail) return;
-      
-      setConsentUser({
-        name: testName.trim(),
-        email: testEmail.trim().toLowerCase(),
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120',
-        type: 'google'
-      });
+      // Try to trigger Google Identity Services SDK prompt
+      if (window.google) {
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            triggerMockGooglePrompt();
+          }
+        });
+      } else {
+        triggerMockGooglePrompt();
+      }
     }
+  };
+
+  const triggerMockGooglePrompt = () => {
+    const testName = prompt(lang === 'ar' ? "أدخل اسم حسابك على جوجل (لمحاكاة تسجيل الدخول):" : "Enter your Google account name (to simulate login):", "محمد أحمد");
+    if (testName === null) return; // User cancelled
+    const testEmail = prompt(lang === 'ar' ? "أدخل البريد الإلكتروني لجوجل:" : "Enter your Google email:", "user.test@gmail.com");
+    if (!testEmail) return;
+    
+    setConsentUser({
+      name: testName.trim(),
+      email: testEmail.trim().toLowerCase(),
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120',
+      type: 'google'
+    });
   };
 
   const handleFacebookClick = async () => {
@@ -418,18 +499,38 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
         setErrorMessage(error.message);
       }
     } else {
-      // Mock Facebook Login: prompt for details to simulate real Facebook Auth!
-      const testName = prompt(lang === 'ar' ? "أدخل اسم حسابك على فيسبوك (لمحاكاة تسجيل الدخول):" : "Enter your Facebook account name (to simulate login):", "محمد أحمد");
-      if (testName === null) return;
-      const testEmail = prompt(lang === 'ar' ? "أدخل البريد الإلكتروني لفيسبوك:" : "Enter your Facebook email:", "user.test@facebook.com");
-      if (!testEmail) return;
+      // Try to trigger real Facebook SDK login
+      if (window.FB) {
+        window.FB.login((response) => {
+          if (response.authResponse) {
+            const accessToken = response.authResponse.accessToken;
+            window.FB.api('/me', { fields: 'name,email,picture.type(large)' }, (userInfo) => {
+              setConsentUser({
+                name: userInfo.name || 'Facebook User',
+                email: userInfo.email || 'user.test@facebook.com',
+                avatar: userInfo.picture?.data?.url || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120',
+                type: 'facebook',
+                token: accessToken
+              });
+            });
+          } else {
+            console.warn('Facebook authentication cancelled or not fully authorized.');
+          }
+        }, { scope: 'public_profile,email' });
+      } else {
+        // Fallback prompt in case Facebook SDK is blocked by browser shield/AdBlock
+        const testName = prompt(lang === 'ar' ? "أدخل اسم حسابك على فيسبوك (لمحاكاة تسجيل الدخول):" : "Enter your Facebook account name (to simulate login):", "محمد أحمد");
+        if (testName === null) return;
+        const testEmail = prompt(lang === 'ar' ? "أدخل البريد الإلكتروني لفيسبوك:" : "Enter your Facebook email:", "user.test@facebook.com");
+        if (!testEmail) return;
 
-      setConsentUser({
-        name: testName.trim(),
-        email: testEmail.trim().toLowerCase(),
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120',
-        type: 'facebook'
-      });
+        setConsentUser({
+          name: testName.trim(),
+          email: testEmail.trim().toLowerCase(),
+          avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120',
+          type: 'facebook'
+        });
+      }
     }
   };
 
