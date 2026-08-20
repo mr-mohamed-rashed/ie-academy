@@ -350,7 +350,9 @@ const Navbar = ({
                     ? (currentUser.subject || 'Instructor') 
                     : (currentUser.role === 'admin' 
                       ? (lang === 'ar' ? 'مدير المنصة' : 'System Admin')
-                      : (lang === 'ar' ? 'طالب جوجل' : 'Google Student'))}
+                      : (currentUser.role === 'support'
+                        ? (lang === 'ar' ? 'الدعم الفني والخدمة' : 'Support Team')
+                        : (lang === 'ar' ? 'طالب جوجل' : 'Google Student')))}
                 </p>
               </div>
             </div>

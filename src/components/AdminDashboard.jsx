@@ -45,10 +45,20 @@ const AdminDashboard = ({
   setAcademicYearFee,
   pendingPayments = [],
   onApprovePayment,
-  onRejectPayment
+  onRejectPayment,
+  supportAgents = [],
+  onAddSupportAgent,
+  onDeleteSupportAgent
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingScreenshot, setViewingScreenshot] = useState(null);
+  const [adminTab, setAdminTab] = useState('dashboard'); // 'dashboard' | 'support'
+  
+  // Support agent form states
+  const [supportName, setSupportName] = useState('');
+  const [supportEmail, setSupportEmail] = useState('');
+  const [supportPhone, setSupportPhone] = useState('');
+  const [showAddSupportModal, setShowAddSupportModal] = useState(false);
   
   // Modals visibility states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -281,7 +291,7 @@ const AdminDashboard = ({
     <div style={{ animation: 'slide-in 0.3s ease-out' }}>
       
       {/* Title Header */}
-      <div className="card-title-group" style={{ marginBottom: '2rem' }}>
+      <div className="card-title-group" style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <ShieldAlert size={26} color="var(--accent-purple)" />
           <span>{t.adminTitle}</span>
@@ -289,11 +299,38 @@ const AdminDashboard = ({
         <p>{t.adminSubtitle}</p>
       </div>
 
-      {/* KPI Stats cards */}
-      <div className="dashboard-grid" style={{ marginBottom: '2.5rem' }}>
-        
-        {/* Total Teachers */}
-        <div className="glass-card" style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem' }}>
+      {/* Tab Switcher */}
+      <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid var(--border-glass)', marginBottom: '2rem', paddingBottom: '0.5rem' }}>
+        <button 
+          onClick={() => setAdminTab('dashboard')}
+          style={{
+            padding: '0.5rem 1.25rem', borderRadius: '8px', border: 'none',
+            backgroundColor: adminTab === 'dashboard' ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+            color: adminTab === 'dashboard' ? 'var(--accent-primary)' : 'var(--text-muted)',
+            fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem', transition: 'all 0.2s'
+          }}
+        >
+          {lang === 'ar' ? 'إدارة المدرسين والاشتراكات' : 'Instructors & Payments'}
+        </button>
+        <button 
+          onClick={() => setAdminTab('support')}
+          style={{
+            padding: '0.5rem 1.25rem', borderRadius: '8px', border: 'none',
+            backgroundColor: adminTab === 'support' ? 'rgba(139, 92, 246, 0.15)' : 'transparent',
+            color: adminTab === 'support' ? 'var(--accent-purple)' : 'var(--text-muted)',
+            fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem', transition: 'all 0.2s'
+          }}
+        >
+          {lang === 'ar' ? 'إدارة فريق الدعم الفني' : 'Technical Support Team'}
+        </button>
+      </div>
+
+      {adminTab === 'dashboard' && (
+        <>
+          {/* KPI Stats cards */}
+          <div className="dashboard-grid" style={{ marginBottom: '2.5rem' }}>
+            {/* Total Teachers */}
+            <div className="glass-card" style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem' }}>
           <div style={{ padding: '0.75rem', borderRadius: '12px', backgroundColor: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-primary)' }}>
             <Users size={24} />
           </div>
@@ -868,6 +905,163 @@ const AdminDashboard = ({
                 </button>
                 <button type="submit" className="btn-primary" style={{ flex: 1 }}>
                   {t.saveBtn}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
+      </>)}
+
+      {/* 2. Support Team Tab */}
+      {adminTab === 'support' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div className="glass-card" style={{ padding: '2rem', textAlign: 'start' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>
+                  {lang === 'ar' ? 'فريق الدعم الفني وخدمة العملاء' : 'Customer Service & Support Team'}
+                </h3>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  {lang === 'ar' ? 'أضف وكلاء الدعم الفني وانسخ لهم روابط المتابعة والولوج لمراقبة سلوك المشاهدة وأرقام الهواتف للطلاب.' : 'Add support agents and copy their invitation monitoring links.'}
+                </p>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setSupportName('');
+                  setSupportEmail('');
+                  setSupportPhone('');
+                  setShowAddSupportModal(true);
+                }}
+                className="btn-primary" 
+                style={{ width: 'auto', padding: '0.6rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              >
+                <PlusCircle size={16} />
+                <span>{lang === 'ar' ? 'إضافة وكيل دعم جديد' : 'Add Support Agent'}</span>
+              </button>
+            </div>
+
+            {/* General Support Login Link */}
+            <div style={{ backgroundColor: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)', padding: '1rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+              <div>
+                <strong style={{ fontSize: '0.85rem', display: 'block', color: 'var(--accent-primary)' }}>
+                  {lang === 'ar' ? 'الرابط العام لتسجيل دخول الدعم الفني:' : 'General Support Login Link:'}
+                </strong>
+                <code style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  {window.location.origin}/?role=support
+                </code>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/?role=support`);
+                  triggerToast(lang === 'ar' ? 'تم نسخ الرابط العام للدعم الفني!' : 'General support link copied!', 'success');
+                }}
+                className="config-btn"
+                style={{ fontSize: '0.8rem', padding: '0.4rem 0.75rem', borderColor: 'var(--accent-primary)', color: 'var(--accent-primary)' }}
+              >
+                {lang === 'ar' ? 'نسخ الرابط' : 'Copy Link'}
+              </button>
+            </div>
+
+            {/* Support Agents Table */}
+            {supportAgents.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
+                {lang === 'ar' ? 'لا يوجد وكلاء دعم فني مسجلين حالياً. أضف وكيلاً للبدء.' : 'No support agents registered yet. Add one to start.'}
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'start' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid var(--border-glass)', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                      <th style={{ padding: '0.75rem 1rem' }}>{lang === 'ar' ? 'الاسم' : 'Name'}</th>
+                      <th style={{ padding: '0.75rem 1rem' }}>{lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}</th>
+                      <th style={{ padding: '0.75rem 1rem' }}>{lang === 'ar' ? 'الهاتف' : 'Phone'}</th>
+                      <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>{lang === 'ar' ? 'رابط الدخول المباشر' : 'Direct Access Link'}</th>
+                      <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>{lang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {supportAgents.map((agent) => {
+                      const directLink = `${window.location.origin}/?role=support&email=${encodeURIComponent(agent.email)}`;
+                      return (
+                        <tr key={agent.id} style={{ borderBottom: '1px solid var(--border-glass)', fontSize: '0.9rem' }}>
+                          <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{agent.name}</td>
+                          <td style={{ padding: '0.75rem 1rem', color: 'var(--text-secondary)' }}>{agent.email}</td>
+                          <td style={{ padding: '0.75rem 1rem', color: 'var(--text-secondary)' }}>{agent.phone || '-'}</td>
+                          <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(directLink);
+                                triggerToast(lang === 'ar' ? 'تم نسخ رابط الولوج المباشر للدعم الفني!' : 'Direct access link copied!', 'success');
+                              }}
+                              className="config-btn"
+                              style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem', borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)' }}
+                            >
+                              {lang === 'ar' ? 'نسخ رابط الدخول' : 'Copy Access Link'}
+                            </button>
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (window.confirm(lang === 'ar' ? 'هل أنت متأكد من حذف عضو الدعم الفني هذا؟' : 'Are you sure you want to delete this support agent?')) {
+                                  onDeleteSupportAgent(agent.id);
+                                  triggerToast(lang === 'ar' ? 'تم حذف العضو بنجاح' : 'Agent deleted successfully', 'success');
+                                }
+                              }}
+                              className="config-btn"
+                              style={{ borderColor: 'var(--accent-red)', color: 'var(--accent-red)', padding: '0.35rem 0.65rem' }}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Add Support Agent Modal Overlay */}
+      {showAddSupportModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 6000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '400px', padding: '2rem', textAlign: 'start' }}>
+            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.25rem' }}>
+              {lang === 'ar' ? 'إضافة عضو دعم فني جديد' : 'Add New Support Member'}
+            </h3>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (!supportName || !supportEmail) return;
+              onAddSupportAgent({ name: supportName, email: supportEmail, phone: supportPhone });
+              setShowAddSupportModal(false);
+              triggerToast(lang === 'ar' ? 'تم إضافة عضو الدعم بنجاح!' : 'Support agent added successfully!', 'success');
+            }}>
+              <div className="form-group">
+                <label>{lang === 'ar' ? 'اسم وكيل الدعم' : 'Agent Full Name'}</label>
+                <input type="text" className="form-control" value={supportName} onChange={e => setSupportName(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+              </div>
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>{lang === 'ar' ? 'البريد الإلكتروني' : 'Email Address'}</label>
+                <input type="email" className="form-control" value={supportEmail} onChange={e => setSupportEmail(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+              </div>
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>{lang === 'ar' ? 'رقم الهاتف (واتساب)' : 'Phone (WhatsApp)'}</label>
+                <input type="tel" className="form-control" value={supportPhone} onChange={e => setSupportPhone(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                <button type="button" onClick={() => setShowAddSupportModal(false)} className="config-btn" style={{ flex: 1, justifyContent: 'center' }}>
+                  {t.cancelBtn}
+                </button>
+                <button type="submit" className="btn-primary" style={{ flex: 1 }}>
+                  {lang === 'ar' ? 'إضافة وتوليد رابط' : 'Add & Create'}
                 </button>
               </div>
             </form>

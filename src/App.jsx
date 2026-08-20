@@ -6,6 +6,7 @@ import { supabase } from './supabaseClient';
 import InstructorDashboard from './components/InstructorDashboard';
 import StudentDashboard from './components/StudentDashboard';
 import AdminDashboard from './components/AdminDashboard';
+import SupportDashboard from './components/SupportDashboard';
 import TeacherProfileModal from './components/TeacherProfileModal';
 import TeacherDetailsModal from './components/TeacherDetailsModal';
 import { initialStudents, initialSessions, initialInstructors } from './mockData';
@@ -194,6 +195,51 @@ function App() {
   
   // Real Supabase OAuth User state
   const [supabaseUser, setSupabaseUser] = useState(null);
+  
+  // Technical Support Agents list state
+  const [supportAgents, setSupportAgents] = useState(() => {
+    const saved = localStorage.getItem('edu_support_agents');
+    return saved ? JSON.parse(saved) : [
+      { id: 1, name: "م. أحمد علي (دعم فني)", email: "ahmed.support@ie-academy.com", phone: "01099887766" }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('edu_support_agents', JSON.stringify(supportAgents));
+  }, [supportAgents]);
+
+  const handleAddSupportAgent = (agent) => {
+    const newAgent = {
+      id: Date.now(),
+      name: agent.name,
+      email: agent.email,
+      phone: agent.phone
+    };
+    setSupportAgents(prev => [...prev, newAgent]);
+  };
+
+  const handleDeleteSupportAgent = (id) => {
+    setSupportAgents(prev => prev.filter(a => a.id !== id));
+  };
+
+  // Handle Support Agent Direct Link Login
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const roleParam = params.get('role');
+    const emailParam = params.get('email');
+    if (roleParam === 'support') {
+      setIsLoggedIn(true);
+      setUserRole('support');
+      setCurrentUser({
+        name: emailParam ? emailParam.split('@')[0] : (lang === 'ar' ? 'وكيل الدعم' : 'Support Agent'),
+        email: emailParam || 'support@ie-academy.com',
+        role: 'support',
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120'
+      });
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [lang]);
   
   // PWA Install Prompt State
   const [deferredPrompt, setDeferredPrompt] = useState(null);
@@ -1710,6 +1756,15 @@ function App() {
           />
         )}
 
+        {userRole === 'support' && (
+          <SupportDashboard
+            students={students}
+            lang={lang}
+            onLogout={handleLogout}
+            currentUser={currentUser}
+          />
+        )}
+
         {userRole === 'admin' && (
           <AdminDashboard
             instructors={instructors}
@@ -1727,6 +1782,9 @@ function App() {
             pendingPayments={pendingPayments}
             onApprovePayment={handleApprovePayment}
             onRejectPayment={handleRejectPayment}
+            supportAgents={supportAgents}
+            onAddSupportAgent={handleAddSupportAgent}
+            onDeleteSupportAgent={handleDeleteSupportAgent}
           />
         )}
 
