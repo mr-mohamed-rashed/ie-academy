@@ -470,14 +470,10 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
   };
 
   const triggerMockGooglePrompt = () => {
-    const testName = prompt(lang === 'ar' ? "أدخل اسم حسابك على جوجل (لمحاكاة تسجيل الدخول):" : "Enter your Google account name (to simulate login):", "محمد أحمد");
-    if (testName === null) return; // User cancelled
-    const testEmail = prompt(lang === 'ar' ? "أدخل البريد الإلكتروني لجوجل:" : "Enter your Google email:", "user.test@gmail.com");
-    if (!testEmail) return;
-    
+    const randomId = Math.floor(1000 + Math.random() * 9000);
     setConsentUser({
-      name: testName.trim(),
-      email: testEmail.trim().toLowerCase(),
+      name: lang === 'ar' ? `مستخدم جوجل ${randomId}` : `Google User ${randomId}`,
+      email: `google.user${randomId}@gmail.com`,
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120',
       type: 'google'
     });
@@ -518,15 +514,11 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
           }
         }, { scope: 'public_profile,email' });
       } else {
-        // Fallback prompt in case Facebook SDK is blocked by browser shield/AdBlock
-        const testName = prompt(lang === 'ar' ? "أدخل اسم حسابك على فيسبوك (لمحاكاة تسجيل الدخول):" : "Enter your Facebook account name (to simulate login):", "محمد أحمد");
-        if (testName === null) return;
-        const testEmail = prompt(lang === 'ar' ? "أدخل البريد الإلكتروني لفيسبوك:" : "Enter your Facebook email:", "user.test@facebook.com");
-        if (!testEmail) return;
-
+        // Generate mock user directly without browser prompt
+        const randomId = Math.floor(1000 + Math.random() * 9000);
         setConsentUser({
-          name: testName.trim(),
-          email: testEmail.trim().toLowerCase(),
+          name: lang === 'ar' ? `مستخدم فيسبوك ${randomId}` : `Facebook User ${randomId}`,
+          email: `facebook.user${randomId}@facebook.com`,
           avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120',
           type: 'facebook'
         });
