@@ -855,6 +855,49 @@ function App() {
           </div>
         </section>
 
+        {/* Top 10 VIP Instructors Infinite Loop Row */}
+        {subscribedTeachers.length > 0 && (
+          <div className="marquee-container">
+            <div className="marquee-track">
+              {/* Multiply the array to ensure enough cards for seamless overflow scrolling */}
+              {[
+                ...subscribedTeachers,
+                ...subscribedTeachers,
+                ...subscribedTeachers,
+                ...subscribedTeachers,
+                ...subscribedTeachers
+              ].slice(0, 15).map((teacher, idx) => (
+                <div 
+                  key={`${teacher.id}-${idx}`} 
+                  className="marquee-teacher-card"
+                  onClick={() => setSelectedTeacherDetails(teacher)}
+                >
+                  <img 
+                    src={teacher.avatar} 
+                    alt={teacher.nameEn} 
+                    style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--color-gold)', boxShadow: '0 4px 12px rgba(251, 191, 36, 0.3)' }}
+                  />
+                  <div>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>{lang === 'ar' ? teacher.nameAr : teacher.nameEn}</h4>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-primary)', display: 'block', marginTop: '0.2rem' }}>
+                      {lang === 'ar' ? teacher.subjectAr : teacher.subjectEn}
+                    </span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '0.75rem', color: 'var(--text-secondary)', padding: '0.4rem 0.75rem', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
+                    <span>{lang === 'ar' ? 'الطلاب: ٣٠+' : 'Students: 30+'}</span>
+                    <span>{lang === 'ar' ? 'المحاضرات: ٦' : 'Lectures: 6'}</span>
+                  </div>
+                  
+                  <button className="config-btn" style={{ fontSize: '0.75rem', padding: '0.35rem 1rem', pointerEvents: 'none', border: 'none', backgroundColor: '#fff', color: '#000', fontWeight: 800, borderRadius: '8px', width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    {lang === 'ar' ? 'اعرف أكثر' : 'Know More'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Main Content Tabs (Guides, Subscribed Teachers, Centers Gallery) */}
         <section id="explore-section" className="visitor-content-section" style={{ maxWidth: '1200px', margin: '0 auto', padding: '4rem 1.5rem' }}>
           <div className="role-selector-container" style={{ justifyContent: 'center', marginBottom: '3rem', width: '100%', gap: '1rem', position: 'relative', zIndex: 10 }}>

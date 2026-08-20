@@ -1430,3 +1430,67 @@ body.rtl .visitor-hero h1 {
     align-items: stretch;
   }
 }
+
+/* Infinite Marquee styles */
+.marquee-container {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  background: var(--bg-card);
+  padding: 2.25rem 0;
+  border-top: 1px solid var(--border-glass);
+  border-bottom: 1px solid var(--border-glass);
+  direction: ltr !important; /* Force LTR scroll direction */
+  user-select: none;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 1.75rem;
+  padding-left: 1.75rem;
+  animation: marquee-scroll-animation 35s linear infinite;
+}
+
+.marquee-container:hover .marquee-track,
+.marquee-container:active .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll-animation {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Premium Marquee Teacher Card */
+.marquee-teacher-card {
+  width: 260px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.25) 100%);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.15rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  direction: rtl; /* Reset content direction to RTL */
+}
+
+[data-theme="light"] .marquee-teacher-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.marquee-teacher-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.18);
+  border-color: var(--accent-primary);
+}
