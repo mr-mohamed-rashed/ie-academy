@@ -363,7 +363,13 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
         setErrorMessage(error.message);
       }
     } else {
-      setShowGoogleAuth(true);
+      // Mock Google Login: Instantly authenticates with a mock Google user
+      setConsentUser({
+        name: lang === 'ar' ? 'أحمد محمد (طالب جوجل)' : 'Ahmed Mohamed (Google)',
+        email: 'ahmed.demo@gmail.com',
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120',
+        type: 'google'
+      });
     }
   };
 
@@ -383,7 +389,13 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
         setErrorMessage(error.message);
       }
     } else {
-      setShowFacebookAuth(true);
+      // Mock Facebook Login: Instantly authenticates with a mock Facebook user
+      setConsentUser({
+        name: lang === 'ar' ? 'سارة أحمد (طالب فيسبوك)' : 'Sarah Ahmed (Facebook)',
+        email: 'sarah.demo@facebook.com',
+        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120',
+        type: 'facebook'
+      });
     }
   };
 
@@ -1005,214 +1017,7 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
         </div>
       )}
 
-      {/* Simulated Google Authentication Choose Account Modal */}
-      {showGoogleAuth && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.85)',
-          zIndex: 3000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backdropFilter: 'blur(8px)',
-          direction: lang === 'ar' ? 'rtl' : 'ltr'
-        }}>
-          <div className="glass-card" style={{ width: '90%', maxWidth: '400px', padding: '2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.5rem', backgroundColor: '#ffffff', color: '#1f2937' }}>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <svg style={{ width: '40px', height: '40px' }} viewBox="0 0 24 24">
-                <path fill="#ea4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2A11.95 11.95 0 0 0 12 0 11.94 11.94 0 0 0 1.29 6.29l3.73 2.9A7.12 7.12 0 0 1 12 5.04z"/>
-                <path fill="#4285f4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46a5.53 5.53 0 0 1-2.4 3.63l3.73 2.9a11.92 11.92 0 0 0 3.7-8.68z"/>
-                <path fill="#fbbc05" d="M5.02 8.78A7.13 7.13 0 0 1 12 5.04a7.12 7.12 0 0 1 6.98 3.74l3.73-2.9A11.94 11.94 0 0 0 12 0C7.8 0 4.19 2.05 2.02 5.24l3.73 2.9.27.64z"/>
-                <path fill="#34a853" d="M12 18.96c-1.92 0-3.63-.64-4.98-1.74l-3.73 2.9C5.46 21.95 8.54 24 12 24c4.14 0 7.73-1.4 10.3-3.8l-3.73-2.9a7.12 7.12 0 0 1-6.57 1.66z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#111827' }}>
-                {lang === 'ar' ? 'اختر حساباً للمتابعة' : 'Choose an account'}
-              </h3>
-              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#6b7280' }}>
-                {lang === 'ar' ? 'للمتابعة إلى منصة أكاديمية التعليم' : 'to continue to EduAcademy Portal'}
-              </p>
-            </div>
 
-            {authLoading ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '1rem' }}>
-                <div className="loader" style={{ width: '30px', height: '30px', borderTopColor: '#4285f4' }}></div>
-                <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>{lang === 'ar' ? 'جاري التحقق والمتابعة...' : 'Verifying account...'}</span>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', textAlign: 'start' }}>
-                <span style={{ display: 'block', fontSize: '0.85rem', color: '#4b5563', fontWeight: 600 }}>
-                  {lang === 'ar' ? 'سجل الدخول بحسابك على جوجل:' : 'Sign in with your Google account:'}
-                </span>
-                
-                <div className="form-group">
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#374151', marginBottom: '0.25rem' }}>
-                    {lang === 'ar' ? 'الاسم الكامل' : 'Full Name'}
-                  </label>
-                  <input 
-                    type="text" 
-                    id="custom-google-name"
-                    placeholder={lang === 'ar' ? 'اكتب اسمك الكامل...' : 'Enter your full name...'} 
-                    style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.85rem', outline: 'none', color: '#111827', backgroundColor: '#ffffff' }}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#374151', marginBottom: '0.25rem' }}>
-                    {lang === 'ar' ? 'البريد الإلكتروني' : 'Email Address'}
-                  </label>
-                  <input 
-                    type="email" 
-                    id="custom-google-email"
-                    placeholder={lang === 'ar' ? 'مثال: user@gmail.com' : 'e.g. user@gmail.com'} 
-                    style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.85rem', outline: 'none', color: '#111827', backgroundColor: '#ffffff' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-                  <button 
-                    type="button"
-                    onClick={() => setShowGoogleAuth(false)}
-                    style={{ flex: 1, padding: '0.6rem', border: 'none', borderRadius: '8px', backgroundColor: '#e5e7eb', color: '#374151', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
-                  >
-                    {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-                  </button>
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      const nameInput = document.getElementById('custom-google-name');
-                      const emailInput = document.getElementById('custom-google-email');
-                      if (nameInput && nameInput.value.trim() && emailInput && emailInput.value.trim()) {
-                        const name = nameInput.value.trim();
-                        const email = emailInput.value.trim();
-                        setAuthLoading(true);
-                        setTimeout(() => {
-                          setAuthLoading(false);
-                          setConsentUser({
-                            name: name,
-                            email: email,
-                            avatar: PRESET_AVATARS[0],
-                            type: 'google'
-                          });
-                        }, 800);
-                      }
-                    }}
-                    style={{ flex: 1, padding: '0.6rem', border: 'none', borderRadius: '8px', backgroundColor: '#4285f4', color: 'white', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
-                  >
-                    {lang === 'ar' ? 'دخول' : 'Sign In'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Simulated Facebook Authentication Authorization Modal */}
-      {showFacebookAuth && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.85)',
-          zIndex: 3000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backdropFilter: 'blur(8px)',
-          direction: lang === 'ar' ? 'rtl' : 'ltr'
-        }}>
-          <div className="glass-card" style={{ width: '90%', maxWidth: '400px', padding: '2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.5rem', backgroundColor: '#ffffff', color: '#1f2937' }}>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <svg style={{ width: '40px', height: '40px', fill: '#1877F2' }} viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#111827' }}>
-                {lang === 'ar' ? 'تفويض تطبيق EduAcademy' : 'Authorize EduAcademy App'}
-              </h3>
-              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#6b7280', lineHeight: '1.5' }}>
-                {lang === 'ar' 
-                  ? 'يطلب تطبيق EduAcademy الحصول على إذن للوصول إلى اسمك وصورتك الشخصية والبريد الإلكتروني المسجل.' 
-                  : 'EduAcademy is requesting permission to access your profile name, picture, and email address.'}
-              </p>
-            </div>
-
-            {authLoading ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '1rem' }}>
-                <div className="loader" style={{ width: '30px', height: '30px', borderTopColor: '#1877F2' }}></div>
-                <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>{lang === 'ar' ? 'جاري الاتصال بـ Facebook...' : 'Connecting to Facebook...'}</span>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', textAlign: 'start' }}>
-                <span style={{ display: 'block', fontSize: '0.85rem', color: '#4b5563', fontWeight: 600 }}>
-                  {lang === 'ar' ? 'سجل الدخول بحسابك على فيسبوك:' : 'Sign in with your Facebook account:'}
-                </span>
-                
-                <div className="form-group">
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#374151', marginBottom: '0.25rem' }}>
-                    {lang === 'ar' ? 'الاسم الكامل' : 'Full Name'}
-                  </label>
-                  <input 
-                    type="text" 
-                    id="custom-facebook-name"
-                    placeholder={lang === 'ar' ? 'اكتب اسمك الكامل...' : 'Enter your full name...'} 
-                    style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.85rem', outline: 'none', color: '#111827', backgroundColor: '#ffffff' }}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#374151', marginBottom: '0.25rem' }}>
-                    {lang === 'ar' ? 'البريد الإلكتروني' : 'Email Address'}
-                  </label>
-                  <input 
-                    type="email" 
-                    id="custom-facebook-email"
-                    placeholder={lang === 'ar' ? 'مثال: user@facebook.com' : 'e.g. user@facebook.com'} 
-                    style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.85rem', outline: 'none', color: '#111827', backgroundColor: '#ffffff' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-                  <button 
-                    type="button"
-                    onClick={() => setShowFacebookAuth(false)}
-                    style={{ flex: 1, padding: '0.6rem', border: 'none', borderRadius: '8px', backgroundColor: '#e5e7eb', color: '#374151', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
-                  >
-                    {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-                  </button>
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      const nameInput = document.getElementById('custom-facebook-name');
-                      const emailInput = document.getElementById('custom-facebook-email');
-                      if (nameInput && nameInput.value.trim() && emailInput && emailInput.value.trim()) {
-                        const name = nameInput.value.trim();
-                        const email = emailInput.value.trim();
-                        setAuthLoading(true);
-                        setTimeout(() => {
-                          setAuthLoading(false);
-                          setConsentUser({
-                            name: name,
-                            email: email,
-                            avatar: PRESET_AVATARS[0],
-                            type: 'facebook'
-                          });
-                        }, 800);
-                      }
-                    }}
-                    style={{ flex: 1, padding: '0.6rem', border: 'none', borderRadius: '8px', backgroundColor: '#1877F2', color: 'white', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
-                  >
-                    {lang === 'ar' ? 'دخول' : 'Sign In'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Visual Image Cropper Modal */}
       {rawImage && (
