@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Podium from './components/Podium';
 import Login from './components/Login';
+import { supabase } from './supabaseClient';
 import InstructorDashboard from './components/InstructorDashboard';
 import StudentDashboard from './components/StudentDashboard';
 import AdminDashboard from './components/AdminDashboard';
@@ -191,12 +192,47 @@ function App() {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   
+  // Real Supabase OAuth User state
+  const [supabaseUser, setSupabaseUser] = useState(null);
+  
   // PWA Install Prompt State
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
 
   const [toasts, setToasts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Handle Supabase OAuth session changes
+  useEffect(() => {
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+    
+    if (!isConfigured) return;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setSupabaseUser(session.user);
+        // Automatically pop up login overlay to chooser/wizard if not logged in
+        if (localStorage.getItem('edu_is_logged_in') !== 'true') {
+          setShowLoginModal(true);
+        }
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setSupabaseUser(session.user);
+        if (localStorage.getItem('edu_is_logged_in') !== 'true') {
+          setShowLoginModal(true);
+        }
+      } else {
+        setSupabaseUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Lock background scroll when modal overlays are active
   useEffect(() => {
@@ -438,6 +474,15 @@ function App() {
     setIsLoggedIn(false);
     setCurrentUser(null);
     setUserRole('landing');
+    
+    // Call Supabase signOut
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+    if (isConfigured) {
+      supabase.auth.signOut();
+    }
+    setSupabaseUser(null);
     triggerToast(lang === 'ar' ? 'تم تسجيل الخروج بنجاح' : 'Successfully logged out', 'success');
   };
 
@@ -1318,7 +1363,7 @@ function App() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             backdropFilter: 'blur(10px)'
           }}>
-            <Login onLogin={handleLogin} lang={lang} instructors={instructors} initialRole={loginModalRole} onClose={() => setShowLoginModal(false)} />
+            <Login onLogin={handleLogin} lang={lang} instructors={instructors} initialRole={loginModalRole} onClose={() => setShowLoginModal(false)} supabaseUser={supabaseUser} />
           </div>
         )}
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, User, Briefcase, Camera, Check } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 
 const PRESET_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120",
@@ -10,7 +11,7 @@ const PRESET_AVATARS = [
   "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=120"
 ];
 
-const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
+const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabaseUser }) => {
   const [showModal, setShowModal] = useState(false);
   const [inviteTeacherId, setInviteTeacherId] = useState(null);
   const [isAdminMode, setIsAdminMode] = useState(false);
@@ -104,6 +105,18 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
       setLoginTab('email');
     }
   }, []);
+
+  // Autofill consentUser from active Supabase session
+  useEffect(() => {
+    if (supabaseUser) {
+      setConsentUser({
+        name: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'User',
+        email: supabaseUser.email || '',
+        avatar: supabaseUser.user_metadata?.avatar_url || supabaseUser.user_metadata?.picture || PRESET_AVATARS[0],
+        type: supabaseUser.app_metadata?.provider || 'google'
+      });
+    }
+  }, [supabaseUser]);
 
   const handleAvatarFileChange = (e) => {
     const file = e.target.files[0];
@@ -301,12 +314,44 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
     return accounts.length > 0 ? accounts[0] : null;
   };
 
-  const handleGoogleClick = () => {
-    setShowGoogleAuth(true);
+  const handleGoogleClick = async () => {
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+    
+    if (isConfigured) {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) {
+        setErrorMessage(error.message);
+      }
+    } else {
+      setShowGoogleAuth(true);
+    }
   };
 
-  const handleFacebookClick = () => {
-    setShowFacebookAuth(true);
+  const handleFacebookClick = async () => {
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+    
+    if (isConfigured) {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) {
+        setErrorMessage(error.message);
+      }
+    } else {
+      setShowFacebookAuth(true);
+    }
   };
 
   const handleEmailLoginSubmit = (e) => {
