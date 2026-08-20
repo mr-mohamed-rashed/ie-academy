@@ -635,22 +635,34 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
           <BookOpen size={30} />
         </div>
 
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.75rem' }}>{t.headline}</h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem' }}>{t.tagline}</p>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.75rem' }}>
+          {authMode === 'signup' 
+            ? (role === 'instructor' 
+                ? (lang === 'ar' ? 'إنشاء حساب معلم جديد' : 'Register Instructor Account') 
+                : (lang === 'ar' ? 'إنشاء حساب طالب جديد' : 'Register Student Account'))
+            : t.headline}
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem' }}>
+          {authMode === 'signup' 
+            ? (lang === 'ar' ? 'قم بإنشاء حسابك لبدء استخدام المنصة والتفاعل' : 'Create your account to start interacting on the platform')
+            : t.tagline}
+        </p>
 
         {/* Tab Selector */}
         <div style={{ display: 'flex', borderBottom: '1px solid var(--border-glass)', marginBottom: '2rem' }}>
           <button 
+            type="button"
             onClick={() => setLoginTab('quick')}
             style={{ flex: 1, padding: '0.75rem', background: 'transparent', border: 'none', borderBottom: loginTab === 'quick' ? '2px solid var(--accent-primary)' : 'none', color: loginTab === 'quick' ? 'var(--text-primary)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
           >
-            {t.tabQuick}
+            {authMode === 'signup' ? (lang === 'ar' ? 'التسجيل السريع' : 'Quick Register') : t.tabQuick}
           </button>
           <button 
+            type="button"
             onClick={() => setLoginTab('email')}
             style={{ flex: 1, padding: '0.75rem', background: 'transparent', border: 'none', borderBottom: loginTab === 'email' ? '2px solid var(--accent-primary)' : 'none', color: loginTab === 'email' ? 'var(--text-primary)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
           >
-            {t.tabEmail}
+            {authMode === 'signup' ? (lang === 'ar' ? 'تسجيل بالبريد' : 'Email Register') : t.tabEmail}
           </button>
         </div>
 
@@ -664,7 +676,11 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
                 <path fill="#fbbc05" d="M5.02 8.78A7.13 7.13 0 0 1 12 5.04a7.12 7.12 0 0 1 6.98 3.74l3.73-2.9A11.94 11.94 0 0 0 12 0C7.8 0 4.19 2.05 2.02 5.24l3.73 2.9.27.64z"/>
                 <path fill="#34a853" d="M12 18.96c-1.92 0-3.63-.64-4.98-1.74l-3.73 2.9C5.46 21.95 8.54 24 12 24c4.14 0 7.73-1.4 10.3-3.8l-3.73-2.9a7.12 7.12 0 0 1-6.57 1.66z"/>
               </svg>
-              <span>{t.googleBtn}</span>
+              <span>
+                {authMode === 'signup' 
+                  ? (lang === 'ar' ? 'إنشاء حساب باستخدام Google' : 'Sign Up with Google') 
+                  : t.googleBtn}
+              </span>
             </button>
 
             {/* Facebook Sign In Button */}
@@ -672,8 +688,58 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
               <svg className="google-icon-svg" viewBox="0 0 24 24" style={{ fill: 'white' }}>
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
-              <span style={{ color: 'white' }}>{t.facebookBtn}</span>
+              <span style={{ color: 'white' }}>
+                {authMode === 'signup' 
+                  ? (lang === 'ar' ? 'إنشاء حساب باستخدام Facebook' : 'Sign Up with Facebook') 
+                  : t.facebookBtn}
+              </span>
             </button>
+
+            {authMode === 'signup' ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode('login');
+                  setIsRegisterMode(false);
+                  setErrorMessage('');
+                }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', textDecoration: 'underline', cursor: 'pointer', textAlign: 'center', marginTop: '1.25rem' }}
+              >
+                {lang === 'ar' ? 'لديك حساب بالفعل؟ تسجيل الدخول هنا' : 'Already have an account? Log In here'}
+              </button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.25rem', textAlign: 'center' }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  {lang === 'ar' ? 'ليس لديك حساب؟ أنشئ حساب جديد الآن:' : 'Don\'t have an account? Create one now:'}
+                </span>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRole('student');
+                      setAuthMode('signup');
+                      setIsRegisterMode(true);
+                      setErrorMessage('');
+                    }}
+                    style={{ background: 'none', border: 'none', color: 'var(--accent-purple)', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'underline', cursor: 'pointer' }}
+                  >
+                    {lang === 'ar' ? 'حساب طالب' : 'Student Account'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRole('instructor');
+                      setAuthMode('signup');
+                      setIsRegisterMode(true);
+                      setErrorMessage('');
+                    }}
+                    style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'underline', cursor: 'pointer' }}
+                  >
+                    {lang === 'ar' ? 'حساب معلم' : 'Teacher Account'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <form onSubmit={handleEmailLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', textAlign: 'start' }}>
