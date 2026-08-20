@@ -375,10 +375,15 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
         setErrorMessage(error.message);
       }
     } else {
-      // Mock Google Login: Instantly authenticates with a mock Google user
+      // Mock Google Login: prompt for details to simulate real Google Auth!
+      const testName = prompt(lang === 'ar' ? "أدخل اسم حسابك على جوجل (لمحاكاة تسجيل الدخول):" : "Enter your Google account name (to simulate login):", "محمد أحمد");
+      if (testName === null) return; // User cancelled
+      const testEmail = prompt(lang === 'ar' ? "أدخل البريد الإلكتروني لجوجل:" : "Enter your Google email:", "user.test@gmail.com");
+      if (!testEmail) return;
+      
       setConsentUser({
-        name: lang === 'ar' ? 'أحمد محمد (طالب جوجل)' : 'Ahmed Mohamed (Google)',
-        email: 'ahmed.demo@gmail.com',
+        name: testName.trim(),
+        email: testEmail.trim().toLowerCase(),
         avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120',
         type: 'google'
       });
@@ -401,10 +406,15 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
         setErrorMessage(error.message);
       }
     } else {
-      // Mock Facebook Login: Instantly authenticates with a mock Facebook user
+      // Mock Facebook Login: prompt for details to simulate real Facebook Auth!
+      const testName = prompt(lang === 'ar' ? "أدخل اسم حسابك على فيسبوك (لمحاكاة تسجيل الدخول):" : "Enter your Facebook account name (to simulate login):", "محمد أحمد");
+      if (testName === null) return;
+      const testEmail = prompt(lang === 'ar' ? "أدخل البريد الإلكتروني لفيسبوك:" : "Enter your Facebook email:", "user.test@facebook.com");
+      if (!testEmail) return;
+
       setConsentUser({
-        name: lang === 'ar' ? 'سارة أحمد (طالب فيسبوك)' : 'Sarah Ahmed (Facebook)',
-        email: 'sarah.demo@facebook.com',
+        name: testName.trim(),
+        email: testEmail.trim().toLowerCase(),
         avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120',
         type: 'facebook'
       });
