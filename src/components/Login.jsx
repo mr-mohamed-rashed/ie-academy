@@ -109,12 +109,45 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose, supabase
   // Autofill consentUser from active Supabase session
   useEffect(() => {
     if (supabaseUser) {
-      setConsentUser({
-        name: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'User',
-        email: supabaseUser.email || '',
-        avatar: supabaseUser.user_metadata?.avatar_url || supabaseUser.user_metadata?.picture || PRESET_AVATARS[0],
-        type: supabaseUser.app_metadata?.provider || 'google'
-      });
+      const email = supabaseUser.email || '';
+      const name = supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || email.split('@')[0] || 'User';
+      const avatar = supabaseUser.user_metadata?.avatar_url || supabaseUser.user_metadata?.picture || PRESET_AVATARS[0];
+      
+      const accounts = getExistingAccounts(email);
+      if (accounts.length === 1) {
+        // Log in directly!
+        const account = accounts[0];
+        onLogin({
+          id: account.data.id,
+          name: account.role === 'instructor' ? (account.data.nameAr || account.data.nameEn) : (account.data.nameEn || account.data.nameAr),
+          role: account.role,
+          avatar: account.data.avatar,
+          email: email,
+          isSubscribed: account.data.isSubscribed,
+          isExisting: true
+        });
+        onClose();
+      } else if (accounts.length > 1) {
+        // Show account chooser
+        setConsentUser({ name, email, avatar, type: supabaseUser.app_metadata?.provider || 'google' });
+      } else {
+        // Brand new user!
+        if (initialRole === 'student') {
+          setFullName(name);
+          setEmail(email);
+          setAvatarUrl(avatar);
+          setRole('student');
+          setShowModal(true);
+        } else if (initialRole === 'instructor') {
+          setFullName(name);
+          setEmail(email);
+          setAvatarUrl(avatar);
+          setRole('instructor');
+          setShowModal(true);
+        } else {
+          setConsentUser({ name, email, avatar, type: supabaseUser.app_metadata?.provider || 'google' });
+        }
+      }
     }
   }, [supabaseUser]);
 
