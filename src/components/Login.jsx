@@ -282,18 +282,23 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
     }
   }[lang];
 
+  const getExistingAccounts = (selectedEmail) => {
+    const list = [];
+    if (!selectedEmail) return list;
+    const inst = instructors?.find(i => i.email?.toLowerCase() === selectedEmail.toLowerCase());
+    if (inst) {
+      list.push({ role: 'instructor', data: inst });
+    }
+    const stud = students?.find(s => s.email?.toLowerCase() === selectedEmail.toLowerCase());
+    if (stud) {
+      list.push({ role: 'student', data: stud });
+    }
+    return list;
+  };
+
   const checkEmailExists = (selectedEmail) => {
-    // Check if an instructor has this email
-    const existingInst = instructors?.find(i => i.email === selectedEmail);
-    if (existingInst) {
-      return { role: 'instructor', data: existingInst };
-    }
-    // Check if a student has this email
-    const existingStud = students?.find(s => s.email === selectedEmail);
-    if (existingStud) {
-      return { role: 'student', data: existingStud };
-    }
-    return null;
+    const accounts = getExistingAccounts(selectedEmail);
+    return accounts.length > 0 ? accounts[0] : null;
   };
 
   const handleGoogleClick = () => {
@@ -528,6 +533,39 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
 
             <form onSubmit={handleSubmit}>
               
+              {/* Role selector - ONLY show if initialRole was not passed! */}
+              {!initialRole && (
+                <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>{lang === 'ar' ? 'اختر نوع الحساب للتسجيل:' : 'Select Account Type to Register:'}</label>
+                  <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                    <button 
+                      type="button" 
+                      onClick={() => setRole('student')}
+                      style={{ 
+                        flex: 1, padding: '0.55rem', borderRadius: '8px', border: '1.5px solid var(--accent-purple)', 
+                        backgroundColor: role === 'student' ? 'var(--accent-purple)' : 'transparent',
+                        color: role === 'student' ? 'white' : 'var(--text-secondary)',
+                        fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem'
+                      }}
+                    >
+                      {lang === 'ar' ? 'حساب طالب' : 'Student Account'}
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setRole('instructor')}
+                      style={{ 
+                        flex: 1, padding: '0.55rem', borderRadius: '8px', border: '1.5px solid var(--accent-primary)', 
+                        backgroundColor: role === 'instructor' ? 'var(--accent-primary)' : 'transparent',
+                        color: role === 'instructor' ? 'white' : 'var(--text-secondary)',
+                        fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem'
+                      }}
+                    >
+                      {lang === 'ar' ? 'حساب معلم' : 'Teacher Account'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Name Input */}
               <div className="form-group">
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
@@ -973,6 +1011,55 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                   </div>
                 </button>
 
+                <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '0.75rem', marginTop: '0.25rem' }}>
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: 600 }}>{lang === 'ar' ? 'أو سجل بحساب جوجل جديد باسمك:' : 'Or sign in with a new Google account:'}</span>
+                  <div style={{ display: 'flex', gap: '0.35rem' }}>
+                    <input 
+                      type="text" 
+                      id="custom-google-name"
+                      placeholder={lang === 'ar' ? 'اكتب اسمك الكامل...' : 'Enter your full name...'} 
+                      style={{ flex: 1, padding: '0.4rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.8rem', outline: 'none' }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.target.value.trim()) {
+                          const name = e.target.value.trim();
+                          setAuthLoading(true);
+                          setTimeout(() => {
+                            setAuthLoading(false);
+                            setConsentUser({
+                              name: name,
+                              email: `${name.toLowerCase().replace(/\s+/g, '')}@gmail.com`,
+                              avatar: PRESET_AVATARS[2] || PRESET_AVATARS[0],
+                              type: 'google'
+                            });
+                          }, 800);
+                        }
+                      }}
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const input = document.getElementById('custom-google-name');
+                        if (input && input.value.trim()) {
+                          const name = input.value.trim();
+                          setAuthLoading(true);
+                          setTimeout(() => {
+                            setAuthLoading(false);
+                            setConsentUser({
+                              name: name,
+                              email: `${name.toLowerCase().replace(/\s+/g, '')}@gmail.com`,
+                              avatar: PRESET_AVATARS[2] || PRESET_AVATARS[0],
+                              type: 'google'
+                            });
+                          }, 800);
+                        }
+                      }}
+                      style={{ padding: '0.4rem 0.75rem', border: 'none', borderRadius: '6px', backgroundColor: '#4285f4', color: 'white', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      {lang === 'ar' ? 'دخول' : 'Go'}
+                    </button>
+                  </div>
+                </div>
+
                 <button 
                   type="button"
                   onClick={() => setShowGoogleAuth(false)}
@@ -1041,6 +1128,55 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
                 >
                   {lang === 'ar' ? 'متابعة باسم محمد راشد' : 'Continue as Mohamed Rashed'}
                 </button>
+
+                <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '0.75rem', marginTop: '0.25rem' }}>
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: 600 }}>{lang === 'ar' ? 'أو سجل بحساب فيسبوك جديد باسمك:' : 'Or sign in with a new Facebook account:'}</span>
+                  <div style={{ display: 'flex', gap: '0.35rem' }}>
+                    <input 
+                      type="text" 
+                      id="custom-facebook-name"
+                      placeholder={lang === 'ar' ? 'اكتب اسمك الكامل...' : 'Enter your full name...'} 
+                      style={{ flex: 1, padding: '0.4rem 0.75rem', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '0.8rem', outline: 'none' }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.target.value.trim()) {
+                          const name = e.target.value.trim();
+                          setAuthLoading(true);
+                          setTimeout(() => {
+                            setAuthLoading(false);
+                            setConsentUser({
+                              name: name,
+                              email: `${name.toLowerCase().replace(/\s+/g, '')}@facebook.com`,
+                              avatar: PRESET_AVATARS[0],
+                              type: 'facebook'
+                            });
+                          }, 800);
+                        }
+                      }}
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const input = document.getElementById('custom-facebook-name');
+                        if (input && input.value.trim()) {
+                          const name = input.value.trim();
+                          setAuthLoading(true);
+                          setTimeout(() => {
+                            setAuthLoading(false);
+                            setConsentUser({
+                              name: name,
+                              email: `${name.toLowerCase().replace(/\s+/g, '')}@facebook.com`,
+                              avatar: PRESET_AVATARS[0],
+                              type: 'facebook'
+                            });
+                          }, 800);
+                        }
+                      }}
+                      style={{ padding: '0.4rem 0.75rem', border: 'none', borderRadius: '6px', backgroundColor: '#1877F2', color: 'white', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      {lang === 'ar' ? 'دخول' : 'Go'}
+                    </button>
+                  </div>
+                </div>
 
                 <button 
                   type="button"
@@ -1158,76 +1294,150 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
         </div>
       )}
       {/* Simulated OAuth Consent Modal */}
-      {consentUser && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.85)',
-          zIndex: 4000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backdropFilter: 'blur(8px)',
-          direction: lang === 'ar' ? 'rtl' : 'ltr'
-        }}>
-          <div className="glass-card" style={{ width: '90%', maxWidth: '380px', padding: '1.75rem', textAlign: 'start', display: 'flex', flexDirection: 'column', gap: '1.25rem', backgroundColor: '#ffffff', color: '#1f2937', borderRadius: '12px', boxShadow: '0 8px 30px rgba(0,0,0,0.3)', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-            {/* Header logos */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e5e7eb', paddingBottom: '0.75rem' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#4b5563' }}>{consentUser.type === 'facebook' ? 'Facebook Connect' : 'Google Account Access'}</span>
-              {consentUser.type === 'facebook' ? (
-                <svg style={{ width: '28px', height: '28px', fill: '#1877F2' }} viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
+      {consentUser && (() => {
+        const userAccounts = getExistingAccounts(consentUser.email);
+        return (
+          <div style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.85)',
+            zIndex: 4000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backdropFilter: 'blur(8px)',
+            direction: lang === 'ar' ? 'rtl' : 'ltr'
+          }}>
+            <div className="glass-card" style={{ width: '90%', maxWidth: '390px', padding: '1.75rem', textAlign: 'start', display: 'flex', flexDirection: 'column', gap: '1.25rem', backgroundColor: '#ffffff', color: '#1f2937', borderRadius: '12px', boxShadow: '0 8px 30px rgba(0,0,0,0.3)', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+              {/* Header logos */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e5e7eb', paddingBottom: '0.75rem' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#4b5563' }}>{consentUser.type === 'facebook' ? 'Facebook Connect' : 'Google Account Access'}</span>
+                {consentUser.type === 'facebook' ? (
+                  <svg style={{ width: '28px', height: '28px', fill: '#1877F2' }} viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                ) : (
+                  <svg style={{ width: '28px', height: '28px' }} viewBox="0 0 24 24">
+                    <path fill="#ea4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2A11.95 11.95 0 0 0 12 0 11.94 11.94 0 0 0 1.29 6.29l3.73 2.9A7.12 7.12 0 0 1 12 5.04z"/>
+                    <path fill="#4285f4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46a5.53 5.53 0 0 1-2.4 3.63l3.73 2.9a11.92 11.92 0 0 0 3.7-8.68z"/>
+                    <path fill="#fbbc05" d="M5.02 8.78A7.13 7.13 0 0 1 12 5.04a7.12 7.12 0 0 1 6.98 3.74l3.73-2.9A11.94 11.94 0 0 0 12 0C7.8 0 4.19 2.05 2.02 5.24l3.73 2.9.27.64z"/>
+                    <path fill="#34a853" d="M12 18.96c-1.92 0-3.63-.64-4.98-1.74l-3.73 2.9C5.46 21.95 8.54 24 12 24c4.14 0 7.73-1.4 10.3-3.8l-3.73-2.9a7.12 7.12 0 0 1-6.57 1.66z"/>
+                  </svg>
+                )}
+              </div>
+
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#111827', lineHeight: '1.4' }}>
+                  {lang === 'ar' ? 'بيانات الحساب ومزامنة الدخول' : 'Account profile synchronization'}
+                </h3>
+                <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.8rem', color: '#4b5563' }}>
+                  {consentUser.email}
+                </p>
+              </div>
+
+              {userAccounts.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#4b5563', display: 'block' }}>
+                    {lang === 'ar' ? 'اختر الحساب الذي تود الدخول به:' : 'Choose the account to log in:'}
+                  </span>
+                  
+                  {userAccounts.map((account, index) => {
+                    const isInst = account.role === 'instructor';
+                    return (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          onLogin({
+                            id: account.data.id,
+                            name: isInst ? (account.data.nameAr || account.data.nameEn) : (account.data.nameEn || account.data.nameAr),
+                            role: account.role,
+                            avatar: account.data.avatar,
+                            email: consentUser.email,
+                            isSubscribed: account.data.isSubscribed,
+                            isExisting: true
+                          });
+                          setConsentUser(null);
+                          setShowGoogleAuth(false);
+                          setShowFacebookAuth(false);
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          padding: '0.65rem 0.85rem',
+                          width: '100%',
+                          border: '1.5px solid #e5e7eb',
+                          borderRadius: '8px',
+                          backgroundColor: '#f9fafb',
+                          cursor: 'pointer',
+                          textAlign: 'start',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <img 
+                          src={account.data.avatar || PRESET_AVATARS[0]} 
+                          style={{ width: '32px', height: '32px', borderRadius: '50%', border: isInst ? '1.5px solid #6366f1' : '1.5px solid #8b5cf6' }} 
+                          alt="Avatar" 
+                        />
+                        <div style={{ flex: 1 }}>
+                          <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#1f2937' }}>
+                            {isInst ? (account.data.nameAr || account.data.nameEn) : (account.data.nameEn || account.data.nameAr)}
+                          </span>
+                          <span style={{ fontSize: '0.75rem', color: isInst ? '#6366f1' : '#8b5cf6', fontWeight: 600 }}>
+                            {isInst ? (lang === 'ar' ? 'حساب معلم' : 'Instructor Account') : (lang === 'ar' ? 'حساب طالب' : 'Student Account')}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFullName(consentUser.name);
+                      setEmail(consentUser.email);
+                      setAvatarUrl(consentUser.avatar);
+                      setShowModal(true);
+                      setConsentUser(null);
+                      setShowGoogleAuth(false);
+                      setShowFacebookAuth(false);
+                    }}
+                    style={{
+                      padding: '0.55rem',
+                      border: '1px dashed #4285f4',
+                      borderRadius: '8px',
+                      backgroundColor: 'transparent',
+                      color: '#4285f4',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      width: '100%',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {lang === 'ar' ? 'إنشاء حساب جديد إضافي' : 'Register a new additional profile'}
+                  </button>
+                </div>
               ) : (
-                <svg style={{ width: '28px', height: '28px' }} viewBox="0 0 24 24">
-                  <path fill="#ea4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2A11.95 11.95 0 0 0 12 0 11.94 11.94 0 0 0 1.29 6.29l3.73 2.9A7.12 7.12 0 0 1 12 5.04z"/>
-                  <path fill="#4285f4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46a5.53 5.53 0 0 1-2.4 3.63l3.73 2.9a11.92 11.92 0 0 0 3.7-8.68z"/>
-                  <path fill="#fbbc05" d="M5.02 8.78A7.13 7.13 0 0 1 12 5.04a7.12 7.12 0 0 1 6.98 3.74l3.73-2.9A11.94 11.94 0 0 0 12 0C7.8 0 4.19 2.05 2.02 5.24l3.73 2.9.27.64z"/>
-                  <path fill="#34a853" d="M12 18.96c-1.92 0-3.63-.64-4.98-1.74l-3.73 2.9C5.46 21.95 8.54 24 12 24c4.14 0 7.73-1.4 10.3-3.8l-3.73-2.9a7.12 7.12 0 0 1-6.57 1.66z"/>
-                </svg>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setFullName(consentUser.name);
+                      setEmail(consentUser.email);
+                      setAvatarUrl(consentUser.avatar);
+                      setShowModal(true);
+                      setConsentUser(null);
+                      setShowGoogleAuth(false);
+                      setShowFacebookAuth(false);
+                    }}
+                    style={{ padding: '0.75rem', border: 'none', borderRadius: '8px', backgroundColor: consentUser.type === 'facebook' ? '#1877F2' : '#4285f4', color: 'white', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', width: '100%', textAlign: 'center' }}
+                  >
+                    {lang === 'ar' ? `متابعة باسم ${consentUser.name.split(' ')[0]}` : `Continue as ${consentUser.name.split(' ')[0]}`}
+                  </button>
+                </div>
               )}
-            </div>
-
-            <div>
-              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#111827', lineHeight: '1.4' }}>
-                {lang === 'ar' ? 'منصة EduAcademy تطلب الوصول إلى:' : 'EduAcademy Hub requests access to:'}
-              </h3>
-              <ul style={{ margin: '0.75rem 0', paddingInlineStart: '1.25rem', fontSize: '0.85rem', color: '#374151', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <li>{lang === 'ar' ? 'اسمك وصورة ملفك الشخصي' : 'Your name and profile picture'}</li>
-                <li>{lang === 'ar' ? 'عنوان البريد الإلكتروني' : 'Email address'}</li>
-              </ul>
-              <span style={{ fontSize: '0.8rem', color: '#1877F2', cursor: 'pointer', fontWeight: 600 }}>{lang === 'ar' ? 'تعديل صلاحية الوصول' : 'Edit permissions'}</span>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', marginTop: '0.5rem' }}>
-              <button 
-                type="button"
-                onClick={() => {
-                  const existing = checkEmailExists(consentUser.email);
-                  if (existing) {
-                    onLogin({
-                      id: existing.data.id,
-                      name: existing.role === 'instructor' ? (existing.data.nameAr || existing.data.nameEn) : (existing.data.nameEn || existing.data.nameAr),
-                      role: existing.role,
-                      avatar: existing.data.avatar,
-                      email: consentUser.email,
-                      isSubscribed: existing.data.isSubscribed,
-                      isExisting: true
-                    });
-                  } else {
-                    setFullName(consentUser.name);
-                    setEmail(consentUser.email);
-                    setAvatarUrl(consentUser.avatar);
-                    setShowModal(true);
-                  }
-                  setConsentUser(null);
-                  setShowGoogleAuth(false);
-                  setShowFacebookAuth(false);
-                }}
-                style={{ padding: '0.75rem', border: 'none', borderRadius: '8px', backgroundColor: consentUser.type === 'facebook' ? '#1877F2' : '#4285f4', color: 'white', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', width: '100%', textAlign: 'center' }}
-              >
-                {lang === 'ar' ? `متابعة باسم ${consentUser.name.split(' ')[0]}` : `Continue as ${consentUser.name.split(' ')[0]}`}
-              </button>
 
               <button 
                 type="button"
@@ -1236,16 +1446,16 @@ const Login = ({ onLogin, lang, instructors = [], initialRole, onClose }) => {
               >
                 {lang === 'ar' ? 'إلغاء' : 'Cancel'}
               </button>
-            </div>
 
-            <p style={{ margin: 0, fontSize: '0.7rem', color: '#6b7280', lineHeight: '1.4', borderTop: '1px solid #e5e7eb', paddingTop: '0.75rem' }}>
-              {lang === 'ar' 
-                ? 'بالمتابعة، سيتلقى EduAcademy صلاحية وصول مستمرة إلى المعلومات التي تشاركها، وسيسجل الحساب الأوقات التي يصل فيها. سياسة الخصوصية وشروط الخدمة.' 
-                : 'By continuing, EduAcademy will receive ongoing access to information you share. Privacy Policy and Terms of Service.'}
-            </p>
+              <p style={{ margin: 0, fontSize: '0.7rem', color: '#6b7280', lineHeight: '1.4', borderTop: '1px solid #e5e7eb', paddingTop: '0.75rem', width: '100%' }}>
+                {lang === 'ar' 
+                  ? 'بالمتابعة، سيتلقى EduAcademy صلاحية وصول مستمرة إلى المعلومات التي تشاركها، وسيسجل الحساب الأوقات التي يصل فيها. سياسة الخصوصية وشروط الخدمة.' 
+                  : 'By continuing, EduAcademy will receive ongoing access to information you share. Privacy Policy and Terms of Service.'}
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

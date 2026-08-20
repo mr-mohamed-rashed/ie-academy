@@ -3,16 +3,16 @@ export const initialInstructors = [
   {
     id: 101,
     email: "rishobeh@gmail.com",
-    nameAr: "أ. محمود الجوهري (مدرس افتراضي)",
-    nameEn: "Mr. Mahmoud El-Gohary (Virtual)",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120",
-    subjectAr: "الفيزياء الذكية",
-    subjectEn: "Smart Physics",
+    nameAr: "أ. محمد راشد",
+    nameEn: "Mr. Mohamed Rashed",
+    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120",
+    subjectAr: "الفيزياء والرياضيات",
+    subjectEn: "Physics & Mathematics",
     yearAr: "المرحلة الثانوية",
     yearEn: "High School Phase",
-    aboutAr: "مدرس فيزياء ذكية متخصص للمرحلة الثانوية، خبرة 10 سنوات في تبسيط المناهج.",
-    aboutEn: "Smart Physics teacher specializing in High School, 10 years experience in simplifying curricula.",
-    price: "250 ج.م / شهرياً",
+    aboutAr: "مدرس متخصص للمرحلة الثانوية، خبرة كبيرة في تبسيط المناهج وتأسيس الطلاب.",
+    aboutEn: "Specialist high school teacher with rich experience in simplifying curricula.",
+    price: "200 ج.م / شهرياً",
     paymentMethods: "فودافون كاش، إنستا باي",
     whatsapp: "+201000000000",
     introVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ",
@@ -42,32 +42,6 @@ export const initialInstructors = [
         groups: [
           { id: "sec3-intensive", nameAr: "المعسكر المكثف", nameEn: "Intensive Bootcamp", time: "20:00" },
           { id: "sec3-revision", nameAr: "مجموعة المراجعة النهائية", nameEn: "Final Revision Group", time: "15:00" }
-        ]
-      }
-    ]
-  },
-  {
-    id: 102,
-    nameAr: "أ. نادية علي",
-    nameEn: "Prof. Nadia Ali",
-    avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=120",
-    subjectAr: "الرياضيات",
-    subjectEn: "Mathematics",
-    yearAr: "إعدادي",
-    yearEn: "Middle School",
-    aboutAr: "معلمة رياضيات متميزة للمرحلة الإعدادية، تهتم بتأسيس الطلاب للمراحل المتقدمة.",
-    aboutEn: "Outstanding math teacher for Middle School, focusing on foundational skills.",
-    price: "150 ج.م / شهرياً",
-    paymentMethods: "تحويل بنكي، فودافون كاش",
-    whatsapp: "+201200000000",
-    isSubscribed: true,
-    grades: [
-      {
-        id: "grade-prep-1",
-        nameAr: "الصف الأول الإعدادي",
-        nameEn: "1st Prep",
-        groups: [
-          { id: "math-a", nameAr: "مجموعة أ", nameEn: "Group A", time: "14:00" }
         ]
       }
     ]
