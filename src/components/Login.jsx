@@ -119,6 +119,11 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
   const [authLoading, setAuthLoading] = useState(false);
   const [consentUser, setConsentUser] = useState(null);
 
+  const localAccounts = [
+    ...instructors.map(i => ({ role: 'instructor', data: i })),
+    ...students.map(s => ({ role: 'student', data: s }))
+  ];
+
   // Visual Cropper States
   const [rawImage, setRawImage] = useState(null);
   const [zoom, setZoom] = useState(1);
@@ -879,6 +884,66 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
                   >
                     {lang === 'ar' ? 'حساب معلم' : 'Teacher Account'}
                   </button>
+                </div>
+              </div>
+            )}
+
+            {localAccounts.length > 0 && authMode === 'login' && (
+              <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', borderTop: '1px solid var(--border-glass)', paddingTop: '1.5rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', textAlign: 'center', display: 'block' }}>
+                  {lang === 'ar' ? 'اختر حساباً مسجلاً للدخول المباشر:' : 'Select a registered account to sign in:'}
+                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '180px', overflowY: 'auto', paddingRight: '0.25rem' }}>
+                  {localAccounts.map((account, idx) => {
+                    const isInst = account.role === 'instructor';
+                    const name = isInst ? (account.data.nameAr || account.data.nameEn) : (account.data.nameEn || account.data.nameAr);
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          onLogin({
+                            id: account.data.id,
+                            name: name,
+                            role: account.role,
+                            avatar: account.data.avatar,
+                            email: account.data.email,
+                            isSubscribed: account.data.isSubscribed,
+                            isExisting: true
+                          });
+                          onClose();
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          padding: '0.65rem 0.85rem',
+                          width: '100%',
+                          border: '1.5px solid var(--border-glass)',
+                          borderRadius: '8px',
+                          backgroundColor: 'rgba(255,255,255,0.05)',
+                          cursor: 'pointer',
+                          textAlign: 'start',
+                          color: 'var(--text-primary)',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <img 
+                          src={account.data.avatar || PRESET_AVATARS[0]} 
+                          style={{ width: '28px', height: '28px', borderRadius: '50%', border: isInst ? '1.5px solid var(--accent-primary)' : '1.5px solid var(--accent-purple)' }} 
+                          alt="Avatar" 
+                        />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {name}
+                          </span>
+                          <span style={{ fontSize: '0.7rem', color: isInst ? 'var(--accent-primary)' : 'var(--accent-purple)', fontWeight: 600 }}>
+                            {isInst ? (lang === 'ar' ? 'حساب معلم' : 'Teacher') : (lang === 'ar' ? 'حساب طالب' : 'Student')}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
