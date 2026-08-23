@@ -565,12 +565,7 @@ const AdminDashboard = ({
             }} />
           </div>
 
-          {/* Add Teacher btn */}
-          <button onClick={handleOpenAdd} className="btn-primary" style={{ width: 'auto', display: 'inline-flex', gap: '0.5rem', padding: '0.65rem 1.25rem' }}>
-            <PlusCircle size={18} />
-            <span>{t.addTeacherBtn}</span>
-          </button>
-        </div>
+          </div>
 
         {/* Directory Table */}
         <div style={{ overflowX: 'auto' }}>
@@ -656,129 +651,7 @@ const AdminDashboard = ({
 
       {/* CRUD MODALS */}
       
-      {/* 1. Add Teacher Modal */}
-      {showAddModal && (
-        <div style={{ 
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-          backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 5000, 
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          backdropFilter: 'blur(10px)'
-        }}>
-          <div className="glass-card" style={{ width: '90%', maxWidth: '500px', padding: '2rem', animation: 'slide-in 0.3s ease-out', textAlign: 'start' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem' }}>{t.modalAddTitle}</h3>
-            
-            <form onSubmit={handleAddSubmit}>
-              <div className="form-group">
-                <label>{t.modalNameAr}</label>
-                <input type="text" className="form-control" value={nameAr} onChange={e => setNameAr(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <label>{t.modalNameEn}</label>
-                <input type="text" className="form-control" value={nameEn} onChange={e => setNameEn(e.target.value)} required />
-              </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div className="form-group">
-                  <label>{t.modalSubjAr}</label>
-                  <input type="text" className="form-control" value={subjectAr} onChange={e => setSubjectAr(e.target.value)} required />
-                </div>
-                <div className="form-group">
-                  <label>{t.modalSubjEn}</label>
-                  <input type="text" className="form-control" value={subjectEn} onChange={e => setSubjectEn(e.target.value)} required />
-                </div>
-              </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div className="form-group">
-                  <label>{t.modalYearAr}</label>
-                  <input type="text" className="form-control" value={yearAr} onChange={e => setYearAr(e.target.value)} required />
-                </div>
-                <div className="form-group">
-                  <label>{t.modalYearEn}</label>
-                  <input type="text" className="form-control" value={yearEn} onChange={e => setYearEn(e.target.value)} required />
-                </div>
-              </div>
-
-              {/* Avatar Selector */}
-              <div className="form-group">
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <Camera size={14} />
-                  <span>{t.modalAvatar}</span>
-                </label>
-                <div className="avatar-option-picker">
-                  {PRESET_AVATARS.map((url, idx) => (
-                    <div key={idx} style={{ position: 'relative' }}>
-                      <img 
-                        src={url} 
-                        alt="Avatar Option" 
-                        onClick={() => setAvatar(url)}
-                        className={`avatar-option-img ${avatar === url ? 'selected' : ''}`}
-                      />
-                      {avatar === url && (
-                        <span style={{ 
-                          position: 'absolute', bottom: 0, right: 0, 
-                          backgroundColor: 'var(--accent-primary)', 
-                          color: 'white', borderRadius: '50%', 
-                          width: '14px', height: '14px', 
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: '8px', border: '1px solid #fff'
-                        }}>
-                          <Check size={8} strokeWidth={3} />
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <div style={{ marginTop: '0.5rem' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t.modalCustomAvatar}</span>
-                  <input 
-                    type="url" 
-                    className="form-control" 
-                    value={avatar}
-                    onChange={(e) => setAvatar(e.target.value)}
-                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.6rem', marginTop: '0.25rem' }}
-                  />
-                </div>
-                <div style={{ marginTop: '0.75rem' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t.modalIntroVideo}</span>
-                  <input 
-                    type="url" 
-                    className="form-control" 
-                    placeholder="https://www.youtube.com/..." 
-                    value={introVideo}
-                    onChange={(e) => setIntroVideo(e.target.value)}
-                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.6rem', marginTop: '0.25rem' }}
-                  />
-                </div>
-              </div>
-
-              {/* Visible Checkbox */}
-              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
-                <input 
-                  type="checkbox" 
-                  id="add-is-subscribed" 
-                  checked={isSubscribed} 
-                  onChange={e => setIsSubscribed(e.target.checked)} 
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                />
-                <label htmlFor="add-is-subscribed" style={{ cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
-                  {t.modalSubscribed}
-                </label>
-              </div>
-
-              {/* Action buttons */}
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                <button type="button" onClick={() => setShowAddModal(false)} className="config-btn" style={{ flex: 1, justifyContent: 'center' }}>
-                  {t.cancelBtn}
-                </button>
-                <button type="submit" className="btn-primary" style={{ flex: 1 }}>
-                  {t.saveBtn}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
 
       
