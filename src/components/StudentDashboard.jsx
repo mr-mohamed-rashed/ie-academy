@@ -36,6 +36,16 @@ const StudentDashboard = ({
   lang,
   triggerToast
 }) => {
+  if (!student) {
+    return (
+      <div className="dashboard-container" style={{ padding: '2rem' }}>
+        <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+          {lang === 'ar' ? 'الرجاء تسجيل الدخول أو إكمال بيانات الحساب.' : 'Please log in or complete your profile.'}
+        </div>
+      </div>
+    );
+  }
+
   const [activeSession, setActiveSession] = useState(null);
   
   // State for simulated QR Code Scanning modal

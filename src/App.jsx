@@ -1694,30 +1694,46 @@ function App() {
             </div>
 
             {/* Course Selector for Landing Podium */}
-            <div className="glass-card" style={{ gridColumn: 'span 12', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                {t.activePodiumLabel}
-              </span>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                {instructors.filter(i => i.isSubscribed).map(inst => (
-                  <button 
-                    key={inst.id}
-                    className={`role-tab ${landingPodiumTeacherId === inst.id ? 'active' : ''}`}
-                    onClick={() => setLandingPodiumTeacherId(inst.id)}
-                    style={{ padding: '0.5rem 1rem' }}
-                  >
-                    {lang === 'ar' ? `${inst.nameAr} - ${inst.subjectAr}` : `${inst.nameEn} - ${inst.subjectEn}`}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {instructors.filter(i => i.isSubscribed).length > 0 ? (
+              <>
+                <div className="glass-card" style={{ gridColumn: 'span 12', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                  <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                    {t.activePodiumLabel}
+                  </span>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {instructors.filter(i => i.isSubscribed).map(inst => (
+                      <button 
+                        key={inst.id}
+                        className={`role-tab ${landingPodiumTeacherId === inst.id ? 'active' : ''}`}
+                        onClick={() => setLandingPodiumTeacherId(inst.id)}
+                        style={{ padding: '0.5rem 1rem' }}
+                      >
+                        {lang === 'ar' ? `${inst.nameAr} - ${inst.subjectAr}` : `${inst.nameEn} - ${inst.subjectEn}`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            {/* Renders dynamic podium for chosen course */}
-            <div style={{ gridColumn: 'span 12' }}>
-              {landingPodiumTeacherId && (
-                <Podium students={students} lang={lang} instructorId={landingPodiumTeacherId} />
-              )}
-            </div>
+                {/* Renders dynamic podium for chosen course */}
+                <div style={{ gridColumn: 'span 12' }}>
+                  {landingPodiumTeacherId && (
+                    <Podium students={students} lang={lang} instructorId={landingPodiumTeacherId} />
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="glass-card" style={{ gridColumn: 'span 12', padding: '3rem 2rem', textAlign: 'center', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                <Award size={64} color="var(--accent-purple)" style={{ opacity: 0.8 }} />
+                <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.25rem', fontWeight: 800 }}>
+                  {lang === 'ar' ? 'مرحباً بك في المنصة التعليمية!' : 'Welcome to the Educational Platform!'}
+                </h3>
+                <p style={{ margin: 0, maxWidth: '600px', lineHeight: '1.7', fontSize: '0.95rem' }}>
+                  {lang === 'ar' 
+                    ? 'سيتم عرض المدرسين المشتركين ولوحة شرف الطلاب المتفوقين هنا فور تفعيل الاشتراكات. إذا كنت معلماً، يمكنك إنشاء حسابك وتفعيله للظهور للطلاب.' 
+                    : 'Subscribed instructors and the student honors board will be displayed here once subscriptions are active. If you are a teacher, register your account and activate it to start.'}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
