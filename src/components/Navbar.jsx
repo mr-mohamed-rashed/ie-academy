@@ -328,64 +328,87 @@ const Navbar = ({
 
         {/* User Badging, Settings & Logout */}
         {currentUser && (
-          <div className="user-badge" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem', borderRadius: '8px', backgroundColor: 'var(--bg-glass)', border: '1px solid var(--border-glass)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <img 
-                src={currentUser.avatar} 
-                alt={currentUser.name} 
-                className="user-badge-img" 
-                style={{ 
-                  width: '32px', 
-                  height: '32px',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  border: (currentUser.role === 'instructor' && currentUser.isSubscribed) ? '2px solid var(--color-gold)' : 'none',
-                  boxShadow: (currentUser.role === 'instructor' && currentUser.isSubscribed) ? '0 0 8px var(--color-gold)' : 'none'
-                }}
-              />
-              <div className="user-badge-info" style={{ flexGrow: 1, minWidth: 0, maxWidth: '120px' }}>
-                <p className="user-badge-name" style={{ fontSize: '0.8rem', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={currentUser.name}>{currentUser.name}</p>
-                <p className="user-badge-role" style={{ fontSize: '0.65rem', margin: 0 }}>
-                  {currentUser.role === 'instructor' 
-                    ? (currentUser.subject || 'Instructor') 
-                    : (currentUser.role === 'admin' 
-                      ? (lang === 'ar' ? 'مدير المنصة' : 'System Admin')
-                      : (currentUser.role === 'support'
-                        ? (lang === 'ar' ? 'الدعم الفني والخدمة' : 'Support Team')
-                        : (lang === 'ar' ? 'طالب جوجل' : 'Google Student')))}
-                </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
+            {/* Clean User Info Card */}
+            <div className="user-badge" style={{ display: 'flex', alignItems: 'center', padding: '0.65rem 0.85rem', borderRadius: '8px', backgroundColor: 'var(--bg-glass)', border: '1px solid var(--border-glass)', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', width: '100%' }}>
+                <img 
+                  src={currentUser.avatar} 
+                  alt={currentUser.name} 
+                  className="user-badge-img" 
+                  style={{ 
+                    width: '36px', 
+                    height: '36px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: (currentUser.role === 'instructor' && currentUser.isSubscribed) ? '2px solid var(--color-gold)' : 'none',
+                    boxShadow: (currentUser.role === 'instructor' && currentUser.isSubscribed) ? '0 0 8px var(--color-gold)' : 'none',
+                    flexShrink: 0
+                  }}
+                />
+                <div className="user-badge-info" style={{ flexGrow: 1, minWidth: 0 }}>
+                  <p className="user-badge-name" style={{ fontSize: '0.85rem', margin: 0, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={currentUser.name}>{currentUser.name}</p>
+                  <p className="user-badge-role" style={{ fontSize: '0.7rem', margin: 0, color: 'var(--text-secondary)' }}>
+                    {currentUser.role === 'instructor' 
+                      ? (currentUser.subject || 'Instructor') 
+                      : (currentUser.role === 'admin' 
+                        ? (lang === 'ar' ? 'مدير المنصة' : 'System Admin')
+                        : (currentUser.role === 'support'
+                          ? (lang === 'ar' ? 'الدعم الفني والخدمة' : 'Support Team')
+                          : (lang === 'ar' ? 'طالب' : 'Student')))}
+                  </p>
+                </div>
               </div>
             </div>
-            
-            <div style={{ display: 'flex', gap: '0.25rem' }}>
-              <button 
-                onClick={openModal} 
-                className="config-btn"
-                style={{ 
-                  padding: '0.4rem',
-                  borderColor: 'var(--accent-purple)', 
-                  color: 'var(--accent-purple)',
-                  minWidth: 'auto'
-                }}
-                title={t.editProfile}
-              >
-                <Settings size={16} />
-              </button>
-              
-              <button 
-                onClick={onLogout} 
-                className="config-btn"
-                style={{ 
-                  padding: '0.4rem',
-                  borderColor: 'var(--accent-red)', 
-                  color: 'var(--accent-red)',
-                  minWidth: 'auto'
-                }}
-                title={t.logout}
-              >
-                <LogOut size={16} />
-              </button>
-            </div>
+
+            {/* Action Buttons Stretched Full Width */}
+            <button 
+              onClick={openModal} 
+              className="btn-primary" 
+              style={{ 
+                width: '100%', 
+                padding: '0.55rem', 
+                fontSize: '0.8rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                gap: '0.5rem',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid var(--border-glass)',
+                color: 'var(--text-primary)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 600,
+                transition: 'all 0.2s'
+              }}
+            >
+              <Settings size={14} />
+              <span>{lang === 'ar' ? 'تعديل البيانات' : 'Edit Profile'}</span>
+            </button>
+
+            <button 
+              onClick={onLogout} 
+              className="btn-primary" 
+              style={{ 
+                width: '100%', 
+                padding: '0.55rem', 
+                fontSize: '0.8rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                gap: '0.5rem',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
+                color: 'var(--accent-red)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 600,
+                transition: 'all 0.2s'
+              }}
+            >
+              <LogOut size={14} />
+              <span>{lang === 'ar' ? 'تسجيل الخروج' : 'Log Out'}</span>
+            </button>
           </div>
         )}
       </div>
