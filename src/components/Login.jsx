@@ -1094,9 +1094,39 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
           backdropFilter: 'blur(10px)'
         }}>
           <div className="glass-card" style={{ width: '90%', maxWidth: '485px', maxHeight: '90vh', overflowY: 'auto', padding: '1.5rem', animation: 'slide-in 0.3s ease-out' }}>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.25rem' }}>{t.modalTitle}</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{t.modalSubtitle}</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+              <div>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.25rem' }}>{t.modalTitle}</h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{t.modalSubtitle}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const url = import.meta.env.VITE_SUPABASE_URL;
+                  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+                  const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+                  if (isConfigured) {
+                    supabase.auth.signOut();
+                  }
+                  setShowModal(false);
+                  onClose();
+                }}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid var(--border-glass)',
+                  borderRadius: '50%',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  padding: '0.4rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s'
+                }}
+                title={lang === 'ar' ? 'إلغاء وإغلاق' : 'Cancel and Close'}
+              >
+                <X size={16} />
+              </button>
             </div>
 
             <form onSubmit={handleSubmit}>
