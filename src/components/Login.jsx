@@ -181,7 +181,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
     // 2. Load Facebook SDK programmatically
     if (!window.FB) {
       window.fbAsyncInit = function() {
-        const fbAppId = import.meta.env.VITE_FACEBOOK_APP_ID || '1591873838289456';
+        const fbAppId = import.meta.env.VITE_FACEBOOK_APP_ID || '1363334622651418';
         window.FB.init({
           appId      : fbAppId,
           cookie     : true,
