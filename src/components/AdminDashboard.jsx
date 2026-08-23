@@ -404,16 +404,41 @@ const AdminDashboard = ({
           <h4 style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-secondary)', width: '100%', textAlign: 'start' }}>
             {t.chartSubjectDist}
           </h4>
-          <div style={{ width: '100%', height: '200px', display: 'flex', justifyContent: 'center' }}>
-            <Bar
+          <div style={{ width: '100%', height: '220px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Doughnut
               data={chartSpecialtyData}
               options={{
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                  y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1, color: 'var(--text-secondary)' } },
-                  x: { ticks: { color: 'var(--text-secondary)' } }
+                plugins: {
+                  legend: {
+                    display: true,
+                    position: lang === 'ar' ? 'right' : 'left',
+                    rtl: lang === 'ar',
+                    labels: {
+                      color: 'var(--text-primary)',
+                      boxWidth: 12,
+                      font: { size: 11, family: 'Cairo, sans-serif', fontWeight: 600 },
+                      padding: 12,
+                      generateLabels: (chart) => {
+                        const data = chart.data;
+                        if (data.labels.length && data.datasets.length) {
+                          return data.labels.map((label, i) => {
+                            const value = data.datasets[0].data[i];
+                            const fill = data.datasets[0].backgroundColor[i % data.datasets[0].backgroundColor.length];
+                            return {
+                              text: `${label}: ${value} ${lang === 'ar' ? (value > 2 && value < 11 ? 'مدرسين' : 'مدرس') : 'Teacher(s)'}`,
+                              fillStyle: fill,
+                              strokeStyle: 'transparent',
+                              lineWidth: 0,
+                              index: i
+                            };
+                          });
+                        }
+                        return [];
+                      }
+                    }
+                  }
                 }
               }}
             />
