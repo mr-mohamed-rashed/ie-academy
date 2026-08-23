@@ -40,6 +40,9 @@ export async function getInstructors() {
       isSubscribed: db.is_subscribed,
       groups: db.groups || [
         { id: `group-custom-${db.id}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }
+      ],
+      grades: db.grades || [
+        { id: `grade-sec-${db.id}`, nameAr: "ثانوي", nameEn: "High School", groups: db.groups || [{ id: `group-custom-${db.id}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }] }
       ]
     }));
 
@@ -169,7 +172,8 @@ export async function saveInstructor(inst) {
       year_en: inst.yearEn,
       video_url: inst.videoUrl,
       is_subscribed: inst.isSubscribed,
-      groups: inst.groups
+      groups: inst.groups,
+      grades: inst.grades
     };
     await supabase.from('instructors').upsert(dbRecord);
   } catch (err) {

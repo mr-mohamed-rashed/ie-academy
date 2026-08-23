@@ -495,6 +495,25 @@ function App() {
     if (updatedProfileData.role === 'instructor') {
       // Create new instructor profile in list
       const newTeacherId = 100 + instructors.length + 1;
+      const rawStages = profileData.grades || ['sec'];
+      const instructorGrades = rawStages.map((stage) => {
+        let nameAr = "ثانوي";
+        let nameEn = "High School";
+        if (stage === 'primary') { nameAr = "ابتدائي"; nameEn = "Primary"; }
+        else if (stage === 'prep') { nameAr = "إعدادي"; nameEn = "Middle School"; }
+        else if (stage === 'sec') { nameAr = "ثانوي"; nameEn = "High School"; }
+        else if (stage === 'univ') { nameAr = "جامعي"; nameEn = "University"; }
+        
+        return {
+          id: `grade-${stage}-${newTeacherId}`,
+          nameAr,
+          nameEn,
+          groups: [
+            { id: `group-custom-${newTeacherId}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }
+          ]
+        };
+      });
+
       const newTeacherObj = {
         id: newTeacherId,
         email: profileData.email, // Save email!
@@ -506,8 +525,9 @@ function App() {
         yearAr: profileData.yearAr || "ثانوي",
         yearEn: profileData.yearEn || "High School",
         isSubscribed: false, // Starts as free/unapproved (hidden from visitors)
+        grades: instructorGrades,
         groups: [
-          { id: `group-custom-${newTeacherId}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group" }
+          { id: `group-custom-${newTeacherId}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }
         ]
       };
       setInstructors((prev) => [...prev, newTeacherObj]);
