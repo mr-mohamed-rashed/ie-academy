@@ -1071,7 +1071,7 @@ function App() {
               onClick={() => setVisitorTab('guide')}
               style={{ fontSize: '1.05rem', padding: '0.75rem 1.5rem', cursor: 'pointer' }}
             >
-              {lang === 'ar' ? 'كيفية الاستخدام للمنصة' : 'How the Platform Works'}
+              {lang === 'ar' ? 'كيفية الاستخدام' : 'How It Works'}
             </button>
             <button 
               className={`role-tab ${visitorTab === 'teachers' ? 'active' : ''}`}
