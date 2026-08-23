@@ -143,6 +143,28 @@ function App() {
     }
   }, [isLoggedIn, currentUser, userRole, activeStudentId, activeInstructorId]);
   
+  // Auto-logout if local state is corrupt (e.g. database cleared but user session remains)
+  useEffect(() => {
+    if (isLoggedIn) {
+      if (userRole === 'instructor' && activeInstructorId && !instructors.some(i => i.id === activeInstructorId)) {
+        // Run clear session
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        setUserRole('landing');
+        localStorage.setItem('edu_is_logged_in', 'false');
+        localStorage.removeItem('edu_current_user');
+        localStorage.removeItem('edu_active_instructor_id');
+      } else if (userRole === 'student' && activeStudentId && !students.some(s => s.id === activeStudentId)) {
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        setUserRole('landing');
+        localStorage.setItem('edu_is_logged_in', 'false');
+        localStorage.removeItem('edu_current_user');
+        localStorage.removeItem('edu_active_student_id');
+      }
+    }
+  }, [isLoggedIn, userRole, activeInstructorId, activeStudentId, instructors, students]);
+  
   // PWA BeforeInstallPrompt Listener
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
