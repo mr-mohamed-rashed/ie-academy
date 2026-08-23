@@ -996,7 +996,7 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
           justifyContent: 'center',
           backdropFilter: 'blur(10px)'
         }}>
-          <div className="glass-card" style={{ width: '90%', maxWidth: '485px', padding: '2rem', animation: 'slide-in 0.3s ease-out' }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '485px', maxHeight: '90vh', overflowY: 'auto', padding: '1.5rem', animation: 'slide-in 0.3s ease-out' }}>
             <div style={{ marginBottom: '1.5rem' }}>
               <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.25rem' }}>{t.modalTitle}</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{t.modalSubtitle}</p>
