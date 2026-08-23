@@ -64,7 +64,27 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
   }, [invitationCode, instructors]);
 
   const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState(initialRole || (inviteTeacherId ? 'student' : 'instructor'));
+  const [role, setRole] = useState(() => {
+    const saved = localStorage.getItem('edu_oauth_role');
+    if (saved) return saved;
+    return initialRole || (inviteTeacherId ? 'student' : 'instructor');
+  });
+
+  // Sync initialRole and save to localStorage
+  useEffect(() => {
+    if (initialRole) {
+      localStorage.setItem('edu_oauth_role', initialRole);
+      setRole(initialRole);
+    }
+  }, [initialRole]);
+
+  // Persist role changes
+  useEffect(() => {
+    if (role) {
+      localStorage.setItem('edu_oauth_role', role);
+    }
+  }, [role]);
+
   const [avatarUrl, setAvatarUrl] = useState(PRESET_AVATARS[0]);
   const [subject, setSubject] = useState('');
   const [year, setYear] = useState('');
