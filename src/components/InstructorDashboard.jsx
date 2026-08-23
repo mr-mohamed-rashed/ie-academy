@@ -31,6 +31,16 @@ const InstructorDashboard = ({
   onSubmitPaymentRequest,
   onPaySubscription
 }) => {
+  if (!instructor) {
+    return (
+      <div className="dashboard-container" style={{ padding: '2rem' }}>
+        <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+          {lang === 'ar' ? 'الرجاء تسجيل الدخول أو إكمال بيانات الحساب.' : 'Please log in or complete your profile.'}
+        </div>
+      </div>
+    );
+  }
+
   // Use props for grade and group state
   const activeGrade = instructor.grades?.find(g => g.id === activeGradeId) || instructor.grades?.[0];
   const derivedActiveGradeId = activeGrade?.id || '';
