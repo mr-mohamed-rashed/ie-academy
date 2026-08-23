@@ -26,7 +26,7 @@ export async function getInstructors() {
     const { data, error } = await supabase.from('instructors').select('*');
     if (error) throw error;
     // Map DB schema to UI state
-    return data.map(db => ({
+    const dbInstructors = data.map(db => ({
       id: db.id,
       email: db.email,
       nameAr: db.name_ar,
@@ -42,6 +42,18 @@ export async function getInstructors() {
         { id: `group-custom-${db.id}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }
       ]
     }));
+
+    // Merge with local storage to prevent data loss if Supabase upsert was blocked
+    const localSaved = localStorage.getItem(KEYS.instructors);
+    if (localSaved) {
+      const localParsed = JSON.parse(localSaved);
+      localParsed.forEach(localItem => {
+        if (!dbInstructors.some(dbItem => dbItem.email?.toLowerCase() === localItem.email?.toLowerCase())) {
+          dbInstructors.push(localItem);
+        }
+      });
+    }
+    return dbInstructors;
   } catch (err) {
     console.warn("Supabase fetch error, falling back to localStorage:", err);
     const saved = localStorage.getItem(KEYS.instructors);
@@ -58,7 +70,7 @@ export async function getStudents() {
   try {
     const { data, error } = await supabase.from('students').select('*');
     if (error) throw error;
-    return data.map(db => ({
+    const dbStudents = data.map(db => ({
       id: db.id,
       email: db.email,
       nameAr: db.name_ar,
@@ -70,6 +82,18 @@ export async function getStudents() {
       grades: db.grades || [],
       attendance: db.attendance || []
     }));
+
+    // Merge with local storage to prevent data loss if Supabase upsert was blocked
+    const localSaved = localStorage.getItem(KEYS.students);
+    if (localSaved) {
+      const localParsed = JSON.parse(localSaved);
+      localParsed.forEach(localItem => {
+        if (!dbStudents.some(dbItem => dbItem.email?.toLowerCase() === localItem.email?.toLowerCase())) {
+          dbStudents.push(localItem);
+        }
+      });
+    }
+    return dbStudents;
   } catch (err) {
     console.warn("Supabase fetch error, falling back to localStorage:", err);
     const saved = localStorage.getItem(KEYS.students);
