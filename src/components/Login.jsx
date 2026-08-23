@@ -1375,7 +1375,6 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1.5rem', maxHeight: '240px', overflowY: 'auto', padding: '0.25rem' }}>
                         {(() => {
                           const filtered = instructors.filter(i => {
-                            if (!i.isSubscribed) return false;
                             const hasPrimary = i.yearAr?.includes('ابتدائي') || i.yearAr?.includes('ابتدائى') || i.yearEn?.toLowerCase().includes('primary') || i.yearEn?.toLowerCase().includes('elem');
                             const hasPrep = i.yearAr?.includes('إعدادي') || i.yearAr?.includes('اعدادي') || i.yearEn?.toLowerCase().includes('middle') || i.yearEn?.toLowerCase().includes('prep');
                             const hasSec = i.yearAr?.includes('ثانوي') || i.yearAr?.includes('بكالوريا') || i.yearEn?.toLowerCase().includes('high') || i.yearEn?.toLowerCase().includes('sec') || i.yearEn?.toLowerCase().includes('secondary') || i.yearEn?.toLowerCase().includes('bac');
