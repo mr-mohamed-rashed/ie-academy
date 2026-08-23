@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سياسة الخصوصية - IE ACADEMY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-app: #0a0412;
+            --text-primary: #f8fafc;
+            --text-secondary: #c4b5fd;
+            --accent-primary: #6366f1;
+            --border-glass: rgba(167, 139, 250, 0.15);
+            --bg-card: rgba(56, 31, 99, 0.2);
+        }
+        body {
+            background-color: var(--bg-app);
+            background-image: radial-gradient(circle at 15% 50%, rgba(109, 40, 217, 0.15) 0%, transparent 50%), radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: 'Cairo', 'Outfit', sans-serif;
+            margin: 0;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-top: 0;
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 2px solid var(--border-glass);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        h2 {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-right: 4px solid var(--accent-primary);
+            padding-right: 0.75rem;
+        }
+        p, li {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        ul {
+            padding-right: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        .lang-switch {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1.5rem;
+        }
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.2s;
+        }
+        .lang-btn:hover {
+            background: var(--accent-primary);
+        }
+        .english-content {
+            display: none;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Outfit', sans-serif;
+        }
+        .english-content h2 {
+            border-right: none;
+            border-left: 4px solid var(--accent-primary);
+            padding-right: 0;
+            padding-left: 0.75rem;
+        }
+        .english-content ul {
+            padding-right: 0;
+            padding-left: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lang-switch">
+            <button class="lang-btn" id="toggle-lang" onclick="toggleLanguage()">English</button>
+        </div>
+
+        <!-- Arabic Content -->
+        <div id="content-ar">
+            <h1>سياسة الخصوصية لـ IE ACADEMY</h1>
+            <p>تلتزم منصة <strong>IE ACADEMY</strong> بحماية خصوصيتك وبياناتك الشخصية. توضح هذه الصفحة كيفية جمع واستخدام وحماية البيانات التي تزودنا بها عند استخدام ميزات تسجيل الدخول عبر Google أو Facebook أو البريد الإلكتروني.</p>
+
+            <h2>1. البيانات التي نجمعها</h2>
+            <p>عند تسجيل الدخول باستخدام حساب Google أو Facebook، نقوم بطلب الصلاحيات الأساسية وسحب البيانات التالية المسموح بها من قبلك:</p>
+            <ul>
+                <li>الاسم الكامل (لعرضه في حساب الطالب أو المعلم).</li>
+                <li>البريد الإلكتروني (لتأكيد الهوية وإجراء استعادة كلمة المرور).</li>
+                <li>الصورة الشخصية (لوضعها كصورة بروفايل خاصة بك في المنصة).</li>
+            </ul>
+
+            <h2>2. كيف نستخدم بياناتك</h2>
+            <p>نستخدم هذه البيانات للأغراض التالية فقط:</p>
+            <ul>
+                <li>إنشاء وإدارة حسابك الدراسي أو التعليمي في المنصة.</li>
+                <li>تمكين المدرسين من إرسال تقييمات الواجبات والحضور إليك.</li>
+                <li>التواصل معك وإرسال الإشعارات والتقارير الأكاديمية.</li>
+            </ul>
+
+            <h2>3. حماية البيانات ومشاركتها</h2>
+            <p>نحن لا نبيع أو نشارك أو نؤجر بياناتك الشخصية لأي طرف ثالث على الإطلاق. يتم تشفير كلمات المرور وتخزين البيانات بشكل آمن لمنع الوصول غير المصرح به.</p>
+
+            <h2>4. حقوقك والتحكم في البيانات</h2>
+            <p>يمكنك في أي وقت تعديل بياناتك أو تحديثها من خلال صفحة البروفايل الخاصة بك داخل المنصة. كما يمكنك طلب حذف حسابك وبياناتك بالكامل عبر التواصل مع الدعم الفني للمنصة.</p>
+
+            <h2>5. الاتصال بنا</h2>
+            <p>إذا كانت لديك أي استفسارات حول سياسة الخصوصية، يرجى التواصل معنا عبر البريد الإلكتروني: <strong style="color: var(--text-primary);">rishobeh@gmail.com</strong></p>
+        </div>
+
+        <!-- English Content -->
+        <div id="content-en" class="english-content">
+            <h1>Privacy Policy for IE ACADEMY</h1>
+            <p>The <strong>IE ACADEMY</strong> platform is committed to protecting your privacy and personal data. This page explains how we collect, use, and protect the data you provide to us when using Google, Facebook, or Email login features.</p>
+
+            <h2>1. Data We Collect</h2>
+            <p>When you log in using your Google or Facebook account, we request basic permissions and retrieve the following authorized data:</p>
+            <ul>
+                <li>Full Name (to display on your student or teacher profile).</li>
+                <li>Email Address (to verify identity and handle password recoveries).</li>
+                <li>Profile Picture (to set as your avatar on the platform).</li>
+            </ul>
+
+            <h2>2. How We Use Your Data</h2>
+            <p>We use this data strictly for the following purposes:</p>
+            <ul>
+                <li>Creating and managing your academic or teaching account on the platform.</li>
+                <li>Enabling instructors to send homework grades and attendance reports.</li>
+                <li>Communicating with you and sending academic notifications.</li>
+            </ul>
+
+            <h2>3. Data Protection and Sharing</h2>
+            <p>We absolutely do not sell, share, or lease your personal data to any third party. Passwords are encrypted and all data is securely stored to prevent unauthorized access.</p>
+
+            <h2>4. Your Rights and Data Control</h2>
+            <p>You can modify or update your details at any time through your profile page. You can also request complete deletion of your account and data by contacting our technical support.</p>
+
+            <h2>5. Contact Us</h2>
+            <p>If you have any questions regarding this Privacy Policy, please contact us at: <strong style="color: var(--text-primary);">rishobeh@gmail.com</strong></p>
+        </div>
+    </div>
+
+    <script>
+        function toggleLanguage() {
+            var ar = document.getElementById('content-ar');
+            var en = document.getElementById('content-en');
+            var btn = document.getElementById('toggle-lang');
+            var html = document.documentElement;
+
+            if (ar.style.display === 'none') {
+                ar.style.display = 'block';
+                en.style.display = 'none';
+                btn.textContent = 'English';
+                html.setAttribute('dir', 'rtl');
+                html.setAttribute('lang', 'ar');
+            } else {
+                ar.style.display = 'none';
+                en.style.display = 'block';
+                btn.textContent = 'العربية';
+                html.setAttribute('dir', 'ltr');
+                html.setAttribute('lang', 'en');
+            }
+        }
+    </script>
+</body>
+</html>

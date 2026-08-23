@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شروط الاستخدام - IE ACADEMY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-app: #0a0412;
+            --text-primary: #f8fafc;
+            --text-secondary: #c4b5fd;
+            --accent-primary: #6366f1;
+            --border-glass: rgba(167, 139, 250, 0.15);
+            --bg-card: rgba(56, 31, 99, 0.2);
+        }
+        body {
+            background-color: var(--bg-app);
+            background-image: radial-gradient(circle at 15% 50%, rgba(109, 40, 217, 0.15) 0%, transparent 50%), radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: 'Cairo', 'Outfit', sans-serif;
+            margin: 0;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-top: 0;
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 2px solid var(--border-glass);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        h2 {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-right: 4px solid var(--accent-primary);
+            padding-right: 0.75rem;
+        }
+        p, li {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        ul {
+            padding-right: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        .lang-switch {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1.5rem;
+        }
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.2s;
+        }
+        .lang-btn:hover {
+            background: var(--accent-primary);
+        }
+        .english-content {
+            display: none;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Outfit', sans-serif;
+        }
+        .english-content h2 {
+            border-right: none;
+            border-left: 4px solid var(--accent-primary);
+            padding-right: 0;
+            padding-left: 0.75rem;
+        }
+        .english-content ul {
+            padding-right: 0;
+            padding-left: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lang-switch">
+            <button class="lang-btn" id="toggle-lang" onclick="toggleLanguage()">English</button>
+        </div>
+
+        <!-- Arabic Content -->
+        <div id="content-ar">
+            <h1>شروط وأحكام استخدام منصة IE ACADEMY</h1>
+            <p>مرحباً بك في منصة <strong>IE ACADEMY</strong>. بدخولك واستخدامك للمنصة، فإنك توافق على الالتزام بالشروط والأحكام التالية بالكامل. يرجى قراءتها بعناية.</p>
+
+            <h2>1. الحساب والتسجيل</h2>
+            <p>لتسجيل حساب على المنصة (سواء كطالب أو كمعلم)، يجب تقديم معلومات دقيقة وكاملة. أنت مسؤول مسؤولية كاملة عن الحفاظ على سرية حسابك وكلمة مرورك وكافة الأنشطة التي تتم من خلاله.</p>
+
+            <h2>2. السلوك والاستخدام المقبول</h2>
+            <p>توافق على عدم استخدام المنصة لأي من الأغراض التالية:</p>
+            <ul>
+                <li>نشر محتوى ينتهك حقوق الملكية الفكرية للمدرسين أو المنصة.</li>
+                <li>استخدام المنصة لنشر محتوى غير لائق أو مسيء أو مروج للكراهية.</li>
+                <li>محاولة فك تشفير أو تخريب أو اختراق أي من الأكواد والأنظمة الأمنية للموقع.</li>
+            </ul>
+
+            <h2>3. الملكية الفكرية</h2>
+            <p>جميع المحاضرات ومقاطع الفيديو التعليمية والأسئلة والواجبات والمواد التعليمية المرفوعة من قبل المدرسين هي ملكية فكرية خاصة بهم وبالمنصة، ويُحظر تماماً تصويرها أو تسجيلها أو إعادة نشرها خارج المنصة دون إذن مسبق.</p>
+
+            <h2>4. الاشتراكات والدفع</h2>
+            <p>يتم تفعيل حسابات المعلمين وإتاحة المحتوى الدراسي للطلاب بناءً على خطط الدفع المحددة والاشتراكات المعتمدة في النظام. جميع عمليات الدفع وتأكيد الحوالات تتم مراجعتها بدقة من قبل إدارة المنصة.</p>
+
+            <h2>5. تعديل الشروط وإنهاء الخدمة</h2>
+            <p>نحتفظ بالحق في تعديل هذه الشروط في أي وقت. كما يحق لإدارة المنصة تعليق أو إغلاق أي حساب ينتهك شروط الاستخدام دون إشعار مسبق.</p>
+
+            <h2>6. الاتصال بنا</h2>
+            <p>لأي استفسارات بخصوص شروط الاستخدام، يمكنك التواصل معنا عبر: <strong style="color: var(--text-primary);">rishobeh@gmail.com</strong></p>
+        </div>
+
+        <!-- English Content -->
+        <div id="content-en" class="english-content">
+            <h1>Terms and Conditions of Use - IE ACADEMY</h1>
+            <p>Welcome to the <strong>IE ACADEMY</strong> platform. By accessing and using the platform, you agree to comply with and be bound by the following terms and conditions in full. Please read them carefully.</p>
+
+            <h2>1. Account and Registration</h2>
+            <p>To register an account (whether as a student or a teacher), you must provide accurate and complete information. You are solely responsible for maintaining the confidentiality of your account, password, and all activities under your account.</p>
+
+            <h2>2. Acceptable Conduct and Use</h2>
+            <p>You agree not to use the platform for any of the following:</p>
+            <ul>
+                <li>Posting content that violates the intellectual property rights of teachers or the platform.</li>
+                <li>Using the platform to distribute inappropriate, offensive, or hate-promoting materials.</li>
+                <li>Attempting to decrypt, sabotage, or hack any of the website's codes or security systems.</li>
+            </ul>
+
+            <h2>3. Intellectual Property</h2>
+            <p>All lectures, educational videos, quiz questions, homework, and study materials uploaded by instructors are the intellectual property of the respective instructors and the platform. Recording or redistributing them outside the platform without permission is strictly prohibited.</p>
+
+            <h2>4. Subscriptions and Payments</h2>
+            <p>Teacher accounts activation and access to student courses are granted based on the designated payment plans. All payment transactions and approvals are audited by the platform administration.</p>
+
+            <h2>5. Modifications of Terms and Service Termination</h2>
+            <p>We reserve the right to modify these terms at any time. The platform administration reserves the right to suspend or terminate any account violating these terms without prior notice.</p>
+
+            <h2>6. Contact Us</h2>
+            <p>For any inquiries regarding these Terms of Use, please contact us at: <strong style="color: var(--text-primary);">rishobeh@gmail.com</strong></p>
+        </div>
+    </div>
+
+    <script>
+        function toggleLanguage() {
+            var ar = document.getElementById('content-ar');
+            var en = document.getElementById('content-en');
+            var btn = document.getElementById('toggle-lang');
+            var html = document.documentElement;
+
+            if (ar.style.display === 'none') {
+                ar.style.display = 'block';
+                en.style.display = 'none';
+                btn.textContent = 'English';
+                html.setAttribute('dir', 'rtl');
+                html.setAttribute('lang', 'ar');
+            } else {
+                ar.style.display = 'none';
+                en.style.display = 'block';
+                btn.textContent = 'العربية';
+                html.setAttribute('dir', 'ltr');
+                html.setAttribute('lang', 'en');
+            }
+        }
+    </script>
+</body>
+</html>
