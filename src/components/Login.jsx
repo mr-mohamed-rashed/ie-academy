@@ -25,7 +25,7 @@ const PRESET_AVATARS = [
   "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=120"
 ];
 
-const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, onClose, supabaseUser }) => {
+const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, onClose, supabaseUser, isLoading }) => {
   const [showModal, setShowModal] = useState(false);
   const [inviteTeacherId, setInviteTeacherId] = useState(null);
   const [isAdminMode, setIsAdminMode] = useState(false);
@@ -209,6 +209,7 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
 
   // Autofill consentUser from active Supabase session
   useEffect(() => {
+    if (isLoading) return; // Wait until DB data is loaded to prevent race conditions!
     if (supabaseUser) {
       const email = supabaseUser.email || '';
       const name = supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || email.split('@')[0] || 'User';
@@ -262,7 +263,7 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
         }
       }
     }
-  }, [supabaseUser]);
+  }, [supabaseUser, isLoading]);
 
   const handleAvatarFileChange = (e) => {
     const file = e.target.files[0];
