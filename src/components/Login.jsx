@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, User, Briefcase, Camera, Check } from 'lucide-react';
+import { BookOpen, User, Briefcase, Camera, Check, X } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 const decodeJwt = (token) => {
