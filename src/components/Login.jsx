@@ -1821,7 +1821,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
                     type="button"
                     onClick={() => {
                       const ADMIN_EMAILS = ['rishobeh@gmail.com', 'admin@ie-academy.com', 'admin@ie.com'];
-                      if (ADMIN_EMAILS.includes(consentUser.email.toLowerCase())) {
+                      if (consentUser.email && ADMIN_EMAILS.includes(consentUser.email.toLowerCase())) {
                         onLogin({
                           name: lang === 'ar' ? 'أ/ ريشو' : 'Super Admin',
                           role: 'admin',
