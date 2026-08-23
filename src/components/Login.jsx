@@ -1004,38 +1004,7 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
 
             <form onSubmit={handleSubmit}>
               
-              {/* Role selector - ONLY show if initialRole was not passed! */}
-              {!initialRole && (
-                <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>{lang === 'ar' ? 'اختر نوع الحساب للتسجيل:' : 'Select Account Type to Register:'}</label>
-                  <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                    <button 
-                      type="button" 
-                      onClick={() => setRole('student')}
-                      style={{ 
-                        flex: 1, padding: '0.55rem', borderRadius: '8px', border: '1.5px solid var(--accent-purple)', 
-                        backgroundColor: role === 'student' ? 'var(--accent-purple)' : 'transparent',
-                        color: role === 'student' ? 'white' : 'var(--text-secondary)',
-                        fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem'
-                      }}
-                    >
-                      {lang === 'ar' ? 'حساب طالب' : 'Student Account'}
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => setRole('instructor')}
-                      style={{ 
-                        flex: 1, padding: '0.55rem', borderRadius: '8px', border: '1.5px solid var(--accent-primary)', 
-                        backgroundColor: role === 'instructor' ? 'var(--accent-primary)' : 'transparent',
-                        color: role === 'instructor' ? 'white' : 'var(--text-secondary)',
-                        fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem'
-                      }}
-                    >
-                      {lang === 'ar' ? 'حساب معلم' : 'Teacher Account'}
-                    </button>
-                  </div>
-                </div>
-              )}
+
 
               {errorMessage && (
                 <div style={{ padding: '0.75rem', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.15)', color: 'var(--accent-red)', fontSize: '0.85rem', fontWeight: 600, border: '1px solid rgba(239, 68, 68, 0.2)', marginBottom: '1rem' }}>
