@@ -343,8 +343,8 @@ const Navbar = ({
                   boxShadow: (currentUser.role === 'instructor' && currentUser.isSubscribed) ? '0 0 8px var(--color-gold)' : 'none'
                 }}
               />
-              <div className="user-badge-info" style={{ flexGrow: 1 }}>
-                <p className="user-badge-name" style={{ fontSize: '0.8rem', margin: 0 }}>{currentUser.name}</p>
+              <div className="user-badge-info" style={{ flexGrow: 1, minWidth: 0, maxWidth: '120px' }}>
+                <p className="user-badge-name" style={{ fontSize: '0.8rem', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={currentUser.name}>{currentUser.name}</p>
                 <p className="user-badge-role" style={{ fontSize: '0.65rem', margin: 0 }}>
                   {currentUser.role === 'instructor' 
                     ? (currentUser.subject || 'Instructor') 
