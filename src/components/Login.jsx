@@ -246,20 +246,30 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
         setConsentUser({ name, email, avatar, type: supabaseUser.app_metadata?.provider || 'google' });
       } else {
         // Brand new user!
-        if (initialRole === 'student') {
-          setFullName(name);
-          setEmail(email);
-          setAvatarUrl(avatar);
-          setRole('student');
-          setShowModal(true);
-        } else if (initialRole === 'instructor') {
-          setFullName(name);
-          setEmail(email);
-          setAvatarUrl(avatar);
-          setRole('instructor');
-          setShowModal(true);
+        if (authMode === 'login') {
+          setErrorMessage(lang === 'ar' ? 'هذا الحساب غير مسجل بالمنصة! يرجى إنشاء حساب جديد أولاً.' : 'This account is not registered! Please sign up first.');
+          const url = import.meta.env.VITE_SUPABASE_URL;
+          const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+          const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+          if (isConfigured) {
+            supabase.auth.signOut();
+          }
         } else {
-          setConsentUser({ name, email, avatar, type: supabaseUser.app_metadata?.provider || 'google' });
+          if (initialRole === 'student') {
+            setFullName(name);
+            setEmail(email);
+            setAvatarUrl(avatar);
+            setRole('student');
+            setShowModal(true);
+          } else if (initialRole === 'instructor') {
+            setFullName(name);
+            setEmail(email);
+            setAvatarUrl(avatar);
+            setRole('instructor');
+            setShowModal(true);
+          } else {
+            setConsentUser({ name, email, avatar, type: supabaseUser.app_metadata?.provider || 'google' });
+          }
         }
       }
     }
