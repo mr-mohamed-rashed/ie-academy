@@ -480,8 +480,11 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
     return list;
   };
 
-  const checkEmailExists = (selectedEmail) => {
+  const checkEmailExists = (selectedEmail, targetRole) => {
     const accounts = getExistingAccounts(selectedEmail);
+    if (targetRole) {
+      return accounts.find(acc => acc.role === targetRole) || null;
+    }
     return accounts.length > 0 ? accounts[0] : null;
   };
 
@@ -589,8 +592,9 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
       // Check if email already exists in local database
       const savedInstructors = JSON.parse(localStorage.getItem('edu_instructors') || '[]');
       const savedStudents = JSON.parse(localStorage.getItem('edu_students') || '[]');
-      const emailExists = savedInstructors.some(i => i.email?.toLowerCase() === email.toLowerCase()) || 
-                          savedStudents.some(s => s.email?.toLowerCase() === email.toLowerCase());
+      const emailExists = role === 'instructor' 
+        ? savedInstructors.some(i => i.email?.toLowerCase() === email.toLowerCase())
+        : savedStudents.some(s => s.email?.toLowerCase() === email.toLowerCase());
       
       if (emailExists) {
         setErrorMessage(lang === 'ar' ? 'هذا البريد الإلكتروني مسجل بالفعل!' : 'This email is already registered!');
@@ -707,8 +711,9 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
       // Check if email already exists
       const savedInstructors = JSON.parse(localStorage.getItem('edu_instructors') || '[]');
       const savedStudents = JSON.parse(localStorage.getItem('edu_students') || '[]');
-      const emailExists = savedInstructors.some(i => i.email?.toLowerCase() === email.toLowerCase()) || 
-                          savedStudents.some(s => s.email?.toLowerCase() === email.toLowerCase());
+      const emailExists = role === 'instructor' 
+        ? savedInstructors.some(i => i.email?.toLowerCase() === email.toLowerCase())
+        : savedStudents.some(s => s.email?.toLowerCase() === email.toLowerCase());
       
       if (emailExists) {
         setErrorMessage(lang === 'ar' ? 'هذا البريد الإلكتروني مسجل بالفعل!' : 'This email is already registered!');
