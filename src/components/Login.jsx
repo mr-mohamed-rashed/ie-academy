@@ -166,7 +166,7 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
 
   const initializeGoogleSDK = () => {
     if (window.google) {
-      const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1092837491-example.apps.googleusercontent.com';
+      const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '649933821481-34nhsr9oq0264vv6i6gst9vk4avrbgfj.apps.googleusercontent.com';
       window.google.accounts.id.initialize({
         client_id: googleClientId,
         callback: handleGoogleCredentialResponse
