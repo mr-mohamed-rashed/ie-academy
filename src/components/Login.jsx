@@ -266,7 +266,13 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
       } else {
         // Brand new user!
         if (authMode === 'login') {
-          setErrorMessage(lang === 'ar' ? 'هذا الحساب غير مسجل بالمنصة! يرجى إنشاء حساب جديد أولاً.' : 'This account is not registered! Please sign up first.');
+          setErrorMessage(lang === 'ar' ? 'هذا الحساب غير مسجل. يرجى استكمال البيانات بالأسفل لإنشاء حسابك الجديد!' : 'This account is not registered. Please complete the form below to create your account!');
+          setAuthMode('signup');
+          setFullName(name);
+          setEmail(email);
+          setAvatarUrl(avatar);
+          setRole(role || initialRole || 'student');
+          setShowModal(true);
         } else {
           setErrorMessage(''); // Clear error if switching to signup
           if (role === 'student' || initialRole === 'student') {
