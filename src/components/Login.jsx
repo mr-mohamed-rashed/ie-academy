@@ -740,8 +740,8 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
         setStudentStep(2);
         return;
       }
-      if (!selectedInstructor || !selectedGroup) {
-        setErrorMessage(lang === 'ar' ? 'يرجى اختيار المدرس والصف والمجموعة أولاً!' : 'Please select a teacher, grade, and group first!');
+      if (selectedInstructor && !selectedGroup) {
+        setErrorMessage(lang === 'ar' ? 'يرجى اختيار الصف والمجموعة للمعلم المختار!' : 'Please select the grade and group for the chosen teacher!');
         return;
       }
     }
