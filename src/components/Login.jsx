@@ -240,7 +240,13 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
         return;
       }
 
-      const accounts = getExistingAccounts(email);
+      const signupRole = role || initialRole;
+      const accounts = getExistingAccounts(email).filter(acc => {
+        if (authMode === 'signup' && signupRole) {
+          return acc.role === signupRole;
+        }
+        return true;
+      });
       if (accounts.length === 1) {
         // Log in directly!
         const account = accounts[0];
