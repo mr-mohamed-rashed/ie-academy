@@ -741,6 +741,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
         return;
       }
       if (!selectedInstructor || !selectedGroup) {
+        setErrorMessage(lang === 'ar' ? 'يرجى اختيار المدرس والصف والمجموعة أولاً!' : 'Please select a teacher, grade, and group first!');
         return;
       }
     }
@@ -1433,45 +1434,57 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
                         })()}
                       </div>
 
-                      {selectedInstructor && (
-                        <div style={{ animation: 'slide-in 0.2s ease-out', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'start' }}>
-                          <div className="form-group">
-                            <label>{t.selectGradeLabel}</label>
-                            <select 
-                              className="form-control" 
-                              value={selectedGrade} 
-                              onChange={(e) => { setSelectedGrade(e.target.value); setSelectedGroup(''); }}
-                              required
-                              style={{ appearance: 'auto' }}
-                            >
-                              <option value="">{t.selectGradeLabel}...</option>
-                              {instructors.find(i => String(i.id) === String(selectedInstructor))?.grades?.map(g => (
-                                <option key={g.id} value={g.id}>{lang === 'ar' ? g.nameAr : g.nameEn}</option>
-                              ))}
-                            </select>
-                          </div>
-
-                          {selectedGrade && (
+                      {selectedInstructor && (() => {
+                        const currentTeacher = instructors.find(i => String(i.id) === String(selectedInstructor));
+                        const teacherGrades = currentTeacher?.grades && currentTeacher.grades.length > 0
+                          ? currentTeacher.grades
+                          : [
+                              { 
+                                id: `grade-sec-${currentTeacher?.id}`, 
+                                nameAr: "ثانوي", 
+                                nameEn: "High School", 
+                                groups: currentTeacher?.groups || [{ id: `group-custom-${currentTeacher?.id}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }] 
+                              }
+                            ];
+                        
+                        return (
+                          <div style={{ animation: 'slide-in 0.2s ease-out', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'start' }}>
                             <div className="form-group">
-                              <label>{t.selectGroupLabel}</label>
+                              <label>{t.selectGradeLabel}</label>
                               <select 
                                 className="form-control" 
-                                value={selectedGroup} 
-                                onChange={(e) => setSelectedGroup(e.target.value)}
+                                value={selectedGrade} 
+                                onChange={(e) => { setSelectedGrade(e.target.value); setSelectedGroup(''); }}
                                 required
                                 style={{ appearance: 'auto' }}
                               >
-                                <option value="">{t.selectGroupLabel}...</option>
-                                {instructors.find(i => String(i.id) === String(selectedInstructor))
-                                  ?.grades?.find(g => String(g.id) === String(selectedGrade))
-                                  ?.groups?.map(g => (
+                                <option value="">{t.selectGradeLabel}...</option>
+                                {teacherGrades.map(g => (
                                   <option key={g.id} value={g.id}>{lang === 'ar' ? g.nameAr : g.nameEn}</option>
                                 ))}
                               </select>
                             </div>
-                          )}
-                        </div>
-                      )}
+
+                            {selectedGrade && (
+                              <div className="form-group">
+                                <label>{t.selectGroupLabel}</label>
+                                <select 
+                                  className="form-control" 
+                                  value={selectedGroup} 
+                                  onChange={(e) => setSelectedGroup(e.target.value)}
+                                  required
+                                  style={{ appearance: 'auto' }}
+                                >
+                                  <option value="">{t.selectGroupLabel}...</option>
+                                  {(teacherGrades.find(g => String(g.id) === String(selectedGrade))?.groups || currentTeacher?.groups || []).map(g => (
+                                    <option key={g.id} value={g.id}>{lang === 'ar' ? g.nameAr : g.nameEn}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
 
                       {/* Action buttons Step 2 */}
                       <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
