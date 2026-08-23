@@ -1737,7 +1737,10 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
 
               <button 
                 type="button"
-                onClick={() => setConsentUser(null)}
+                onClick={() => {
+                  setConsentUser(null);
+                  onClose();
+                }}
                 style={{ padding: '0.7rem', border: 'none', borderRadius: '8px', backgroundColor: '#f3f4f6', color: '#4b5563', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', width: '100%', textAlign: 'center' }}
               >
                 {lang === 'ar' ? 'إلغاء' : 'Cancel'}

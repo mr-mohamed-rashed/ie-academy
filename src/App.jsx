@@ -532,6 +532,23 @@ function App() {
     triggerToast(lang === 'ar' ? 'تم تسجيل الخروج بنجاح' : 'Successfully logged out', 'success');
   };
 
+  const clearSupabaseSession = () => {
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+    if (isConfigured) {
+      supabase.auth.signOut();
+    }
+    setSupabaseUser(null);
+  };
+
+  const handleCloseLoginModal = () => {
+    setShowLoginModal(false);
+    if (!isLoggedIn) {
+      clearSupabaseSession();
+    }
+  };
+
   const handleSubmitPaymentRequest = (requestData) => {
     const newRequest = {
       id: `req-${Date.now()}`,
@@ -1413,7 +1430,7 @@ function App() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             backdropFilter: 'blur(10px)'
           }}>
-            <Login onLogin={handleLogin} lang={lang} instructors={instructors} students={students} initialRole={loginModalRole} onClose={() => setShowLoginModal(false)} supabaseUser={supabaseUser} />
+            <Login onLogin={handleLogin} lang={lang} instructors={instructors} students={students} initialRole={loginModalRole} onClose={handleCloseLoginModal} supabaseUser={supabaseUser} />
           </div>
         )}
 
