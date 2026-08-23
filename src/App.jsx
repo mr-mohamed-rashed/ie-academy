@@ -281,6 +281,10 @@ function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setSupabaseUser(session.user);
+        const savedOAuthRole = localStorage.getItem('edu_oauth_role');
+        if (savedOAuthRole && savedOAuthRole !== 'login') {
+          setLoginModalRole(savedOAuthRole);
+        }
         // Automatically pop up login overlay to chooser/wizard if not logged in
         if (localStorage.getItem('edu_is_logged_in') !== 'true') {
           setShowLoginModal(true);
@@ -291,6 +295,10 @@ function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setSupabaseUser(session.user);
+        const savedOAuthRole = localStorage.getItem('edu_oauth_role');
+        if (savedOAuthRole && savedOAuthRole !== 'login') {
+          setLoginModalRole(savedOAuthRole);
+        }
         if (localStorage.getItem('edu_is_logged_in') !== 'true') {
           setShowLoginModal(true);
         }

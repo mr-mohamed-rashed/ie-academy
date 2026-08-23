@@ -476,6 +476,8 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
     const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
     const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
     
+    localStorage.setItem('edu_oauth_role', authMode === 'signup' ? (role || initialRole || 'student') : 'login');
+
     if (isConfigured) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -515,6 +517,8 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
     const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
     const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
     
+    localStorage.setItem('edu_oauth_role', authMode === 'signup' ? (role || initialRole || 'student') : 'login');
+
     if (isConfigured) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
