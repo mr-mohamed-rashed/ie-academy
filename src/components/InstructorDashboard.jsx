@@ -65,6 +65,7 @@ const InstructorDashboard = ({
   const [sessionDescAr, setSessionDescAr] = useState('');
   const [sessionDescEn, setSessionDescEn] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
+  const [formLang, setFormLang] = useState('ar'); // 'ar' | 'en'
 
   const [selectedQrSessionId, setSelectedQrSessionId] = useState('');
 
@@ -298,21 +299,31 @@ const InstructorDashboard = ({
   // Session Form handler
   const handleSessionSubmit = (e) => {
     e.preventDefault();
-    if (!sessionTitleAr || !sessionTitleEn || !videoUrl) return;
+    const titleAr = sessionTitleAr.trim();
+    const titleEn = sessionTitleEn.trim() || titleAr;
+    const finalTitleAr = titleAr || titleEn;
+    const finalTitleEn = titleEn;
+
+    const descAr = sessionDescAr.trim();
+    const descEn = sessionDescEn.trim() || descAr;
+    const finalDescAr = descAr || descEn;
+    const finalDescEn = descEn;
+
+    if (!finalTitleAr || !finalTitleEn || !videoUrl) return;
 
     const newSession = {
       instructorId: instructor.id,
       gradeId: activeGradeId, // Sessions attached to grade
-      titleAr: sessionTitleAr,
-      titleEn: sessionTitleEn,
-      descAr: sessionDescAr,
-      descEn: sessionDescEn,
+      titleAr: finalTitleAr,
+      titleEn: finalTitleEn,
+      descAr: finalDescAr,
+      descEn: finalDescEn,
       videoUrl: videoUrl,
       date: new Date().toISOString().split('T')[0]
     };
 
     onAddSession(newSession);
-    triggerToast(t.toastSessionSuccess + (lang === 'ar' ? sessionTitleAr : sessionTitleEn), 'success');
+    triggerToast(t.toastSessionSuccess + (lang === 'ar' ? finalTitleAr : finalTitleEn), 'success');
 
     // Reset fields
     setSessionTitleAr('');
@@ -752,59 +763,100 @@ const InstructorDashboard = ({
         <>
       {/* Create Session Form */}
       <div className="glass-card session-create-card" style={{ gridColumn: 'span 7' }}>
-        <div className="card-title-group">
-          <h3>{t.sessionTitle}</h3>
+        <div className="card-title-group" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+          <h3 style={{ margin: 0 }}>{t.sessionTitle}</h3>
+          <div style={{ display: 'flex', gap: '0.25rem', padding: '0.25rem', backgroundColor: 'rgba(0,0,0,0.15)', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
+            <button 
+              type="button"
+              onClick={() => setFormLang('ar')} 
+              style={{
+                padding: '0.35rem 0.85rem',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                backgroundColor: formLang === 'ar' ? 'var(--accent-purple)' : 'transparent',
+                color: formLang === 'ar' ? 'white' : 'var(--text-secondary)',
+                transition: 'all 0.2s'
+              }}
+            >
+              العربية
+            </button>
+            <button 
+              type="button"
+              onClick={() => setFormLang('en')} 
+              style={{
+                padding: '0.35rem 0.85rem',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                backgroundColor: formLang === 'en' ? 'var(--accent-purple)' : 'transparent',
+                color: formLang === 'en' ? 'white' : 'var(--text-secondary)',
+                transition: 'all 0.2s'
+              }}
+            >
+              English
+            </button>
+          </div>
         </div>
         <form onSubmit={handleSessionSubmit}>
-          <div className="form-row">
-            <div className="form-group">
-              <label>{t.sTitleAr}</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="المحاضرة 6: مدخل إلى..."
-                value={sessionTitleAr}
-                onChange={(e) => setSessionTitleAr(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>{t.sTitleEn}</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="Session 6: Introduction to..."
-                value={sessionTitleEn}
-                onChange={(e) => setSessionTitleEn(e.target.value)}
-                required
-              />
-            </div>
-          </div>
+          {formLang === 'ar' ? (
+            <>
+              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sTitleAr}</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  placeholder="المحاضرة 6: مدخل إلى..."
+                  value={sessionTitleAr}
+                  onChange={(e) => setSessionTitleAr(e.target.value)}
+                  required={!sessionTitleEn.trim()}
+                />
+              </div>
 
-          <div className="form-group">
-            <label>{t.sDescAr}</label>
-            <textarea 
-              rows="1" 
-              className="form-control" 
-              placeholder="اكتب شرحاً مختصراً للمحاضرة هنا..."
-              value={sessionDescAr}
-              onChange={(e) => setSessionDescAr(e.target.value)}
-            />
-          </div>
+              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sDescAr}</label>
+                <textarea 
+                  rows="3" 
+                  className="form-control" 
+                  placeholder="اكتب شرحاً مختصراً للمحاضرة هنا..."
+                  value={sessionDescAr}
+                  onChange={(e) => setSessionDescAr(e.target.value)}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sTitleEn}</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  placeholder="Session 6: Introduction to..."
+                  value={sessionTitleEn}
+                  onChange={(e) => setSessionTitleEn(e.target.value)}
+                  required={!sessionTitleAr.trim()}
+                />
+              </div>
 
-          <div className="form-group">
-            <label>{t.sDescEn}</label>
-            <textarea 
-              rows="1" 
-              className="form-control" 
-              placeholder="Write a brief explanation of the session..."
-              value={sessionDescEn}
-              onChange={(e) => setSessionDescEn(e.target.value)}
-            />
-          </div>
+              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sDescEn}</label>
+                <textarea 
+                  rows="3" 
+                  className="form-control" 
+                  placeholder="Write a brief explanation of the session..."
+                  value={sessionDescEn}
+                  onChange={(e) => setSessionDescEn(e.target.value)}
+                />
+              </div>
+            </>
+          )}
 
-          <div className="form-group">
-            <label>{t.sVideo}</label>
+          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sVideo}</label>
             <input 
               type="url" 
               className="form-control" 
@@ -815,7 +867,7 @@ const InstructorDashboard = ({
             />
           </div>
 
-          <button type="submit" className="btn-primary" style={{ backgroundColor: 'var(--accent-purple)' }}>
+          <button type="submit" className="btn-primary" style={{ backgroundColor: 'var(--accent-purple)', width: '100%', padding: '0.75rem', justifyContent: 'center' }}>
             <PlusCircle size={18} />
             <span>{t.submitSession}</span>
           </button>
