@@ -1620,23 +1620,23 @@ function App() {
             {userRole === 'instructor' ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div 
-                  style={{ position: 'relative', cursor: activeInstructor.videoUrl ? 'pointer' : 'default' }}
-                  onClick={() => activeInstructor.videoUrl && setPlayingVideoUrl(activeInstructor.videoUrl)}
-                  title={activeInstructor.videoUrl ? (lang === 'ar' ? 'تشغيل الفيديو التعريفي' : 'Play Intro Video') : ''}
+                  style={{ position: 'relative', cursor: activeInstructor?.videoUrl ? 'pointer' : 'default' }}
+                  onClick={() => activeInstructor?.videoUrl && setPlayingVideoUrl(activeInstructor.videoUrl)}
+                  title={activeInstructor?.videoUrl ? (lang === 'ar' ? 'تشغيل الفيديو التعريفي' : 'Play Intro Video') : ''}
                 >
                   <img 
-                    src={activeInstructor.avatar} 
+                    src={activeInstructor?.avatar} 
                     alt="Avatar" 
                     style={{ 
                       width: '60px', 
                       height: '60px', 
                       borderRadius: '50%', 
                       objectFit: 'cover', 
-                      border: activeInstructor.isSubscribed ? '3px solid var(--color-gold)' : '2px solid var(--accent-primary)',
-                      boxShadow: activeInstructor.isSubscribed ? '0 0 12px var(--color-gold)' : 'none'
+                      border: activeInstructor?.isSubscribed ? '3px solid var(--color-gold)' : '2px solid var(--accent-primary)',
+                      boxShadow: activeInstructor?.isSubscribed ? '0 0 12px var(--color-gold)' : 'none'
                     }} 
                   />
-                  {activeInstructor.videoUrl && (
+                  {activeInstructor?.videoUrl && (
                     <div style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: 'var(--accent-primary)', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-app)' }}>
                       <Play size={10} color="white" fill="white" />
                     </div>
@@ -1644,15 +1644,15 @@ function App() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
                   <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                    {lang === 'ar' ? activeInstructor.nameAr : activeInstructor.nameEn}
+                    {lang === 'ar' ? activeInstructor?.nameAr : activeInstructor?.nameEn}
                   </h1>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     <span style={{ color: 'var(--accent-primary)', fontSize: '0.95rem', fontWeight: 500 }}>
-                      {lang === 'ar' ? activeInstructor.subjectAr : activeInstructor.subjectEn}
+                      {lang === 'ar' ? activeInstructor?.subjectAr : activeInstructor?.subjectEn}
                     </span>
                     <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>•</span>
                     <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 400 }}>
-                      {lang === 'ar' ? activeInstructor.yearAr : activeInstructor.yearEn}
+                      {lang === 'ar' ? activeInstructor?.yearAr : activeInstructor?.yearEn}
                     </span>
                   </div>
                 </div>
@@ -1662,7 +1662,7 @@ function App() {
                 <h1 style={{ margin: 0 }}>
                   {userRole === 'landing' && t.guestHeadline}
                   {userRole === 'admin' && (lang === 'ar' ? 'لوحة تحكم مدير النظام' : 'System Admin Console')}
-                  {userRole === 'student' && (lang === 'ar' ? activeStudent.nameAr : activeStudent.nameEn)}
+                  {userRole === 'student' && (lang === 'ar' ? activeStudent?.nameAr : activeStudent?.nameEn)}
                 </h1>
                 <p style={{ marginTop: '0.25rem' }}>{t.courseDetails}</p>
               </>
@@ -1738,7 +1738,7 @@ function App() {
             academicYearFee={academicYearFee}
             pendingPayments={pendingPayments}
             onSubmitPaymentRequest={handleSubmitPaymentRequest}
-            onPaySubscription={() => handleToggleSubscription(activeInstructor.id)}
+            onPaySubscription={() => activeInstructor && handleToggleSubscription(activeInstructor.id)}
           />
         )}
 
