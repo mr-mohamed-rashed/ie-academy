@@ -248,20 +248,15 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
         // Brand new user!
         if (authMode === 'login') {
           setErrorMessage(lang === 'ar' ? 'هذا الحساب غير مسجل بالمنصة! يرجى إنشاء حساب جديد أولاً.' : 'This account is not registered! Please sign up first.');
-          const url = import.meta.env.VITE_SUPABASE_URL;
-          const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-          const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
-          if (isConfigured) {
-            supabase.auth.signOut();
-          }
         } else {
-          if (initialRole === 'student') {
+          setErrorMessage(''); // Clear error if switching to signup
+          if (role === 'student' || initialRole === 'student') {
             setFullName(name);
             setEmail(email);
             setAvatarUrl(avatar);
             setRole('student');
             setShowModal(true);
-          } else if (initialRole === 'instructor') {
+          } else if (role === 'instructor' || initialRole === 'instructor') {
             setFullName(name);
             setEmail(email);
             setAvatarUrl(avatar);
@@ -273,7 +268,7 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
         }
       }
     }
-  }, [supabaseUser, isLoading]);
+  }, [supabaseUser, isLoading, authMode, role]);
 
   const handleAvatarFileChange = (e) => {
     const file = e.target.files[0];
