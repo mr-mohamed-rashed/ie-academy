@@ -25,7 +25,7 @@ const PRESET_AVATARS = [
   "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=120"
 ];
 
-const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, onClose, supabaseUser, isLoading }) => {
+const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRole, onClose, supabaseUser, isLoading }) => {
   const [showModal, setShowModal] = useState(false);
   const [inviteTeacherId, setInviteTeacherId] = useState(null);
   const [isAdminMode, setIsAdminMode] = useState(false);
@@ -95,9 +95,9 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
   const [studentStep, setStudentStep] = useState(1);
 
   // Email login / signup states
-  const [authMode, setAuthMode] = useState(initialRole ? 'signup' : 'login'); // 'login' | 'signup'
+  const [authMode, setAuthMode] = useState(mode || (initialRole ? 'signup' : 'login')); // 'login' | 'signup'
   const [loginTab, setLoginTab] = useState(initialRole === 'admin' ? 'email' : 'quick'); // 'quick' | 'email'
-  const [isRegisterMode, setIsRegisterMode] = useState(initialRole ? true : false);
+  const [isRegisterMode, setIsRegisterMode] = useState(mode ? (mode === 'signup') : (initialRole ? true : false));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -123,6 +123,14 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
     ...instructors.map(i => ({ role: 'instructor', data: i })),
     ...students.map(s => ({ role: 'student', data: s }))
   ];
+
+  // Sync mode prop changes to states
+  useEffect(() => {
+    if (mode) {
+      setAuthMode(mode);
+      setIsRegisterMode(mode === 'signup');
+    }
+  }, [mode]);
 
   // Visual Cropper States
   const [rawImage, setRawImage] = useState(null);
@@ -846,50 +854,52 @@ const Login = ({ onLogin, lang, instructors = [], students = [], initialRole, on
               </span>
             </button>
 
-            {authMode === 'signup' ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode('login');
-                  setIsRegisterMode(false);
-                  setErrorMessage('');
-                }}
-                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', textDecoration: 'underline', cursor: 'pointer', textAlign: 'center', marginTop: '1.25rem' }}
-              >
-                {lang === 'ar' ? 'لديك حساب بالفعل؟ تسجيل الدخول هنا' : 'Already have an account? Log In here'}
-              </button>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.25rem', textAlign: 'center' }}>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  {lang === 'ar' ? 'ليس لديك حساب؟ أنشئ حساب جديد الآن:' : 'Don\'t have an account? Create one now:'}
-                </span>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRole('student');
-                      setAuthMode('signup');
-                      setIsRegisterMode(true);
-                      setErrorMessage('');
-                    }}
-                    style={{ background: 'none', border: 'none', color: 'var(--accent-purple)', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'underline', cursor: 'pointer' }}
-                  >
-                    {lang === 'ar' ? 'حساب طالب' : 'Student Account'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRole('instructor');
-                      setAuthMode('signup');
-                      setIsRegisterMode(true);
-                      setErrorMessage('');
-                    }}
-                    style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'underline', cursor: 'pointer' }}
-                  >
-                    {lang === 'ar' ? 'حساب معلم' : 'Teacher Account'}
-                  </button>
+            {!mode && (
+              authMode === 'signup' ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('login');
+                    setIsRegisterMode(false);
+                    setErrorMessage('');
+                  }}
+                  style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', textDecoration: 'underline', cursor: 'pointer', textAlign: 'center', marginTop: '1.25rem' }}
+                >
+                  {lang === 'ar' ? 'لديك حساب بالفعل؟ تسجيل الدخول هنا' : 'Already have an account? Log In here'}
+                </button>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.25rem', textAlign: 'center' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {lang === 'ar' ? 'ليس لديك حساب؟ أنشئ حساب جديد الآن:' : 'Don\'t have an account? Create one now:'}
+                  </span>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRole('student');
+                        setAuthMode('signup');
+                        setIsRegisterMode(true);
+                        setErrorMessage('');
+                      }}
+                      style={{ background: 'none', border: 'none', color: 'var(--accent-purple)', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'underline', cursor: 'pointer' }}
+                    >
+                      {lang === 'ar' ? 'حساب طالب' : 'Student Account'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRole('instructor');
+                        setAuthMode('signup');
+                        setIsRegisterMode(true);
+                        setErrorMessage('');
+                      }}
+                      style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'underline', cursor: 'pointer' }}
+                    >
+                      {lang === 'ar' ? 'حساب معلم' : 'Teacher Account'}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )
             )}
 
             {localAccounts.length > 0 && authMode === 'login' && (
