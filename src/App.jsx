@@ -1376,18 +1376,22 @@ function App() {
         <footer className="visitor-footer" style={{ padding: '2.5rem 1.5rem', textAlign: 'center', borderTop: '1px solid var(--border-glass)', marginTop: '4rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
           <p>© 2026 {lang === 'ar' ? 'منصة أكاديمية التعليم الرقمية التفاعلية.' : 'EduAcademy Interactive Digital Platform. All rights reserved.'}</p>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
-            <button 
-              onClick={() => setPrivacyOpen(true)}
-              style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}
+            <a 
+              href="/privacy.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
             >
               {lang === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
-            </button>
-            <button 
-              onClick={() => setTermsOpen(true)}
-              style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}
+            </a>
+            <a 
+              href="/terms.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
             >
               {lang === 'ar' ? 'شروط الاستخدام' : 'Terms of Use'}
-            </button>
+            </a>
             <span style={{ color: 'var(--border-glass)' }}>|</span>
             <button 
               onClick={() => {
