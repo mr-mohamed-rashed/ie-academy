@@ -21,7 +21,8 @@ const Navbar = ({
   activeGradeId,
   activeGroupId,
   onGradeChange,
-  onGroupChange
+  onGroupChange,
+  onPlayVideo
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -385,6 +386,34 @@ const Navbar = ({
               <Settings size={14} />
               <span>{lang === 'ar' ? 'تعديل البيانات' : 'Edit Profile'}</span>
             </button>
+
+            {localStorage.getItem('edu_last_video') && (
+              <button 
+                onClick={() => onPlayVideo(localStorage.getItem('edu_last_video'))}
+                className="btn-primary" 
+                style={{ 
+                  width: '100%', 
+                  padding: '0.55rem', 
+                  fontSize: '0.8rem', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: '0.5rem',
+                  background: 'rgba(99, 102, 241, 0.15)',
+                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                  color: '#818cf8',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  transition: 'all 0.2s'
+                }}
+              >
+                <svg style={{ width: '12px', height: '12px', fill: 'currentColor' }} viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+                <span>{lang === 'ar' ? 'آخر فيديو شاهدته' : 'Resume Last Video'}</span>
+              </button>
+            )}
 
             <button 
               onClick={onLogout} 

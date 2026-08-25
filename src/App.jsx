@@ -54,6 +54,12 @@ function App() {
   });
 
   const [playingVideoUrl, setPlayingVideoUrl] = useState(null);
+  const handlePlayVideo = (url) => {
+    setPlayingVideoUrl(url);
+    if (url) {
+      localStorage.setItem('edu_last_video', url);
+    }
+  };
 
   // Derived active objectsy default
   
@@ -1767,6 +1773,7 @@ function App() {
         activeGroupId={activeGroupId}
         onGradeChange={setActiveGradeId}
         onGroupChange={setActiveGroupId}
+        onPlayVideo={handlePlayVideo}
       />
 
       {/* Main Panel Viewport */}
@@ -1778,7 +1785,7 @@ function App() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div 
                   style={{ position: 'relative', cursor: activeInstructor?.videoUrl ? 'pointer' : 'default' }}
-                  onClick={() => activeInstructor?.videoUrl && setPlayingVideoUrl(activeInstructor.videoUrl)}
+                  onClick={() => activeInstructor?.videoUrl && handlePlayVideo(activeInstructor.videoUrl)}
                   title={activeInstructor?.videoUrl ? (lang === 'ar' ? 'تشغيل الفيديو التعريفي' : 'Play Intro Video') : ''}
                 >
                   <img 
