@@ -16,19 +16,38 @@ const isSupabaseConfigured = () => {
   return url && url !== 'https://your-supabase-project-url.supabase.co' && key && key !== 'your-supabase-public-anon-key';
 };
 
-// XSS Sanitizer to neutralize HTML tags and escape special characters
+// Helper to decode HTML entities to restore and repair any previously corrupted strings
+export function decodeHtmlEntities(text) {
+  if (typeof text !== 'string') return text;
+  let decoded = text;
+  // Decodes nested escapes up to 5 times
+  for (let i = 0; i < 5; i++) {
+    if (!decoded.includes('&')) break;
+    decoded = decoded
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#x27;/g, "'")
+      .replace(/&#x2F;/g, '/')
+      .replace(/&#39;/g, "'");
+  }
+  return decoded;
+}
+
+// XSS Sanitizer to neutralize HTML tags while preserving normal characters in URLs & base64 strings
 export function sanitizeText(text) {
   if (typeof text !== 'string') return text;
+  
+  // First, decode any previously corrupted entities to clean them
+  let cleaned = decodeHtmlEntities(text);
+  
   // Strip HTML tags using regex
-  let cleaned = text.replace(/<[^>]*>?/gm, '');
-  // Escape potential dangerous characters for absolute XSS security
-  cleaned = cleaned
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
+  cleaned = cleaned.replace(/<[^>]*>?/gm, '');
+  
+  // Strip dangerous javascript: protocol injection
+  cleaned = cleaned.replace(/javascript:/gi, '');
+  
   return cleaned;
 }
 
