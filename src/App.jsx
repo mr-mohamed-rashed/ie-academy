@@ -746,7 +746,7 @@ function App() {
       setInstructors((prev) =>
         prev.map((inst) => {
           if (inst.id === activeInstructorId) {
-            return {
+            const updated = {
               ...inst,
               nameAr: formattedName,
               nameEn: formattedName,
@@ -760,8 +760,11 @@ function App() {
               price: updatedData.price !== undefined ? updatedData.price : inst.price,
               paymentMethods: updatedData.paymentMethods !== undefined ? updatedData.paymentMethods : inst.paymentMethods,
               yearAr: updatedData.yearAr || inst.yearAr,
-              yearEn: updatedData.yearEn || inst.yearEn
+              yearEn: updatedData.yearEn || inst.yearEn,
+              whatsapp: updatedData.whatsapp !== undefined ? updatedData.whatsapp : inst.whatsapp
             };
+            saveInstructor(updated);
+            return updated;
           }
           return inst;
         })
@@ -771,13 +774,15 @@ function App() {
       setStudents((prev) =>
         prev.map((s) => {
           if (s.id === activeStudentId) {
-            return {
+            const updated = {
               ...s,
               nameAr: formattedName,
               nameEn: formattedName,
               avatar: updatedData.avatar,
               parentPhone: updatedData.parentPhone || s.parentPhone
             };
+            saveStudent(updated);
+            return updated;
           }
           return s;
         })

@@ -41,11 +41,11 @@ const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', width: '80px', height: '80px' }}>
+          <div style={{ position: 'relative', width: '120px', height: '120px' }}>
             <img 
               src={teacher.avatar} 
               alt={teacher.nameEn} 
-              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--accent-primary)', boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)' }}
+              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '4px solid var(--accent-primary)', boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)' }}
             />
             {introVideo && (
               <div 
@@ -58,7 +58,7 @@ const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
                 }}
                 className="hover-scale"
               >
-                <PlayCircle size={32} color="white" />
+                <PlayCircle size={42} color="white" />
               </div>
             )}
           </div>

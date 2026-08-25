@@ -84,7 +84,8 @@ export async function getInstructors() {
       grades: db.grades || [
         { id: `grade-sec-${db.id}`, nameAr: "ثانوي", nameEn: "High School", groups: db.groups || [{ id: `group-custom-${db.id}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }] }
       ],
-      maxStudentsLimit: db.max_students_limit !== undefined ? db.max_students_limit : (db.groups?.[0]?.maxStudentsLimit ?? 999999)
+      maxStudentsLimit: db.max_students_limit !== undefined ? db.max_students_limit : (db.groups?.[0]?.maxStudentsLimit ?? 999999),
+      whatsapp: db.whatsapp || db.groups?.[0]?.whatsapp || ''
     }));
 
     // Merge with local storage to prevent data loss if Supabase upsert was blocked
@@ -273,9 +274,10 @@ export async function saveInstructor(inst) {
   if (!isSupabaseConfigured()) return;
   try {
     const cleanInst = sanitizeData(inst);
-    // Safely embed limit in groups JSON to preserve it across schema variations
+    // Safely embed limit and whatsapp in groups JSON to preserve it across schema variations
     if (cleanInst.groups && cleanInst.groups.length > 0) {
       cleanInst.groups[0].maxStudentsLimit = cleanInst.maxStudentsLimit;
+      cleanInst.groups[0].whatsapp = cleanInst.whatsapp;
     }
     const dbRecord = {
       id: cleanInst.id,
@@ -291,9 +293,16 @@ export async function saveInstructor(inst) {
       is_subscribed: cleanInst.isSubscribed,
       groups: cleanInst.groups,
       grades: cleanInst.grades,
-      max_students_limit: cleanInst.maxStudentsLimit
+      max_students_limit: cleanInst.maxStudentsLimit,
+      whatsapp: cleanInst.whatsapp
     };
-    await supabase.from('instructors').upsert(dbRecord);
+    const { error } = await supabase.from('instructors').upsert(dbRecord);
+    if (error) {
+      // If column is missing (PostgREST error code 42703 or similar), retry without the whatsapp root key
+      console.warn("Retrying upsert without root whatsapp column:", error.message);
+      delete dbRecord.whatsapp;
+      await supabase.from('instructors').upsert(dbRecord);
+    }
   } catch (err) {
     console.error("Supabase upsert error:", err);
   }

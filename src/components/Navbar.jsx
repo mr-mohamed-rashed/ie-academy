@@ -35,6 +35,7 @@ const Navbar = ({
   const [editAbout, setEditAbout] = useState(currentUser?.about || currentUser?.aboutAr || '');
   const [editPrice, setEditPrice] = useState(currentUser?.price || '');
   const [editPaymentMethods, setEditPaymentMethods] = useState(currentUser?.paymentMethods || '');
+  const [editWhatsapp, setEditWhatsapp] = useState(currentUser?.whatsapp || '');
 
   // Visual Cropper States
   const [rawImage, setRawImage] = useState(null);
@@ -215,6 +216,7 @@ const Navbar = ({
     setEditAbout(currentUser?.about || currentUser?.aboutAr || '');
     setEditPrice(currentUser?.price || '');
     setEditPaymentMethods(currentUser?.paymentMethods || '');
+    setEditWhatsapp(currentUser?.whatsapp || '');
     setShowEditModal(true);
   };
 
@@ -232,6 +234,7 @@ const Navbar = ({
       aboutEn: currentUser.role === 'instructor' ? editAbout : undefined,
       price: currentUser.role === 'instructor' ? editPrice : undefined,
       paymentMethods: currentUser.role === 'instructor' ? editPaymentMethods : undefined,
+      whatsapp: currentUser.role === 'instructor' ? editWhatsapp : undefined,
       parentPhone: currentUser.role === 'student' ? editParentPhone : undefined
     });
     setShowEditModal(false);
@@ -602,6 +605,16 @@ const Navbar = ({
                         onChange={(e) => setEditPaymentMethods(e.target.value)}
                       />
                     </div>
+                  </div>
+                  <div className="form-group" style={{ marginTop: '1rem' }}>
+                    <label>{lang === 'ar' ? 'رقم الواتساب للتواصل (مثال: 201234567890)' : 'WhatsApp Number (e.g. 201234567890)'}</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      placeholder="e.g. 201012345678"
+                      value={editWhatsapp}
+                      onChange={(e) => setEditWhatsapp(e.target.value)}
+                    />
                   </div>
                 </>
               )}
