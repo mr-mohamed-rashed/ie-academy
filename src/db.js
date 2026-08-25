@@ -144,7 +144,8 @@ export async function getStudents() {
       parentPhone: db.parent_phone,
       enrollments: db.enrollments || [],
       grades: db.grades || [],
-      attendance: db.attendance || []
+      attendance: db.attendance || [],
+      password: db.enrollments?.[0]?.password || ''
     }));
 
     // Merge with local storage to prevent data loss if Supabase upsert was blocked

@@ -569,10 +569,12 @@ function App() {
         isSubscribed: false, // Starts as free/unapproved (hidden from visitors)
         grades: instructorGrades,
         groups: [
-          { id: `group-custom-${newTeacherId}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }
-        ]
+          { id: `group-custom-${newTeacherId}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM", password: profileData.password }
+        ],
+        password: profileData.password
       };
       setInstructors((prev) => [...prev, newTeacherObj]);
+      saveInstructor(newTeacherObj); // Persist to Supabase instantly!
       setActiveInstructorId(newTeacherId);
       setUserRole('instructor');
       triggerToast(lang === 'ar' ? `مرحباً بك يا معلم ${formattedName}!` : `Welcome Instructor ${formattedName}!`, 'success');
@@ -593,15 +595,18 @@ function App() {
         enrollments: [
           { 
             instructorId: profileData.instructorId ? Number(profileData.instructorId) : 101, 
-            groupId: profileData.groupId || "math-a" 
+            groupId: profileData.groupId || "math-a",
+            password: profileData.password 
           }
         ],
         grades: [
           { id: 900, instructorId: updatedProfileData.instructorId ? Number(updatedProfileData.instructorId) : 101, titleAr: "اختبار مبدئي", titleEn: "Initial Quiz", score: 0, max: 100 }
         ],
-        attendance: []
+        attendance: [],
+        password: profileData.password
       };
       setStudents((prev) => [...prev, newStudentObj]);
+      saveStudent(newStudentObj); // Persist to Supabase instantly!
       setActiveStudentId(newStudentId);
       setUserRole('student');
       triggerToast(lang === 'ar' ? `مرحباً بك يا طالب ${formattedName}!` : `Welcome Student ${formattedName}!`, 'success');

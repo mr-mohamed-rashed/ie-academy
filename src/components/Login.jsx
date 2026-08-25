@@ -668,19 +668,28 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
       return;
     }
     
-    // Check custom registered users
-    const passwords = JSON.parse(localStorage.getItem('edu_user_passwords') || '{}');
-    if (passwords[email.toLowerCase()] && passwords[email.toLowerCase()] === password) {
-      // Find user profile
-      const savedInstructors = JSON.parse(localStorage.getItem('edu_instructors') || '[]');
-      const savedStudents = JSON.parse(localStorage.getItem('edu_students') || '[]');
-      
-      const matchedTeacher = savedInstructors.find(i => i.email?.toLowerCase() === email.toLowerCase());
+    // Check custom registered users from global Supabase lists or local storage
+    const matchedTeacher = instructors.find(i => i.email?.toLowerCase() === email.toLowerCase());
+    const matchedStudent = students.find(s => s.email?.toLowerCase() === email.toLowerCase());
+
+    const globalPassword = matchedTeacher?.password || matchedTeacher?.groups?.[0]?.password || 
+                           matchedStudent?.password || matchedStudent?.enrollments?.[0]?.password || '';
+                           
+    const localPasswords = JSON.parse(localStorage.getItem('edu_user_passwords') || '{}');
+    const localPassword = localPasswords[email.toLowerCase()] || '';
+    
+    const isCorrectPassword = (globalPassword && globalPassword === password) || (localPassword && localPassword === password);
+
+    if (isCorrectPassword) {
       if (matchedTeacher) {
         if (rememberMe) {
           localStorage.setItem('edu_saved_email', email);
           localStorage.setItem('edu_saved_password', password);
         }
+        // Cache password locally for offline support
+        localPasswords[email.toLowerCase()] = password;
+        localStorage.setItem('edu_user_passwords', JSON.stringify(localPasswords));
+        
         onLogin({
           id: matchedTeacher.id,
           name: matchedTeacher.nameAr,
@@ -693,18 +702,23 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
         return;
       }
       
-      const matchedStudent = savedStudents.find(s => s.email?.toLowerCase() === email.toLowerCase());
       if (matchedStudent) {
         if (rememberMe) {
           localStorage.setItem('edu_saved_email', email);
           localStorage.setItem('edu_saved_password', password);
         }
+        // Cache password locally for offline support
+        localPasswords[email.toLowerCase()] = password;
+        localStorage.setItem('edu_user_passwords', JSON.stringify(localPasswords));
+        
         onLogin({
           id: matchedStudent.id,
           name: matchedStudent.nameAr,
           role: 'student',
           avatar: matchedStudent.avatar,
           email: matchedStudent.email,
+          parentPhone: matchedStudent.parentPhone,
+          studentPhone: matchedStudent.studentPhone,
           isExisting: true
         });
         return;
@@ -826,7 +840,8 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
       studentGradeType: role === 'student' ? studentGradeType : undefined,
       instructorId: role === 'student' ? Number(selectedInstructor) : undefined,
       gradeId: role === 'student' ? selectedGrade : undefined,
-      groupId: role === 'student' ? selectedGroup : undefined
+      groupId: role === 'student' ? selectedGroup : undefined,
+      password: isLocalEmailSignup ? password : ''
     });
   };
 
