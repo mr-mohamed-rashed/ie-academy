@@ -16,6 +16,28 @@ const decodeJwt = (token) => {
   }
 };
 
+// Rate Limiter to prevent abuse (Max 2 image uploads & 5 registration requests per minute)
+const rateLimiter = {
+  uploads: [],
+  registrations: [],
+  
+  checkUpload() {
+    const now = Date.now();
+    this.uploads = this.uploads.filter(t => now - t < 60000);
+    if (this.uploads.length >= 2) return false;
+    this.uploads.push(now);
+    return true;
+  },
+  
+  checkRegistration() {
+    const now = Date.now();
+    this.registrations = this.registrations.filter(t => now - t < 60000);
+    if (this.registrations.length >= 5) return false;
+    this.registrations.push(now);
+    return true;
+  }
+};
+
 const PRESET_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120",
   "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=120",
@@ -296,6 +318,13 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
   }, [supabaseUser, isLoading, authMode, role]);
 
   const handleAvatarFileChange = (e) => {
+    if (!rateLimiter.checkUpload()) {
+      setErrorMessage(lang === 'ar' 
+        ? 'تنبيه: لقد تجاوزت الحد المسموح لرفع الصور (صورتين كحد أقصى في الدقيقة)!' 
+        : 'Warning: You have exceeded the image upload rate limit (Max 2 uploads per minute)!'
+      );
+      return;
+    }
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -701,6 +730,14 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMessage('');
+    
+    if (!rateLimiter.checkRegistration()) {
+      setErrorMessage(lang === 'ar' 
+        ? 'تنبيه: لقد تجاوزت الحد المسموح لإرسال طلبات التسجيل (5 طلبات كحد أقصى في الدقيقة)!' 
+        : 'Warning: You have exceeded the registration rate limit (Max 5 requests per minute)!'
+      );
+      return;
+    }
     
     // For direct email signup via wizard
     const isLocalEmailSignup = !consentUser || consentUser.type === 'email_signup';
