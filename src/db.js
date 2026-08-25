@@ -16,6 +16,46 @@ const isSupabaseConfigured = () => {
   return url && url !== 'https://your-supabase-project-url.supabase.co' && key && key !== 'your-supabase-public-anon-key';
 };
 
+// XSS Sanitizer to neutralize HTML tags and escape special characters
+export function sanitizeText(text) {
+  if (typeof text !== 'string') return text;
+  // Strip HTML tags using regex
+  let cleaned = text.replace(/<[^>]*>?/gm, '');
+  // Escape potential dangerous characters for absolute XSS security
+  cleaned = cleaned
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+  return cleaned;
+}
+
+export function sanitizeData(data) {
+  if (data === null || data === undefined) return data;
+  
+  if (typeof data === 'string') {
+    return sanitizeText(data);
+  }
+  
+  if (Array.isArray(data)) {
+    return data.map(item => sanitizeData(item));
+  }
+  
+  if (typeof data === 'object') {
+    const cleanedObj = {};
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        cleanedObj[key] = sanitizeData(data[key]);
+      }
+    }
+    return cleanedObj;
+  }
+  
+  return data;
+}
+
 // 1. Fetch Instructors
 export async function getInstructors() {
   if (!isSupabaseConfigured()) {
@@ -57,11 +97,11 @@ export async function getInstructors() {
         }
       });
     }
-    return dbInstructors;
+    return sanitizeData(dbInstructors);
   } catch (err) {
     console.warn("Supabase fetch error, falling back to localStorage:", err);
     const saved = localStorage.getItem(KEYS.instructors);
-    return saved ? JSON.parse(saved) : initialInstructors;
+    return sanitizeData(saved ? JSON.parse(saved) : initialInstructors);
   }
 }
 
@@ -97,11 +137,11 @@ export async function getStudents() {
         }
       });
     }
-    return dbStudents;
+    return sanitizeData(dbStudents);
   } catch (err) {
     console.warn("Supabase fetch error, falling back to localStorage:", err);
     const saved = localStorage.getItem(KEYS.students);
-    return saved ? JSON.parse(saved) : initialStudents;
+    return sanitizeData(saved ? JSON.parse(saved) : initialStudents);
   }
 }
 
@@ -131,7 +171,7 @@ export async function getSessions() {
         console.warn("Offline session parsing error:", e);
       }
     }
-    return savedSessions;
+    return sanitizeData(savedSessions);
   }
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -185,7 +225,7 @@ export async function getSessions() {
       }
     }
 
-    return filteredData.map(db => ({
+    return sanitizeData(filteredData.map(db => ({
       id: db.id,
       instructorId: db.instructor_id,
       groupId: db.group_id,
@@ -194,11 +234,11 @@ export async function getSessions() {
       date: db.date,
       time: db.time,
       isActive: db.is_active
-    }));
+    })));
   } catch (err) {
     console.warn("Supabase fetch error, falling back to localStorage:", err);
     const saved = localStorage.getItem(KEYS.sessions);
-    return saved ? JSON.parse(saved) : initialSessions;
+    return sanitizeData(saved ? JSON.parse(saved) : initialSessions);
   }
 }
 
@@ -232,25 +272,26 @@ export async function getPendingPayments() {
 export async function saveInstructor(inst) {
   if (!isSupabaseConfigured()) return;
   try {
+    const cleanInst = sanitizeData(inst);
     // Safely embed limit in groups JSON to preserve it across schema variations
-    if (inst.groups && inst.groups.length > 0) {
-      inst.groups[0].maxStudentsLimit = inst.maxStudentsLimit;
+    if (cleanInst.groups && cleanInst.groups.length > 0) {
+      cleanInst.groups[0].maxStudentsLimit = cleanInst.maxStudentsLimit;
     }
     const dbRecord = {
-      id: inst.id,
-      email: inst.email,
-      name_ar: inst.nameAr,
-      name_en: inst.nameEn,
-      avatar: inst.avatar,
-      subject_ar: inst.subjectAr,
-      subject_en: inst.subjectEn,
-      year_ar: inst.yearAr,
-      year_en: inst.yearEn,
-      video_url: inst.videoUrl,
-      is_subscribed: inst.isSubscribed,
-      groups: inst.groups,
-      grades: inst.grades,
-      max_students_limit: inst.maxStudentsLimit
+      id: cleanInst.id,
+      email: cleanInst.email,
+      name_ar: cleanInst.nameAr,
+      name_en: cleanInst.nameEn,
+      avatar: cleanInst.avatar,
+      subject_ar: cleanInst.subjectAr,
+      subject_en: cleanInst.subjectEn,
+      year_ar: cleanInst.yearAr,
+      year_en: cleanInst.yearEn,
+      video_url: cleanInst.videoUrl,
+      is_subscribed: cleanInst.isSubscribed,
+      groups: cleanInst.groups,
+      grades: cleanInst.grades,
+      max_students_limit: cleanInst.maxStudentsLimit
     };
     await supabase.from('instructors').upsert(dbRecord);
   } catch (err) {
@@ -262,17 +303,18 @@ export async function saveInstructor(inst) {
 export async function saveStudent(student) {
   if (!isSupabaseConfigured()) return;
   try {
+    const cleanStudent = sanitizeData(student);
     const dbRecord = {
-      id: student.id,
-      email: student.email,
-      name_ar: student.nameAr,
-      name_en: student.nameEn,
-      avatar: student.avatar,
-      student_phone: student.studentPhone,
-      parent_phone: student.parentPhone,
-      enrollments: student.enrollments,
-      grades: student.grades,
-      attendance: student.attendance
+      id: cleanStudent.id,
+      email: cleanStudent.email,
+      name_ar: cleanStudent.nameAr,
+      name_en: cleanStudent.nameEn,
+      avatar: cleanStudent.avatar,
+      student_phone: cleanStudent.studentPhone,
+      parent_phone: cleanStudent.parentPhone,
+      enrollments: cleanStudent.enrollments,
+      grades: cleanStudent.grades,
+      attendance: cleanStudent.attendance
     };
     await supabase.from('students').upsert(dbRecord);
   } catch (err) {
@@ -284,15 +326,16 @@ export async function saveStudent(student) {
 export async function saveSession(session) {
   if (!isSupabaseConfigured()) return;
   try {
+    const cleanSession = sanitizeData(session);
     const dbRecord = {
-      id: session.id,
-      instructor_id: session.instructorId,
-      group_id: session.groupId,
-      title_ar: session.titleAr,
-      title_en: session.titleEn,
-      date: session.date,
-      time: session.time,
-      is_active: session.isActive
+      id: cleanSession.id,
+      instructor_id: cleanSession.instructorId,
+      group_id: cleanSession.groupId,
+      title_ar: cleanSession.titleAr,
+      title_en: cleanSession.titleEn,
+      date: cleanSession.date,
+      time: cleanSession.time,
+      is_active: cleanSession.isActive
     };
     await supabase.from('sessions').upsert(dbRecord);
   } catch (err) {
@@ -304,15 +347,16 @@ export async function saveSession(session) {
 export async function addPendingPayment(req) {
   if (!isSupabaseConfigured()) return;
   try {
+    const cleanReq = sanitizeData(req);
     const dbRecord = {
-      id: req.id,
-      instructor_id: req.instructorId,
-      instructor_name: req.instructorName,
-      plan: req.plan,
-      amount: req.amount,
-      screenshot: req.screenshot,
-      date: req.date,
-      status: req.status
+      id: cleanReq.id,
+      instructor_id: cleanReq.instructorId,
+      instructor_name: cleanReq.instructorName,
+      plan: cleanReq.plan,
+      amount: cleanReq.amount,
+      screenshot: cleanReq.screenshot,
+      date: cleanReq.date,
+      status: cleanReq.status
     };
     await supabase.from('pending_payments').insert(dbRecord);
   } catch (err) {
