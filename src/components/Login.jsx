@@ -100,12 +100,13 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
     }
   }, [initialRole]);
 
-  // Persist role changes
   useEffect(() => {
-    if (role) {
-      localStorage.setItem('edu_oauth_role', role);
+    if (role === 'admin' || initialRole === 'admin') {
+      setAuthMode('login');
+      setIsRegisterMode(false);
+      setLoginTab('email');
     }
-  }, [role]);
+  }, [role, initialRole]);
 
   const [avatarUrl, setAvatarUrl] = useState(PRESET_AVATARS[0]);
   const [subject, setSubject] = useState('');
@@ -892,22 +893,24 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
         </p>
 
         {/* Tab Selector */}
-        <div style={{ display: 'flex', borderBottom: '1px solid var(--border-glass)', marginBottom: '2rem' }}>
-          <button 
-            type="button"
-            onClick={() => setLoginTab('quick')}
-            style={{ flex: 1, padding: '0.75rem', background: 'transparent', border: 'none', borderBottom: loginTab === 'quick' ? '2px solid var(--accent-primary)' : 'none', color: loginTab === 'quick' ? 'var(--text-primary)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
-          >
-            {authMode === 'signup' ? (lang === 'ar' ? 'التسجيل السريع' : 'Quick Register') : t.tabQuick}
-          </button>
-          <button 
-            type="button"
-            onClick={() => setLoginTab('email')}
-            style={{ flex: 1, padding: '0.75rem', background: 'transparent', border: 'none', borderBottom: loginTab === 'email' ? '2px solid var(--accent-primary)' : 'none', color: loginTab === 'email' ? 'var(--text-primary)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
-          >
-            {authMode === 'signup' ? (lang === 'ar' ? 'تسجيل بالبريد' : 'Email Register') : t.tabEmail}
-          </button>
-        </div>
+        {role !== 'admin' && initialRole !== 'admin' && (
+          <div style={{ display: 'flex', borderBottom: '1px solid var(--border-glass)', marginBottom: '2rem' }}>
+            <button 
+              type="button"
+              onClick={() => setLoginTab('quick')}
+              style={{ flex: 1, padding: '0.75rem', background: 'transparent', border: 'none', borderBottom: loginTab === 'quick' ? '2px solid var(--accent-primary)' : 'none', color: loginTab === 'quick' ? 'var(--text-primary)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
+            >
+              {authMode === 'signup' ? (lang === 'ar' ? 'التسجيل السريع' : 'Quick Register') : t.tabQuick}
+            </button>
+            <button 
+              type="button"
+              onClick={() => setLoginTab('email')}
+              style={{ flex: 1, padding: '0.75rem', background: 'transparent', border: 'none', borderBottom: loginTab === 'email' ? '2px solid var(--accent-primary)' : 'none', color: loginTab === 'email' ? 'var(--text-primary)' : 'var(--text-muted)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
+            >
+              {authMode === 'signup' ? (lang === 'ar' ? 'تسجيل بالبريد' : 'Email Register') : t.tabEmail}
+            </button>
+          </div>
+        )}
 
         {loginTab === 'quick' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -1137,18 +1140,20 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
                 : t.loginBtn}
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setIsRegisterMode(!isRegisterMode);
-                setErrorMessage('');
-              }}
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', textDecoration: 'underline', cursor: 'pointer', textAlign: 'center', marginTop: '0.5rem' }}
-            >
-              {isRegisterMode 
-                ? (lang === 'ar' ? 'لديك حساب بالفعل؟ تسجيل الدخول هنا' : 'Already have an account? Log In here')
-                : (lang === 'ar' ? 'ليس لديك حساب؟ إنشاء حساب جديد بالبريد' : 'Do not have an account? Sign Up with Email')}
-            </button>
+            {role !== 'admin' && initialRole !== 'admin' && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRegisterMode(!isRegisterMode);
+                  setErrorMessage('');
+                }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', textDecoration: 'underline', cursor: 'pointer', textAlign: 'center', marginTop: '0.5rem' }}
+              >
+                {isRegisterMode 
+                  ? (lang === 'ar' ? 'لديك حساب بالفعل؟ تسجيل الدخول هنا' : 'Already have an account? Log In here')
+                  : (lang === 'ar' ? 'ليس لديك حساب؟ إنشاء حساب جديد بالبريد' : 'Do not have an account? Sign Up with Email')}
+              </button>
+            )}
           </form>
         )}
       </div>

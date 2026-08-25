@@ -25,6 +25,15 @@ const isSupabaseConfigured = () => {
 function App() {
   const [lang, setLang] = useState(() => localStorage.getItem('edu_lang') || 'ar'); // Default to Arabic
   const [theme, setTheme] = useState(() => localStorage.getItem('edu_theme') || 'light'); // Default to light
+  const [showAdminPanel, setShowAdminPanel] = useState(() => localStorage.getItem('edu_show_admin_link') === 'true');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('admin') === 'true') {
+      setShowAdminPanel(true);
+      localStorage.setItem('edu_show_admin_link', 'true');
+    }
+  }, []);
   
   // Simulated Google Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -1550,16 +1559,20 @@ function App() {
             >
               {lang === 'ar' ? 'شروط الاستخدام' : 'Terms of Use'}
             </a>
-            <span style={{ color: 'var(--border-glass)' }}>|</span>
-            <button 
-              onClick={() => {
-                setLoginModalRole('admin');
-                setShowLoginModal(true);
-              }}
-              style={{ background: 'none', border: 'none', color: 'var(--color-gold)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}
-            >
-              {lang === 'ar' ? 'إدارة المنصة' : 'Admin Panel'}
-            </button>
+            {showAdminPanel && (
+              <>
+                <span style={{ color: 'var(--border-glass)' }}>|</span>
+                <button 
+                  onClick={() => {
+                    setLoginModalRole('admin');
+                    setShowLoginModal(true);
+                  }}
+                  style={{ background: 'none', border: 'none', color: 'var(--color-gold)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}
+                >
+                  {lang === 'ar' ? 'إدارة المنصة' : 'Admin Panel'}
+                </button>
+              </>
+            )}
           </div>
         </footer>
 
