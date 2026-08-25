@@ -16,6 +16,12 @@ import {
   saveInstructor, saveStudent, saveSession, addPendingPayment, deletePendingPayment 
 } from './db';
 
+const isSupabaseConfigured = () => {
+  const url = import.meta.env.VITE_SUPABASE_URL || 'https://luhaxtokriahwqruaymr.supabase.co';
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_ofzb67GhUvtuPpHXRrLT5w_o4t3laqY';
+  return url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+};
+
 function App() {
   const [lang, setLang] = useState(() => localStorage.getItem('edu_lang') || 'ar'); // Default to Arabic
   const [theme, setTheme] = useState(() => localStorage.getItem('edu_theme') || 'light'); // Default to light
@@ -278,11 +284,7 @@ function App() {
 
   // Handle Supabase OAuth session changes
   useEffect(() => {
-    const url = import.meta.env.VITE_SUPABASE_URL;
-    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
-    
-    if (!isConfigured) return;
+    if (!isSupabaseConfigured()) return;
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
@@ -492,10 +494,7 @@ function App() {
     const newToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
     localStorage.setItem('edu_session_token', newToken);
 
-    const url = import.meta.env.VITE_SUPABASE_URL;
-    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
-    if (isConfigured) {
+    if (isSupabaseConfigured()) {
       try {
         await supabase.auth.updateUser({ data: { current_session_token: newToken } });
       } catch (err) {
@@ -615,10 +614,7 @@ function App() {
     setUserRole('landing');
     
     // Call Supabase signOut
-    const url = import.meta.env.VITE_SUPABASE_URL;
-    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
-    if (isConfigured) {
+    if (isSupabaseConfigured()) {
       supabase.auth.signOut();
     }
     setSupabaseUser(null);
@@ -627,11 +623,7 @@ function App() {
 
   // Periodically check for concurrent logins from other devices
   useEffect(() => {
-    const url = import.meta.env.VITE_SUPABASE_URL;
-    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
-    
-    if (!isConfigured || !isLoggedIn) return;
+    if (!isSupabaseConfigured() || !isLoggedIn) return;
 
     const checkSession = async () => {
       try {
@@ -675,10 +667,7 @@ function App() {
   }, [isLoggedIn, lang]);
 
   const clearSupabaseSession = () => {
-    const url = import.meta.env.VITE_SUPABASE_URL;
-    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
-    if (isConfigured) {
+    if (isSupabaseConfigured()) {
       supabase.auth.signOut();
     }
     setSupabaseUser(null);
