@@ -107,16 +107,6 @@ export async function getInstructors() {
       whatsapp: db.whatsapp || db.groups?.[0]?.whatsapp || ''
     }));
 
-    // Merge with local storage to prevent data loss if Supabase upsert was blocked
-    const localSaved = localStorage.getItem(KEYS.instructors);
-    if (localSaved) {
-      const localParsed = JSON.parse(localSaved);
-      localParsed.forEach(localItem => {
-        if (!dbInstructors.some(dbItem => dbItem.email?.toLowerCase() === localItem.email?.toLowerCase())) {
-          dbInstructors.push(localItem);
-        }
-      });
-    }
     return sanitizeData(dbInstructors);
   } catch (err) {
     console.warn("Supabase fetch error, falling back to localStorage:", err);
@@ -148,16 +138,6 @@ export async function getStudents() {
       password: db.enrollments?.[0]?.password || ''
     }));
 
-    // Merge with local storage to prevent data loss if Supabase upsert was blocked
-    const localSaved = localStorage.getItem(KEYS.students);
-    if (localSaved) {
-      const localParsed = JSON.parse(localSaved);
-      localParsed.forEach(localItem => {
-        if (!dbStudents.some(dbItem => dbItem.email?.toLowerCase() === localItem.email?.toLowerCase())) {
-          dbStudents.push(localItem);
-        }
-      });
-    }
     return sanitizeData(dbStudents);
   } catch (err) {
     console.warn("Supabase fetch error, falling back to localStorage:", err);
