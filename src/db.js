@@ -109,12 +109,83 @@ export async function getStudents() {
 export async function getSessions() {
   if (!isSupabaseConfigured()) {
     const saved = localStorage.getItem(KEYS.sessions);
-    return saved ? JSON.parse(saved) : initialSessions;
+    const savedSessions = saved ? JSON.parse(saved) : initialSessions;
+    
+    // Offline local storage mock user constraint check
+    const localUserStr = localStorage.getItem('edu_current_user');
+    if (localUserStr) {
+      try {
+        const localUser = JSON.parse(localUserStr);
+        if (localUser.role === 'student') {
+          const studentsList = JSON.parse(localStorage.getItem('edu_students') || '[]');
+          const currentStudent = studentsList.find(s => s.id === localUser.id || s.email?.toLowerCase() === localUser.email?.toLowerCase());
+          if (currentStudent) {
+            const groupIds = (currentStudent.enrollments || []).map(e => e.groupId);
+            return savedSessions.filter(s => groupIds.includes(s.groupId));
+          }
+          return []; // Unregistered student gets empty
+        } else if (localUser.role === 'instructor') {
+          return savedSessions.filter(s => s.instructorId === localUser.id);
+        }
+      } catch (e) {
+        console.warn("Offline session parsing error:", e);
+      }
+    }
+    return savedSessions;
   }
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    let allowedGroupIds = null;
+    let allowedInstructorId = null;
+    let isAdmin = false;
+
+    if (user) {
+      const email = user.email?.toLowerCase();
+      const ADMIN_EMAILS = ['rishobeh@gmail.com', 'admin@ie-academy.com', 'admin@ie.com'];
+      if (ADMIN_EMAILS.includes(email)) {
+        isAdmin = true;
+      } else {
+        // Strict fetch student record matching this email to find their registered group enrollments
+        const { data: studentData } = await supabase
+          .from('students')
+          .select('enrollments')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (studentData) {
+          const enrollments = studentData.enrollments || [];
+          allowedGroupIds = enrollments.map(e => e.groupId);
+        } else {
+          // If not student, check if it's an instructor
+          const { data: instData } = await supabase
+            .from('instructors')
+            .select('id')
+            .eq('email', email)
+            .maybeSingle();
+          if (instData) {
+            allowedInstructorId = instData.id;
+          }
+        }
+      }
+    }
+
     const { data, error } = await supabase.from('sessions').select('*');
     if (error) throw error;
-    return data.map(db => ({
+
+    let filteredData = data;
+    if (user && !isAdmin) {
+      if (allowedGroupIds !== null) {
+        // Enforce strict student group membership constraint!
+        filteredData = data.filter(db => allowedGroupIds.includes(db.group_id));
+      } else if (allowedInstructorId !== null) {
+        // Enforce instructor constraint (only see their own lessons)
+        filteredData = data.filter(db => db.instructor_id === allowedInstructorId);
+      } else {
+        filteredData = [];
+      }
+    }
+
+    return filteredData.map(db => ({
       id: db.id,
       instructorId: db.instructor_id,
       groupId: db.group_id,
