@@ -17,8 +17,8 @@ import {
 } from './db';
 
 function App() {
-  const [lang, setLang] = useState('ar'); // Default to Arabic
-  const [theme, setTheme] = useState('light'); // Default to light
+  const [lang, setLang] = useState(() => localStorage.getItem('edu_lang') || 'ar'); // Default to Arabic
+  const [theme, setTheme] = useState(() => localStorage.getItem('edu_theme') || 'light'); // Default to light
   
   // Simulated Google Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -451,12 +451,16 @@ function App() {
   };
 
   const handleLangToggle = () => {
-    setLang(lang === 'ar' ? 'en' : 'ar');
+    const nextLang = lang === 'ar' ? 'en' : 'ar';
+    setLang(nextLang);
+    localStorage.setItem('edu_lang', nextLang);
     triggerToast(lang === 'ar' ? 'Switched to English' : 'تم تغيير اللغة إلى العربية', 'success');
   };
 
   const handleThemeToggle = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('edu_theme', nextTheme);
   };
 
   // Helper to format teacher name
