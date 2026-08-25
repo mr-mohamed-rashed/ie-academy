@@ -746,9 +746,23 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
         setStudentStep(2);
         return;
       }
-      if (selectedInstructor && !selectedGroup) {
-        setErrorMessage(lang === 'ar' ? 'يرجى اختيار الصف والمجموعة للمعلم المختار!' : 'Please select the grade and group for the chosen teacher!');
-        return;
+      if (selectedInstructor) {
+        if (!selectedGroup) {
+          setErrorMessage(lang === 'ar' ? 'يرجى اختيار الصف والمجموعة للمعلم المختار!' : 'Please select the grade and group for the chosen teacher!');
+          return;
+        }
+        const teacher = instructors.find(i => i.id === selectedInstructor);
+        if (teacher) {
+          const enrolledCount = students.filter(s => s.enrollments?.some(e => e.instructorId === teacher.id)).length;
+          const limit = teacher.maxStudentsLimit !== undefined ? teacher.maxStudentsLimit : (teacher.groups?.[0]?.maxStudentsLimit ?? 999999);
+          if (enrolledCount >= limit) {
+            setErrorMessage(lang === 'ar' 
+              ? `عذراً، هذا المعلم وصل للحد الأقصى المسموح به من الطلاب حالياً (${limit} طالب)!` 
+              : `Sorry, this teacher has reached the maximum allowed student limit (${limit} students) for now!`
+            );
+            return;
+          }
+        }
       }
     }
 

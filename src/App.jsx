@@ -368,9 +368,27 @@ function App() {
 
   const handleToggleSubscription = (id) => {
     setInstructors((prev) =>
-      prev.map((inst) =>
-        inst.id === id ? { ...inst, isSubscribed: !inst.isSubscribed } : inst
-      )
+      prev.map((inst) => {
+        if (inst.id === id) {
+          const updated = { ...inst, isSubscribed: !inst.isSubscribed };
+          saveInstructor(updated);
+          return updated;
+        }
+        return inst;
+      })
+    );
+  };
+
+  const handleUpdateTeacherLimit = (id, limit) => {
+    setInstructors((prev) =>
+      prev.map((inst) => {
+        if (inst.id === id) {
+          const updated = { ...inst, maxStudentsLimit: limit };
+          saveInstructor(updated);
+          return updated;
+        }
+        return inst;
+      })
     );
   };
 
@@ -1936,6 +1954,7 @@ function App() {
             supportAgents={supportAgents}
             onAddSupportAgent={handleAddSupportAgent}
             onDeleteSupportAgent={handleDeleteSupportAgent}
+            onUpdateTeacherLimit={handleUpdateTeacherLimit}
           />
         )}
 

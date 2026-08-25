@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, DollarSign, CheckCircle, AlertCircle, PlusCircle, Edit, Trash2, Search, Check, Camera, ShieldAlert, Clock, X } from 'lucide-react';
+import { Users, DollarSign, CheckCircle, AlertCircle, PlusCircle, Edit, Trash2, Search, Check, Camera, ShieldAlert, Clock, X, Eye, Info, Phone, Mail } from 'lucide-react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -48,11 +48,13 @@ const AdminDashboard = ({
   onRejectPayment,
   supportAgents = [],
   onAddSupportAgent,
-  onDeleteSupportAgent
+  onDeleteSupportAgent,
+  onUpdateTeacherLimit
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingScreenshot, setViewingScreenshot] = useState(null);
   const [adminTab, setAdminTab] = useState('dashboard'); // 'dashboard' | 'support'
+  const [viewingTeacherDetails, setViewingTeacherDetails] = useState(null);
   
   // Support agent form states
   const [supportName, setSupportName] = useState('');
@@ -602,6 +604,7 @@ const AdminDashboard = ({
                 <th style={{ padding: '0.75rem 1rem' }}>{t.tblSubject}</th>
                 <th style={{ padding: '0.75rem 1rem' }}>{t.tblYear}</th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>{t.tblVisibility}</th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>{lang === 'ar' ? 'حد الطلاب' : 'Student Limit'}</th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>{t.tblActions}</th>
               </tr>
             </thead>
@@ -649,7 +652,33 @@ const AdminDashboard = ({
                       </div>
                     </td>
                     <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
+                      <input 
+                        type="number" 
+                        value={teacher.maxStudentsLimit !== undefined ? teacher.maxStudentsLimit : (teacher.groups?.[0]?.maxStudentsLimit ?? 999999)} 
+                        onChange={(e) => onUpdateTeacherLimit(teacher.id, Number(e.target.value))}
+                        style={{
+                          width: '90px',
+                          padding: '0.35rem 0.5rem',
+                          borderRadius: '6px',
+                          border: '1px solid var(--border-glass)',
+                          backgroundColor: 'rgba(0,0,0,0.15)',
+                          color: 'var(--text-primary)',
+                          textAlign: 'center',
+                          fontSize: '0.85rem',
+                          fontWeight: 'bold'
+                        }}
+                      />
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
                       <div style={{ display: 'inline-flex', gap: '0.5rem' }}>
+                        <button 
+                          onClick={() => setViewingTeacherDetails(teacher)} 
+                          className="config-btn" 
+                          style={{ padding: '0.4rem', borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)' }}
+                          title={lang === 'ar' ? 'عرض التفاصيل والاتصال' : 'View Details & Contact'}
+                        >
+                          <Eye size={14} />
+                        </button>
                         <button 
                           onClick={() => handleDeleteClick(teacher.id)} 
                           className="config-btn" 
@@ -679,7 +708,92 @@ const AdminDashboard = ({
 
 
 
-      
+      {/* 3. View Teacher Details Modal */}
+      {viewingTeacherDetails && (() => {
+        const teacher = viewingTeacherDetails;
+        const enrolledStudents = students.filter(s => s.enrollments?.some(e => e.instructorId === teacher.id));
+        return (
+          <div style={{ 
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+            backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 7000, 
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backdropFilter: 'blur(10px)',
+            direction: lang === 'ar' ? 'rtl' : 'ltr'
+          }}>
+            <div className="glass-card" style={{ width: '90%', maxWidth: '480px', padding: '2rem', animation: 'slide-in 0.3s ease-out', textAlign: 'start', position: 'relative' }}>
+              <button 
+                onClick={() => setViewingTeacherDetails(null)}
+                style={{ position: 'absolute', top: '1rem', right: lang === 'ar' ? 'auto' : '1rem', left: lang === 'ar' ? '1rem' : 'auto', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+              >
+                <X size={18} />
+              </button>
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', textAlign: 'center' }}>
+                <img 
+                  src={teacher.avatar} 
+                  alt={teacher.nameAr} 
+                  style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--border-glass)' }}
+                />
+                <div>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0 }}>{lang === 'ar' ? teacher.nameAr : teacher.nameEn}</h3>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--accent-primary)', fontWeight: 600 }}>{lang === 'ar' ? teacher.subjectAr : teacher.subjectEn}</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {/* Email info */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-glass)' }}>
+                  <Mail size={16} style={{ color: 'var(--text-secondary)' }} />
+                  <div style={{ flexGrow: 1 }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block' }}>{lang === 'ar' ? 'البريد الإلكتروني للاتصال' : 'Contact Email'}</span>
+                    <a href={`mailto:${teacher.email}`} style={{ fontSize: '0.85rem', color: 'var(--text-primary)', textDecoration: 'underline', fontWeight: 600 }}>{teacher.email || 'N/A'}</a>
+                  </div>
+                </div>
+
+                {/* Stages */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-glass)' }}>
+                  <Info size={16} style={{ color: 'var(--text-secondary)' }} />
+                  <div style={{ flexGrow: 1 }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block' }}>{lang === 'ar' ? 'المراحل التعليمية' : 'Educational Stages'}</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>{lang === 'ar' ? teacher.yearAr : teacher.yearEn}</span>
+                  </div>
+                </div>
+
+                {/* Groups count */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-glass)' }}>
+                  <Users size={16} style={{ color: 'var(--text-secondary)' }} />
+                  <div style={{ flexGrow: 1 }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block' }}>{lang === 'ar' ? 'عدد المجموعات الدراسية' : 'Study Groups'}</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>{teacher.groups?.length || 0} {lang === 'ar' ? 'مجموعات' : 'Group(s)'}</span>
+                  </div>
+                </div>
+
+                {/* Students Count */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-glass)' }}>
+                  <Users size={16} style={{ color: 'var(--text-secondary)' }} />
+                  <div style={{ flexGrow: 1 }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block' }}>{lang === 'ar' ? 'الطلاب المشتركون حالياً' : 'Currently Enrolled Students'}</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>
+                      {enrolledStudents.length} / {teacher.maxStudentsLimit !== undefined ? teacher.maxStudentsLimit : (teacher.groups?.[0]?.maxStudentsLimit ?? 999999)} {lang === 'ar' ? 'طالب' : 'Student(s)'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '2rem' }}>
+                <button 
+                  onClick={() => setViewingTeacherDetails(null)} 
+                  className="btn-primary" 
+                  style={{ width: '100%' }}
+                >
+                  {lang === 'ar' ? 'إغلاق' : 'Close'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       </>)}
 
       {/* 2. Support Team Tab */}

@@ -43,7 +43,8 @@ export async function getInstructors() {
       ],
       grades: db.grades || [
         { id: `grade-sec-${db.id}`, nameAr: "ثانوي", nameEn: "High School", groups: db.groups || [{ id: `group-custom-${db.id}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }] }
-      ]
+      ],
+      maxStudentsLimit: db.max_students_limit !== undefined ? db.max_students_limit : (db.groups?.[0]?.maxStudentsLimit ?? 999999)
     }));
 
     // Merge with local storage to prevent data loss if Supabase upsert was blocked
@@ -160,6 +161,10 @@ export async function getPendingPayments() {
 export async function saveInstructor(inst) {
   if (!isSupabaseConfigured()) return;
   try {
+    // Safely embed limit in groups JSON to preserve it across schema variations
+    if (inst.groups && inst.groups.length > 0) {
+      inst.groups[0].maxStudentsLimit = inst.maxStudentsLimit;
+    }
     const dbRecord = {
       id: inst.id,
       email: inst.email,
@@ -173,7 +178,8 @@ export async function saveInstructor(inst) {
       video_url: inst.videoUrl,
       is_subscribed: inst.isSubscribed,
       groups: inst.groups,
-      grades: inst.grades
+      grades: inst.grades,
+      max_students_limit: inst.maxStudentsLimit
     };
     await supabase.from('instructors').upsert(dbRecord);
   } catch (err) {
