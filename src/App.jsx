@@ -459,7 +459,22 @@ function App() {
   };
 
   // Google Login simulation callback
-  const handleLogin = (profileData) => {
+  const handleLogin = async (profileData) => {
+    // Generate and store unique session token to prevent concurrent logins on multiple devices
+    const newToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    localStorage.setItem('edu_session_token', newToken);
+
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+    if (isConfigured) {
+      try {
+        await supabase.auth.updateUser({ data: { current_session_token: newToken } });
+      } catch (err) {
+        console.warn("Failed to sync session token with Supabase Auth metadata:", err);
+      }
+    }
+
     let formattedName = profileData.name;
     if (profileData.role === 'instructor') {
       formattedName = formatTeacherName(profileData.name);
@@ -581,6 +596,55 @@ function App() {
     setSupabaseUser(null);
     triggerToast(lang === 'ar' ? 'تم تسجيل الخروج بنجاح' : 'Successfully logged out', 'success');
   };
+
+  // Periodically check for concurrent logins from other devices
+  useEffect(() => {
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+    
+    if (!isConfigured || !isLoggedIn) return;
+
+    const checkSession = async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) return;
+
+        const dbToken = user.user_metadata?.current_session_token;
+        const localToken = localStorage.getItem('edu_session_token');
+
+        if (dbToken && localToken && dbToken !== localToken) {
+          // Log out immediately!
+          handleLogout();
+          triggerToast(
+            lang === 'ar' 
+              ? 'تم تسجيل الدخول إلى هذا الحساب من جهاز آخر! تم تسجيل خروجك لحماية حسابك.' 
+              : 'This account has been logged in from another device! You have been logged out to protect your account.',
+            'error'
+          );
+        }
+      } catch (err) {
+        console.warn("Error checking session concurrency:", err);
+      }
+    };
+
+    // Check on mount/focus
+    checkSession();
+    
+    const interval = setInterval(checkSession, 10000); // Check every 10 seconds
+    
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkSession();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isLoggedIn, lang]);
 
   const clearSupabaseSession = () => {
     const url = import.meta.env.VITE_SUPABASE_URL;
