@@ -1509,7 +1509,7 @@ function App() {
               {/* Classroom Card */}
               <div className="glass-card visitor-teacher-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-glass)' }}>
                 <img 
-                  src={`${import.meta.env.BASE_URL}classroom.png`} 
+                  src={`${import.meta.env.BASE_URL}classroom.webp`} 
                   alt="Smart Classroom AI" 
                   style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
                 />
@@ -1526,7 +1526,7 @@ function App() {
               {/* Lobby Card */}
               <div className="glass-card visitor-teacher-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-glass)' }}>
                 <img 
-                  src={`${import.meta.env.BASE_URL}lobby.png`} 
+                  src={`${import.meta.env.BASE_URL}lobby.webp`} 
                   alt="Luxury Lobby AI" 
                   style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
                 />
