@@ -2,12 +2,19 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     cssInjectedByJsPlugin(),
+    visualizer({
+      filename: 'bundle-analysis.html',
+      open: false,
+      gzipSize: true,
+      brotliSize: true
+    }),
     ViteImageOptimizer({
       exclude: ['**/*.svg'],
       webp: {
