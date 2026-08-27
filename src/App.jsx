@@ -1533,11 +1533,16 @@ function App() {
             <div className="visitor-teachers-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
               {/* Classroom Card */}
               <div className="glass-card visitor-teacher-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-glass)' }}>
-                <img 
-                  src={`${import.meta.env.BASE_URL}classroom.webp`} 
-                  alt="Smart Classroom AI" 
-                  style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
-                />
+                <picture>
+                  <source srcSet={`${import.meta.env.BASE_URL}classroom.webp`} type="image/webp" />
+                  <img 
+                    src={`${import.meta.env.BASE_URL}classroom.webp`} 
+                    alt="Smart Classroom AI" 
+                    style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
+                    fetchpriority="high"
+                    loading="eager"
+                  />
+                </picture>
                 <div style={{ padding: '1.5rem', textAlign: 'start' }}>
                   <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     {lang === 'ar' ? 'القاعات الدراسية والتدريبية الذكية' : 'Smart Training Classrooms'}
@@ -1550,11 +1555,15 @@ function App() {
 
               {/* Lobby Card */}
               <div className="glass-card visitor-teacher-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-glass)' }}>
-                <img 
-                  src={`${import.meta.env.BASE_URL}lobby.webp`} 
-                  alt="Luxury Lobby AI" 
-                  style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
-                />
+                <picture>
+                  <source srcSet={`${import.meta.env.BASE_URL}lobby.webp`} type="image/webp" />
+                  <img 
+                    src={`${import.meta.env.BASE_URL}lobby.webp`} 
+                    alt="Luxury Lobby AI" 
+                    style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
+                    loading="lazy"
+                  />
+                </picture>
                 <div style={{ padding: '1.5rem', textAlign: 'start' }}>
                   <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     {lang === 'ar' ? 'ردهات الاستراحة والمذاكرة الفاخرة' : 'Premium Study Lounges'}
