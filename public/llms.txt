@@ -1,0 +1,23 @@
+# IE Academy - Interactive Digital Educational Platform
+
+IE Academy is an advanced electronic educational ecosystem linking private tutors/instructors with center and remote students. It supports smart attendance tracking via QR codes, recorded lectures, quizzes, and automated subscription tracking.
+
+## Core Features
+
+- **Tutor Profiles:** Detailed bios, schedules, courses, and ratings.
+- **Student Center:** Attendance records, quiz scores, tasks, and homework logs.
+- **Lesson Library:** Categorized recorded video lessons available offline.
+- **QR Code Attendance:** Instant contactless check-in at physical learning centers.
+- **Admin Control Panel:** Approval of instructor subscriptions and platform moderation.
+
+## URLs & Pages
+
+- Landing Page: https://ie-academy.pages.dev/ (Public)
+- Terms of Use: https://ie-academy.pages.dev/terms.html
+- Privacy Policy: https://ie-academy.pages.dev/privacy.html
+
+## Technology Stack
+
+- Frontend: React 18, Vite, CSS variables, Glassmorphism
+- Backend & Database: Supabase Cloud Database (PostgreSQL)
+- PWA: Offline caching & service worker integration

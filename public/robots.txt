@@ -1,0 +1,18 @@
+# robots.txt for ie-academy
+# Optimized for Search Engines (Google, Bing) and AI Crawlers
+
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /privacy.html
+Allow: /terms.html
+
+# Block indexing of sensitive query strings and secret pathways
+Disallow: /*?admin=
+Disallow: /*?admin_secret=
+Disallow: /*?code=
+Disallow: /admin
+Disallow: /dashboard
+
+# Sitemaps
+Sitemap: https://ie-academy.pages.dev/sitemap.xml
