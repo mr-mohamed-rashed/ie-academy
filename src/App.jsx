@@ -20,7 +20,8 @@ import { initialStudents, initialSessions, initialInstructors } from './mockData
 import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info, Play, X as CloseIcon, Pencil, Ruler, Lightbulb, QrCode, MessageSquare, TrendingUp, BarChart3, Link, Activity, FileText, Users } from 'lucide-react';
 import { 
   getInstructors, getStudents, getSessions, getPendingPayments, 
-  saveInstructor, saveStudent, saveSession, addPendingPayment, deletePendingPayment 
+  saveInstructor, saveStudent, saveSession, addPendingPayment, deletePendingPayment,
+  deleteInstructor
 } from './db';
 
 const isSupabaseConfigured = () => {
@@ -389,11 +390,19 @@ function App() {
       ]
     };
     setInstructors((prev) => [...prev, newTeacherObj]);
+    saveInstructor(newTeacherObj);
   };
 
   const handleEditTeacher = (id, updatedData) => {
     setInstructors((prev) =>
-      prev.map((inst) => (inst.id === id ? { ...inst, ...updatedData } : inst))
+      prev.map((inst) => {
+        if (inst.id === id) {
+          const updated = { ...inst, ...updatedData };
+          saveInstructor(updated);
+          return updated;
+        }
+        return inst;
+      })
     );
   };
 
@@ -402,6 +411,7 @@ function App() {
     if (landingPodiumTeacherId === id) {
       setLandingPodiumTeacherId(null);
     }
+    deleteInstructor(id);
   };
 
   const handleToggleSubscription = (id) => {

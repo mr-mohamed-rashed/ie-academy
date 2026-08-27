@@ -398,3 +398,14 @@ export async function deletePendingPayment(id) {
     console.error("Supabase delete error:", err);
   }
 }
+
+// 10. Delete Instructor
+export async function deleteInstructor(id) {
+  if (!isSupabaseConfigured()) return;
+  try {
+    const supabase = await getSupabase();
+    await supabase.from('instructors').delete().eq('id', id);
+  } catch (err) {
+    console.error("Supabase delete instructor error:", err);
+  }
+}
