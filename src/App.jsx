@@ -188,23 +188,31 @@ function App() {
   
   // PWA BeforeInstallPrompt Listener
   useEffect(() => {
+    let timer;
     const handleBeforeInstallPrompt = (e) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
-      // Update UI notify the user they can install the PWA
-      setShowInstallBanner(true);
+      // Update UI notify the user they can install the PWA after a short delay
+      timer = setTimeout(() => {
+        setShowInstallBanner(true);
+      }, 5000);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     
     // Simulate mobile banner for demonstration purposes if on small screen
     if (window.innerWidth <= 768 && !localStorage.getItem('pwa_banner_dismissed')) {
-       setShowInstallBanner(true);
+       timer = setTimeout(() => {
+         setShowInstallBanner(true);
+       }, 5000);
     }
 
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   const handleInstallClick = async () => {
