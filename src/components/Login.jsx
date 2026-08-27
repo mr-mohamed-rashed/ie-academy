@@ -94,7 +94,11 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
   }, [initialRole]);
 
   useEffect(() => {
-    if (role === 'admin' || initialRole === 'admin') {
+    const params = new URLSearchParams(window.location.search);
+    const inviteParam = params.get('invite');
+    const isInviteValid = inviteParam === 'admin' || inviteParam === 'support';
+    
+    if ((role === 'admin' || initialRole === 'admin' || role === 'support' || initialRole === 'support') && !isInviteValid) {
       setAuthMode('login');
       setIsRegisterMode(false);
       setLoginTab('email');
@@ -1133,7 +1137,9 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
                 : t.loginBtn}
             </button>
 
-            {role !== 'admin' && initialRole !== 'admin' && (
+            {((role !== 'admin' && initialRole !== 'admin' && role !== 'support' && initialRole !== 'support') || 
+              (new URLSearchParams(window.location.search).get('invite') === role) || 
+              (new URLSearchParams(window.location.search).get('invite') === initialRole)) && (
               <button
                 type="button"
                 onClick={() => {

@@ -281,18 +281,18 @@ function App() {
     setSupportAgents(prev => prev.filter(a => a.id !== id));
   };
 
-  // Handle Support Agent Direct Link Login
+  // Handle Admin & Support Agent Direct Link Login
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const roleParam = params.get('role');
     const emailParam = params.get('email');
-    if (roleParam === 'support') {
+    if (roleParam === 'support' || roleParam === 'admin') {
       setIsLoggedIn(true);
-      setUserRole('support');
+      setUserRole(roleParam);
       setCurrentUser({
-        name: emailParam ? emailParam.split('@')[0] : (lang === 'ar' ? 'وكيل الدعم' : 'Support Agent'),
-        email: emailParam || 'support@ie-academy.com',
-        role: 'support',
+        name: emailParam ? emailParam.split('@')[0] : (lang === 'ar' ? (roleParam === 'admin' ? 'مدير المنصة' : 'وكيل الدعم') : (roleParam === 'admin' ? 'Admin' : 'Support Agent')),
+        email: emailParam || (roleParam === 'admin' ? 'admin@ie-academy.com' : 'support@ie-academy.com'),
+        role: roleParam,
         avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120'
       });
       // Clear URL params
