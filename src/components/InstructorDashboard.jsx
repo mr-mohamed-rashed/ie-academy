@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X, Camera, Copy } from 'lucide-react';
+import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X as CloseIcon, Camera, Copy } from 'lucide-react';
 import { calculateGPA, calculateAttendanceRate } from '../mockData';
 import StudentAnalyticsModal from './StudentAnalyticsModal';
 import Podium from './Podium';
@@ -426,8 +426,8 @@ const InstructorDashboard = ({
             <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', color: 'var(--text-secondary)' }}>
               <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--accent-green)"/> <span>{lang === 'ar' ? 'إضافة عدد محدود من الفصول والطلاب' : 'Add limited classes and students'}</span></li>
               <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}><CheckCircle size={18} color="var(--accent-green)"/> <span>{lang === 'ar' ? 'إدارة درجات الطلاب وحضورهم' : 'Manage student grades and attendance'}</span></li>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', opacity: 0.5 }}><X size={18} /> <del>{lang === 'ar' ? 'الظهور للطلاب في المنصة الرئيسية' : 'Appear in student searches'}</del></li>
-              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', opacity: 0.5 }}><X size={18} /> <del>{lang === 'ar' ? 'دعم إعلاني وتسويق لحصصك الدراسية' : 'Ads and marketing support'}</del></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', opacity: 0.5 }}><CloseIcon size={18} /> <del>{lang === 'ar' ? 'الظهور للطلاب في المنصة الرئيسية' : 'Appear in student searches'}</del></li>
+              <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', opacity: 0.5 }}><CloseIcon size={18} /> <del>{lang === 'ar' ? 'دعم إعلاني وتسويق لحصصك الدراسية' : 'Ads and marketing support'}</del></li>
             </ul>
             <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
               <button onClick={() => setHasSkippedPlan(true)} className="config-btn" style={{ width: '100%', padding: '1rem', justifyContent: 'center' }}>
@@ -1305,7 +1305,7 @@ const InstructorDashboard = ({
           <div id="payment-modal-scroll-container" className="glass-card" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}>
             <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', borderBottom: '1px solid var(--border-glass)' }}>
               <h2 style={{ margin: 0 }}>{lang === 'ar' ? 'الترقية للنظام المدفوع' : 'Upgrade to Premium'}</h2>
-              <button onClick={() => { setShowPaymentModal(false); setPaymentSuccess(false); setScreenshot(null); }} className="close-btn" style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><X size={24} /></button>
+              <button onClick={() => { setShowPaymentModal(false); setPaymentSuccess(false); setScreenshot(null); }} className="close-btn" style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><CloseIcon size={24} /></button>
             </div>
             
             <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -1476,7 +1476,7 @@ const InstructorDashboard = ({
                       <div style={{ marginTop: '0.75rem', position: 'relative', display: 'inline-block' }}>
                         <img src={screenshot} alt="Screenshot Preview" style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '8px', border: '1px solid var(--border-glass)' }} />
                         <button onClick={() => setScreenshot(null)} style={{ position: 'absolute', top: '5px', right: '5px', background: 'rgba(239, 68, 68, 0.9)', border: 'none', color: 'white', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <X size={12} />
+                          <CloseIcon size={12} />
                         </button>
                       </div>
                     )}
@@ -1512,7 +1512,7 @@ const InstructorDashboard = ({
           padding: '1rem'
         }}>
           <div className="glass-card" style={{ maxWidth: '400px', width: '100%', padding: '2rem', textAlign: 'center', position: 'relative' }}>
-            <button onClick={() => setShowInviteQrModal(false)} className="close-btn" style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><X size={24} /></button>
+            <button onClick={() => setShowInviteQrModal(false)} className="close-btn" style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><CloseIcon size={24} /></button>
             <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
               {lang === 'ar' ? 'رمز دعوة الطلاب الـ QR' : 'Student Invite QR Code'}
             </h3>

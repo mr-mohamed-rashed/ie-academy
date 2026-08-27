@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, User, Briefcase, Camera, Check, X } from 'lucide-react';
+import { BookOpen, User, Briefcase, Camera, Check, X as CloseIcon } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 const decodeJwt = (token) => {
@@ -1202,7 +1202,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
                 }}
                 title={lang === 'ar' ? 'إلغاء وإغلاق' : 'Cancel and Close'}
               >
-                <X size={16} />
+                <CloseIcon size={16} />
               </button>
             </div>
 

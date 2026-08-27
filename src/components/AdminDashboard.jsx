@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, DollarSign, CheckCircle, AlertCircle, PlusCircle, Edit, Trash2, Search, Check, Camera, ShieldAlert, Clock, X, Eye, Info, Phone, Mail } from 'lucide-react';
+import { Users, DollarSign, CheckCircle, AlertCircle, PlusCircle, Edit, Trash2, Search, Check, Camera, ShieldAlert, Clock, X as CloseIcon, Eye, Info, Phone, Mail } from 'lucide-react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -564,7 +564,7 @@ const AdminDashboard = ({
               onClick={() => setViewingScreenshot(null)}
               style={{ position: 'absolute', top: '1rem', right: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.9)', border: 'none', color: '#fff', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
             >
-              <X size={18} />
+              <CloseIcon size={18} />
             </button>
             <img src={viewingScreenshot} alt="Receipt Fullsize" style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: '8px', objectFit: 'contain' }} />
           </div>
@@ -725,7 +725,7 @@ const AdminDashboard = ({
                 onClick={() => setViewingTeacherDetails(null)}
                 style={{ position: 'absolute', top: '1rem', right: lang === 'ar' ? 'auto' : '1rem', left: lang === 'ar' ? '1rem' : 'auto', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
               >
-                <X size={18} />
+                <CloseIcon size={18} />
               </button>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', textAlign: 'center' }}>

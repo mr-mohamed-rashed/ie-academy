@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Info, CreditCard, DollarSign, MessageCircle, PlayCircle } from 'lucide-react';
+import { X as CloseIcon, Info, CreditCard, DollarSign, MessageCircle, PlayCircle } from 'lucide-react';
 
 const getEmbedUrl = (url) => {
   if (!url) return null;
@@ -147,7 +147,7 @@ const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
             onClick={() => setShowVideo(false)}
             style={{ position: 'absolute', top: '2rem', right: '2rem', borderColor: 'var(--accent-red)', color: 'var(--accent-red)', padding: '0.5rem', borderRadius: '50%', zIndex: 10 }}
           >
-            <X size={24} />
+            <CloseIcon size={24} />
           </button>
           
           <div style={{ width: '90%', maxWidth: '900px', aspectRatio: '16/9', backgroundColor: '#000', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-glass)' }}>

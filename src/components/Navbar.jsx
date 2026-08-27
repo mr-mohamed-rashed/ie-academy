@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Globe, Moon, Sun, UserCheck, Settings, LogOut, Camera, Check, Menu, X } from 'lucide-react';
+import { BookOpen, Globe, Moon, Sun, UserCheck, Settings, LogOut, Camera, Check, Menu, X as CloseIcon } from 'lucide-react';
 import { PRESET_AVATARS } from './Login';
 
 const Navbar = ({ 
@@ -247,7 +247,7 @@ const Navbar = ({
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         aria-label="Toggle Menu"
       >
-        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        {isMobileMenuOpen ? <CloseIcon size={24} /> : <Menu size={24} />}
       </button>
 
       {isMobileMenuOpen && (

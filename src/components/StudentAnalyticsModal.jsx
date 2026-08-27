@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, User, BarChart2, MessageCircle, AlertTriangle, Sparkles } from 'lucide-react';
+import { X as CloseIcon, User, BarChart2, MessageCircle, AlertTriangle, Sparkles } from 'lucide-react';
 
 const StudentAnalyticsModal = ({ student, instructorId, lang, onClose }) => {
   if (!student) return null;
@@ -100,7 +100,7 @@ const StudentAnalyticsModal = ({ student, instructorId, lang, onClose }) => {
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-            <X size={24} />
+            <CloseIcon size={24} />
           </button>
         </div>
 

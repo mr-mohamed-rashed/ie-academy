@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, BookOpen, Clock, Calendar, X } from 'lucide-react';
+import { User, BookOpen, Clock, Calendar } from 'lucide-react';
 
 const TeacherProfileModal = ({ teacher, lang, onClose, onLoginClick }) => {
   if (!teacher) return null;

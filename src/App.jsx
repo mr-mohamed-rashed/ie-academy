@@ -10,7 +10,7 @@ import SupportDashboard from './components/SupportDashboard';
 import TeacherProfileModal from './components/TeacherProfileModal';
 import TeacherDetailsModal from './components/TeacherDetailsModal';
 import { initialStudents, initialSessions, initialInstructors } from './mockData';
-import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info, Play, X, Pencil, Ruler, Lightbulb, QrCode, MessageSquare, TrendingUp, BarChart3, Link, Activity, FileText, Users } from 'lucide-react';
+import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info, Play, X as CloseIcon, Pencil, Ruler, Lightbulb, QrCode, MessageSquare, TrendingUp, BarChart3, Link, Activity, FileText, Users } from 'lucide-react';
 import { 
   getInstructors, getStudents, getSessions, getPendingPayments, 
   saveInstructor, saveStudent, saveSession, addPendingPayment, deletePendingPayment 
@@ -2024,7 +2024,7 @@ function App() {
                 onClick={() => setPlayingVideoUrl(null)} 
                 style={{ position: 'absolute', top: '-2.5rem', right: 0, background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.9rem' }}
               >
-                <X size={20} />
+                <CloseIcon size={20} />
                 <span>{lang === 'ar' ? 'إغلاق' : 'Close'}</span>
               </button>
               <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '12px' }}>
