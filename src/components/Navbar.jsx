@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Globe, Moon, Sun, UserCheck, Settings, LogOut, Camera, Check, Menu, X as CloseIcon } from 'lucide-react';
-import { PRESET_AVATARS } from './Login';
+import { PRESET_AVATARS } from '../mockData';
 
 const Navbar = ({ 
   lang, 

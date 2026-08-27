@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Podium from './components/Podium';
-import Login from './components/Login';
+const Login = React.lazy(() => import('./components/Login'));
 import { supabase } from './supabaseClient';
 const InstructorDashboard = React.lazy(() => import('./components/InstructorDashboard'));
 const StudentDashboard = React.lazy(() => import('./components/StudentDashboard'));
@@ -1597,7 +1597,13 @@ function App() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             backdropFilter: 'blur(10px)'
           }}>
-            <Login mode={loginModalRole ? 'signup' : 'login'} onLogin={handleLogin} lang={lang} instructors={instructors} students={students} initialRole={loginModalRole} onClose={handleCloseLoginModal} supabaseUser={supabaseUser} isLoading={isLoading} />
+            <React.Suspense fallback={
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
+                <span className="loader" style={{ width: '30px', height: '30px', borderTopColor: 'var(--accent-primary)' }}></span>
+              </div>
+            }>
+              <Login mode={loginModalRole ? 'signup' : 'login'} onLogin={handleLogin} lang={lang} instructors={instructors} students={students} initialRole={loginModalRole} onClose={handleCloseLoginModal} supabaseUser={supabaseUser} isLoading={isLoading} />
+            </React.Suspense>
           </div>
         )}
 

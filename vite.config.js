@@ -45,6 +45,7 @@ export default defineConfig({
             if (id.includes('react')) return 'vendor-react';
             if (id.includes('lucide-react')) return 'vendor-icons';
             if (id.includes('@supabase')) return 'vendor-database';
+            if (id.includes('chart.js') || id.includes('react-chartjs-2')) return 'vendor-charts';
             return 'vendor-helpers';
           }
         }

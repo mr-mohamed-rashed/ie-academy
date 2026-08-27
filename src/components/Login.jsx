@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, User, Briefcase, Camera, Check, X as CloseIcon } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { PRESET_AVATARS } from '../mockData';
 
 const decodeJwt = (token) => {
   try {
@@ -38,14 +39,6 @@ const rateLimiter = {
   }
 };
 
-const PRESET_AVATARS = [
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120",
-  "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=120",
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120",
-  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=120",
-  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=120"
-];
 
 const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRole, onClose, supabaseUser, isLoading }) => {
   const [showModal, setShowModal] = useState(false);
@@ -2086,4 +2079,3 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
 };
 
 export default Login;
-export { PRESET_AVATARS };

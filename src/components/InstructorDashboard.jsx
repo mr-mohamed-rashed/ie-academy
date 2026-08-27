@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X as CloseIcon, Camera, Copy } from 'lucide-react';
 import { calculateGPA, calculateAttendanceRate } from '../mockData';
-import StudentAnalyticsModal from './StudentAnalyticsModal';
+const StudentAnalyticsModal = React.lazy(() => import('./StudentAnalyticsModal'));
 import Podium from './Podium';
 
 /**
@@ -1286,12 +1286,18 @@ const InstructorDashboard = ({
       )}
 
       {selectedStudentForAnalytics && (
-        <StudentAnalyticsModal
-          student={selectedStudentForAnalytics}
-          instructorId={instructor.id}
-          lang={lang}
-          onClose={() => setSelectedStudentForAnalytics(null)}
-        />
+        <React.Suspense fallback={
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+            <span className="loader" style={{ width: '28px', height: '28px', borderTopColor: 'var(--accent-primary)' }}></span>
+          </div>
+        }>
+          <StudentAnalyticsModal
+            student={selectedStudentForAnalytics}
+            instructorId={instructor.id}
+            lang={lang}
+            onClose={() => setSelectedStudentForAnalytics(null)}
+          />
+        </React.Suspense>
       )}
 
     {/* Payment/Upgrade Modal */}

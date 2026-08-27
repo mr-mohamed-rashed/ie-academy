@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Award, Search, Trophy } from 'lucide-react';
 import { getSortedStudents } from '../mockData';
-import StudentAnalyticsModal from './StudentAnalyticsModal';
+const StudentAnalyticsModal = React.lazy(() => import('./StudentAnalyticsModal'));
 
 const Podium = ({ students, lang, instructorId, gradeId, groupId, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -213,12 +213,18 @@ const Podium = ({ students, lang, instructorId, gradeId, groupId, onClose }) => 
       </div>
 
       {selectedStudentForAnalytics && (
-        <StudentAnalyticsModal
-          student={selectedStudentForAnalytics}
-          instructorId={instructorId}
-          lang={lang}
-          onClose={() => setSelectedStudentForAnalytics(null)}
-        />
+        <React.Suspense fallback={
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+            <span className="loader" style={{ width: '28px', height: '28px', borderTopColor: 'var(--accent-primary)' }}></span>
+          </div>
+        }>
+          <StudentAnalyticsModal
+            student={selectedStudentForAnalytics}
+            instructorId={instructorId}
+            lang={lang}
+            onClose={() => setSelectedStudentForAnalytics(null)}
+          />
+        </React.Suspense>
       )}
     </div>
   );
