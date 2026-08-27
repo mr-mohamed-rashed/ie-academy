@@ -3,10 +3,10 @@ import Navbar from './components/Navbar';
 import Podium from './components/Podium';
 import Login from './components/Login';
 import { supabase } from './supabaseClient';
-import InstructorDashboard from './components/InstructorDashboard';
-import StudentDashboard from './components/StudentDashboard';
-import AdminDashboard from './components/AdminDashboard';
-import SupportDashboard from './components/SupportDashboard';
+const InstructorDashboard = React.lazy(() => import('./components/InstructorDashboard'));
+const StudentDashboard = React.lazy(() => import('./components/StudentDashboard'));
+const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
+const SupportDashboard = React.lazy(() => import('./components/SupportDashboard'));
 import TeacherProfileModal from './components/TeacherProfileModal';
 import TeacherDetailsModal from './components/TeacherDetailsModal';
 import { initialStudents, initialSessions, initialInstructors } from './mockData';
@@ -1914,77 +1914,83 @@ function App() {
           </div>
         )}
 
-        {userRole === 'instructor' && (
-          <InstructorDashboard
-            instructor={activeInstructor}
-            students={students}
-            sessions={sessions}
-            onAddGrade={handleAddGrade}
-            onAddSession={handleAddSession}
-            onAddGroup={handleAddGroup}
-            onEditGroup={handleEditGroup}
-            onDeleteGroup={handleDeleteGroup}
-            onRemoveStudent={handleRemoveStudentFromGroup}
-            lang={lang}
-            triggerToast={triggerToast}
-            activeGradeId={activeGradeId}
-            activeGroupId={activeGroupId}
-            onGradeChange={setActiveGradeId}
-            onGroupChange={setActiveGroupId}
-            systemFee={systemFee}
-            academicYearFee={academicYearFee}
-            pendingPayments={pendingPayments}
-            onSubmitPaymentRequest={handleSubmitPaymentRequest}
-            onPaySubscription={() => activeInstructor && handleToggleSubscription(activeInstructor.id)}
-          />
-        )}
+        <React.Suspense fallback={
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '6rem 0', width: '100%' }}>
+            <span className="loader" style={{ width: '40px', height: '40px', borderTopColor: 'var(--accent-primary)' }}></span>
+          </div>
+        }>
+          {userRole === 'instructor' && (
+            <InstructorDashboard
+              instructor={activeInstructor}
+              students={students}
+              sessions={sessions}
+              onAddGrade={handleAddGrade}
+              onAddSession={handleAddSession}
+              onAddGroup={handleAddGroup}
+              onEditGroup={handleEditGroup}
+              onDeleteGroup={handleDeleteGroup}
+              onRemoveStudent={handleRemoveStudentFromGroup}
+              lang={lang}
+              triggerToast={triggerToast}
+              activeGradeId={activeGradeId}
+              activeGroupId={activeGroupId}
+              onGradeChange={setActiveGradeId}
+              onGroupChange={setActiveGroupId}
+              systemFee={systemFee}
+              academicYearFee={academicYearFee}
+              pendingPayments={pendingPayments}
+              onSubmitPaymentRequest={handleSubmitPaymentRequest}
+              onPaySubscription={() => activeInstructor && handleToggleSubscription(activeInstructor.id)}
+            />
+          )}
 
-        {userRole === 'student' && (
-          <StudentDashboard
-            student={activeStudent}
-            instructors={instructors}
-            sessions={sessions}
-            students={students}
-            activeTeacherId={activeTeacherId}
-            onSelectTeacher={setActiveTeacherId}
-            onScanQR={handleScanQR}
-            lang={lang}
-            triggerToast={triggerToast}
-          />
-        )}
+          {userRole === 'student' && (
+            <StudentDashboard
+              student={activeStudent}
+              instructors={instructors}
+              sessions={sessions}
+              students={students}
+              activeTeacherId={activeTeacherId}
+              onSelectTeacher={setActiveTeacherId}
+              onScanQR={handleScanQR}
+              lang={lang}
+              triggerToast={triggerToast}
+            />
+          )}
 
-        {userRole === 'support' && (
-          <SupportDashboard
-            students={students}
-            lang={lang}
-            onLogout={handleLogout}
-            currentUser={currentUser}
-          />
-        )}
+          {userRole === 'support' && (
+            <SupportDashboard
+              students={students}
+              lang={lang}
+              onLogout={handleLogout}
+              currentUser={currentUser}
+            />
+          )}
 
-        {userRole === 'admin' && (
-          <AdminDashboard
-            instructors={instructors}
-            students={students}
-            onAddTeacher={handleAddTeacher}
-            onEditTeacher={handleEditTeacher}
-            onDeleteTeacher={handleDeleteTeacher}
-            onToggleSubscription={handleToggleSubscription}
-            lang={lang}
-            triggerToast={triggerToast}
-            systemFee={systemFee}
-            setSystemFee={setSystemFee}
-            academicYearFee={academicYearFee}
-            setAcademicYearFee={setAcademicYearFee}
-            pendingPayments={pendingPayments}
-            onApprovePayment={handleApprovePayment}
-            onRejectPayment={handleRejectPayment}
-            supportAgents={supportAgents}
-            onAddSupportAgent={handleAddSupportAgent}
-            onDeleteSupportAgent={handleDeleteSupportAgent}
-            onUpdateTeacherLimit={handleUpdateTeacherLimit}
-          />
-        )}
+          {userRole === 'admin' && (
+            <AdminDashboard
+              instructors={instructors}
+              students={students}
+              onAddTeacher={handleAddTeacher}
+              onEditTeacher={handleEditTeacher}
+              onDeleteTeacher={handleDeleteTeacher}
+              onToggleSubscription={handleToggleSubscription}
+              lang={lang}
+              triggerToast={triggerToast}
+              systemFee={systemFee}
+              setSystemFee={setSystemFee}
+              academicYearFee={academicYearFee}
+              setAcademicYearFee={setAcademicYearFee}
+              pendingPayments={pendingPayments}
+              onApprovePayment={handleApprovePayment}
+              onRejectPayment={handleRejectPayment}
+              supportAgents={supportAgents}
+              onAddSupportAgent={handleAddSupportAgent}
+              onDeleteSupportAgent={handleDeleteSupportAgent}
+              onUpdateTeacherLimit={handleUpdateTeacherLimit}
+            />
+          )}
+        </React.Suspense>
 
       </main>
 
