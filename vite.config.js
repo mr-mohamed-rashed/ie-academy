@@ -34,7 +34,14 @@ export default defineConfig({
   base: '/',
   build: {
     modulePreload: {
-      polyfill: true
+      polyfill: true,
+      resolveDependencies(filename, deps) {
+        // Prevent preloading charts, database and dashboard modules on initial landing page load
+        if (filename.includes('vendor-charts') || filename.includes('vendor-database') || filename.includes('Dashboard') || filename.includes('Login') || filename.includes('StudentAnalyticsModal')) {
+          return [];
+        }
+        return deps;
+      }
     },
     sourcemap: true,
     cssCodeSplit: true,
