@@ -1063,7 +1063,7 @@ function App() {
             </span>
           </div>
           <div className="visitor-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button className="config-btn" onClick={handleLangToggle}>
+            <button className="config-btn" onClick={handleLangToggle} aria-label={lang === 'ar' ? 'English' : 'العربية'}>
               <Globe size={16} />
               <span className="hide-on-mobile">{lang === 'ar' ? 'English' : 'العربية'}</span>
             </button>
@@ -1166,6 +1166,9 @@ function App() {
 
         {/* Main Content Tabs (Guides, Subscribed Teachers, Centers Gallery) */}
         <section id="explore-section" className="visitor-content-section" style={{ maxWidth: '1200px', margin: '0 auto', padding: '4rem 1.5rem' }}>
+          <h2 style={{ fontSize: '2.2rem', fontWeight: 800, textAlign: 'center', marginBottom: '2.5rem', background: 'linear-gradient(to right, #6366f1, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', position: 'relative', zIndex: 10 }}>
+            {lang === 'ar' ? 'استكشف منصتنا التعليمية' : 'Explore Our Educational Platform'}
+          </h2>
           <div className="role-selector-container" style={{ justifyContent: 'center', marginBottom: '3rem', width: '100%', gap: '1rem', position: 'relative', zIndex: 10 }}>
             <button 
               className={`role-tab ${visitorTab === 'guide' ? 'active' : ''}`}
@@ -1212,9 +1215,9 @@ function App() {
                     <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'rgba(139, 92, 246, 0.15)', color: 'var(--accent-purple)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Link size={20} />
                     </div>
-                    <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-purple)' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-purple)' }}>
                       {lang === 'ar' ? '1. التسجيل والبحث عن المدرسين' : '1. Registration & Search'}
-                    </h4>
+                    </h3>
                   </div>
                   <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <li>{lang === 'ar' ? 'التسجيل الفوري والمباشر عن طريق الرابط الخاص بالمدرس (Invitation Link).' : 'Register instantly via the instructor\'s invitation link.'}</li>
@@ -1240,9 +1243,9 @@ function App() {
                     <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-green)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Activity size={20} />
                     </div>
-                    <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-green)' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-green)' }}>
                       {lang === 'ar' ? '2. رحلتك التعليمية واستفادتك من المنصة' : '2. Student Learning & Benefits'}
-                    </h4>
+                    </h3>
                   </div>
                   <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <li>{lang === 'ar' ? 'مكتبة دروس مسجلة متكاملة في حسابك للرجوع للشروحات والمراجعات في أي وقت لضمان فهمك.' : 'Access a library of recorded sessions and revisions anytime to guarantee full comprehension.'}</li>
@@ -1269,9 +1272,9 @@ function App() {
                     <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <TrendingUp size={20} />
                     </div>
-                    <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-gold)' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-gold)' }}>
                       {lang === 'ar' ? '3. بوابة ولي الأمر والمتابعة الذكية' : '3. Parent Tracking & Reports'}
-                    </h4>
+                    </h3>
                   </div>
                   <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <li>{lang === 'ar' ? 'إرسال تقارير دورية وفورية مباشرة لولي الأمر توضح سلوك الطالب ومدى التزامه بالحضور.' : 'Receive periodic and instant reports detailing student behavior and attendance.'}</li>
@@ -1307,9 +1310,9 @@ function App() {
                     <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <FileText size={20} />
                     </div>
-                    <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
-                      {lang === 'ar' ? '1. طريقة استخدام المعلم للمنصة' : '1. How Instructors Use the Platform'}
-                    </h4>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
+                      {lang === 'ar' ? '1. طريقة استخدام المعلم للمنصة' : '1. How Tutors Use the Platform'}
+                    </h3>
                   </div>
                   <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <li>{lang === 'ar' ? 'إنشاء مجموعات دراسية نشطة وإدارتها بالكامل بشكل مستقل عبر مختلف المراحل التعليمية.' : 'Establish and manage class groups across all educational phases independently.'}</li>
@@ -1336,9 +1339,9 @@ function App() {
                     <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'rgba(244, 63, 94, 0.15)', color: 'var(--accent-red)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Activity size={20} />
                     </div>
-                    <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-red)' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-red)' }}>
                       {lang === 'ar' ? '2. استفادة المعلم ومميزات الأتمتة' : '2. Benefits & Automation for Instructors'}
-                    </h4>
+                    </h3>
                   </div>
                   <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <li>{lang === 'ar' ? 'تصحيح تلقائي فوري للكويزات والاختبارات بالذكاء الاصطناعي مع رصد آلي للدرجات لتوفير الوقت.' : 'Instant AI grading for quizzes with automated score logging to save time and effort.'}</li>
@@ -1365,9 +1368,9 @@ function App() {
                     <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Star size={20} />
                     </div>
-                    <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-gold)' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-gold)' }}>
                       {lang === 'ar' ? '3. ترقية النظام والظهور الترويجي' : '3. VIP Upgrade & Platform Promotion'}
-                    </h4>
+                    </h3>
                   </div>
                   <ul className="guide-list" style={{ color: 'var(--text-secondary)', paddingInlineStart: '1.25rem', fontSize: '0.85rem', lineHeight: '1.7', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <li>{lang === 'ar' ? 'الترقية إلى نظام VIP للظهور المميز والمباشر في لوحة أفضل 10 مدرسين بالصفحة الرئيسية للمنصة.' : 'Upgrade to VIP for direct premier placement in the top 10 teachers row on the landing page.'}</li>
