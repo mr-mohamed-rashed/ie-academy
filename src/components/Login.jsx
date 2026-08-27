@@ -880,7 +880,11 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
           {authMode === 'signup' 
             ? (role === 'instructor' 
                 ? (lang === 'ar' ? 'إنشاء حساب معلم جديد' : 'Register Instructor Account') 
-                : (lang === 'ar' ? 'إنشاء حساب طالب جديد' : 'Register Student Account'))
+                : role === 'admin'
+                  ? (lang === 'ar' ? 'إنشاء حساب مدير جديد' : 'Register Admin Account')
+                  : role === 'support'
+                    ? (lang === 'ar' ? 'إنشاء حساب دعم فني جديد' : 'Register Support Account')
+                    : (lang === 'ar' ? 'إنشاء حساب طالب جديد' : 'Register Student Account'))
             : t.headline}
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem' }}>
@@ -890,7 +894,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
         </p>
 
         {/* Tab Selector */}
-        {role !== 'admin' && initialRole !== 'admin' && (
+        {role !== 'admin' && initialRole !== 'admin' && role !== 'support' && initialRole !== 'support' && (
           <div style={{ display: 'flex', borderBottom: '1px solid var(--border-glass)', marginBottom: '2rem' }}>
             <button 
               type="button"
