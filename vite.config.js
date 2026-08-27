@@ -22,7 +22,7 @@ export default defineConfig({
       }
     })
   ],
-  base: '/ie-academy/',
+  base: '/',
   build: {
     sourcemap: true,
     cssCodeSplit: true,
