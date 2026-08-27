@@ -1,9 +1,27 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    ViteImageOptimizer({
+      exclude: ['**/*.svg'],
+      webp: {
+        quality: 75,
+      },
+      avif: {
+        quality: 65,
+      },
+      png: {
+        quality: 75,
+      },
+      jpeg: {
+        quality: 75,
+      }
+    })
+  ],
   base: '/ie-academy/',
   build: {
     sourcemap: true,
