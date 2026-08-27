@@ -1,8 +1,33 @@
 import React, { useState } from 'react';
-import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X as CloseIcon, Camera, Copy } from 'lucide-react';
+import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X as CloseIcon, Camera, Copy, PlayCircle } from 'lucide-react';
 import { calculateGPA, calculateAttendanceRate } from '../mockData';
 const StudentAnalyticsModal = React.lazy(() => import('./StudentAnalyticsModal'));
 import Podium from './Podium';
+
+const getYouTubeId = (url) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+};
+
+const getEmbedUrl = (url) => {
+  if (!url) return '';
+  const ytId = getYouTubeId(url);
+  if (ytId) {
+    return `https://www.youtube.com/embed/${ytId}`;
+  }
+  return url;
+};
+
+const getThumbnailUrl = (url) => {
+  if (!url) return '';
+  const ytId = getYouTubeId(url);
+  if (ytId) {
+    return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+  }
+  return 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=640';
+};
 
 /**
  * InstructorDashboard component.
@@ -60,6 +85,7 @@ const InstructorDashboard = ({
   
   // Tabs state for organizing the dashboard
   const [activeTab, setActiveTab] = useState('students'); // 'students' | 'curriculum'
+  const [playingVideoId, setPlayingVideoId] = useState(null);
   
   // Grading State
   const [selectedStudentId, setSelectedStudentId] = useState('');
@@ -968,14 +994,38 @@ const InstructorDashboard = ({
             {gradeSessions.map(session => (
               <div key={session.id} style={{ border: '1px solid var(--border-glass)', borderRadius: '12px', overflow: 'hidden', backgroundColor: 'var(--bg-glass)' }}>
                 {session.videoUrl && (
-                  <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-                    <iframe 
-                      src={session.videoUrl} 
-                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} 
-                      frameBorder="0" 
-                      allowFullScreen
-                      title={lang === 'ar' ? session.titleAr : session.titleEn}
-                    />
+                  <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', backgroundColor: '#000' }}>
+                    {playingVideoId === session.id ? (
+                      <iframe 
+                        src={`${getEmbedUrl(session.videoUrl)}?autoplay=1`} 
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} 
+                        frameBorder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={lang === 'ar' ? session.titleAr : session.titleEn}
+                      />
+                    ) : (
+                      <div 
+                        onClick={() => setPlayingVideoId(session.id)}
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', cursor: 'pointer' }}
+                      >
+                        <img 
+                          src={getThumbnailUrl(session.videoUrl)} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                          alt={lang === 'ar' ? session.titleAr : session.titleEn}
+                          onError={(e) => {
+                            e.target.src = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=640';
+                          }}
+                        />
+                        <div style={{ 
+                          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, 
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                          backgroundColor: 'rgba(0,0,0,0.3)', transition: 'all 0.2s' 
+                        }} className="play-overlay">
+                          <PlayCircle size={48} color="white" style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' }} />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 <div style={{ padding: '1rem' }}>

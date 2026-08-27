@@ -1,6 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
+const getYouTubeId = (url) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+};
+
+const getEmbedUrl = (url) => {
+  if (!url) return '';
+  const ytId = getYouTubeId(url);
+  if (ytId) {
+    return `https://www.youtube.com/embed/${ytId}`;
+  }
+  return url;
+};
+
 const InteractiveVideoPlayer = ({ session, lang, onClose }) => {
   const [chatMessages, setMessages] = useState([
     { id: 1, sender: 'ai', text: lang === 'ar' ? `مرحباً بك في حصة "${session.titleAr}". أنا مساعدك الذكي، يمكنك سؤالي عن أي جزء غير واضح في الشرح.` : `Welcome to "${session.titleEn}". I am your AI assistant. Feel free to ask me anything about the lesson.` }
@@ -128,7 +144,7 @@ const InteractiveVideoPlayer = ({ session, lang, onClose }) => {
         {/* The iFrame Video */}
         <div className="session-video-wrapper" style={{ flexGrow: 1, position: 'relative', minHeight: '400px' }}>
           <iframe 
-            src={session.videoUrl} 
+            src={getEmbedUrl(session.videoUrl)} 
             title="Lecture Player" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowFullScreen
