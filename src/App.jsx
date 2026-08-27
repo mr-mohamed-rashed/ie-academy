@@ -281,24 +281,17 @@ function App() {
     setSupportAgents(prev => prev.filter(a => a.id !== id));
   };
 
-  // Handle Admin & Support Agent Direct Link Login
+  // Handle Admin & Support Agent Invitation Link Triggers
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const roleParam = params.get('role');
-    const emailParam = params.get('email');
-    if (roleParam === 'support' || roleParam === 'admin') {
-      setIsLoggedIn(true);
-      setUserRole(roleParam);
-      setCurrentUser({
-        name: emailParam ? emailParam.split('@')[0] : (lang === 'ar' ? (roleParam === 'admin' ? 'مدير المنصة' : 'وكيل الدعم') : (roleParam === 'admin' ? 'Admin' : 'Support Agent')),
-        email: emailParam || (roleParam === 'admin' ? 'admin@ie-academy.com' : 'support@ie-academy.com'),
-        role: roleParam,
-        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120'
-      });
-      // Clear URL params
+    const inviteParam = params.get('invite');
+    if (inviteParam === 'support' || inviteParam === 'admin') {
+      setLoginModalRole(inviteParam);
+      setShowLoginModal(true);
+      // Clear URL params so it doesn't trigger repeatedly
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [lang]);
+  }, []);
   
   // PWA Install Prompt State
   const [deferredPrompt, setDeferredPrompt] = useState(null);

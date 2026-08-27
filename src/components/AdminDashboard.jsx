@@ -829,17 +829,17 @@ const AdminDashboard = ({
             <div style={{ backgroundColor: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)', padding: '1rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
               <div>
                 <strong style={{ fontSize: '0.85rem', display: 'block', color: 'var(--accent-primary)' }}>
-                  {lang === 'ar' ? 'الرابط العام لتسجيل دخول الدعم الفني:' : 'General Support Login Link:'}
+                  {lang === 'ar' ? 'الرابط العام لدعوة الدعم الفني (للتسجيل):' : 'General Support Invitation Link:'}
                 </strong>
                 <code style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                  {window.location.origin}/?role=support
+                  {window.location.origin}/?invite=support
                 </code>
               </div>
               <button
                 type="button"
                 onClick={() => {
-                  navigator.clipboard.writeText(`${window.location.origin}/?role=support`);
-                  triggerToast(lang === 'ar' ? 'تم نسخ الرابط العام للدعم الفني!' : 'General support link copied!', 'success');
+                  navigator.clipboard.writeText(`${window.location.origin}/?invite=support`);
+                  triggerToast(lang === 'ar' ? 'تم نسخ رابط الدعوة العام للدعم الفني!' : 'General support invite link copied!', 'success');
                 }}
                 className="config-btn"
                 style={{ fontSize: '0.8rem', padding: '0.4rem 0.75rem', borderColor: 'var(--accent-primary)', color: 'var(--accent-primary)' }}
@@ -861,13 +861,13 @@ const AdminDashboard = ({
                       <th style={{ padding: '0.75rem 1rem' }}>{lang === 'ar' ? 'الاسم' : 'Name'}</th>
                       <th style={{ padding: '0.75rem 1rem' }}>{lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}</th>
                       <th style={{ padding: '0.75rem 1rem' }}>{lang === 'ar' ? 'الهاتف' : 'Phone'}</th>
-                      <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>{lang === 'ar' ? 'رابط الدخول المباشر' : 'Direct Access Link'}</th>
+                      <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>{lang === 'ar' ? 'رابط دعوة التسجيل' : 'Registration Invite Link'}</th>
                       <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>{lang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {supportAgents.map((agent) => {
-                      const directLink = `${window.location.origin}/?role=support&email=${encodeURIComponent(agent.email)}`;
+                      const inviteLink = `${window.location.origin}/?invite=support&email=${encodeURIComponent(agent.email)}`;
                       return (
                         <tr key={agent.id} style={{ borderBottom: '1px solid var(--border-glass)', fontSize: '0.9rem' }}>
                           <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{agent.name}</td>
@@ -877,13 +877,13 @@ const AdminDashboard = ({
                             <button
                               type="button"
                               onClick={() => {
-                                navigator.clipboard.writeText(directLink);
-                                triggerToast(lang === 'ar' ? 'تم نسخ رابط الولوج المباشر للدعم الفني!' : 'Direct access link copied!', 'success');
+                                navigator.clipboard.writeText(inviteLink);
+                                triggerToast(lang === 'ar' ? 'تم نسخ رابط دعوة التسجيل للدعم الفني!' : 'Registration invite link copied!', 'success');
                               }}
                               className="config-btn"
                               style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem', borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)' }}
                             >
-                              {lang === 'ar' ? 'نسخ رابط الدخول' : 'Copy Access Link'}
+                              {lang === 'ar' ? 'نسخ رابط الدعوة' : 'Copy Invite Link'}
                             </button>
                           </td>
                           <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
