@@ -1,4 +1,11 @@
-import { supabase } from './supabaseClient';
+let supabaseInstance = null;
+const getSupabase = async () => {
+  if (!supabaseInstance) {
+    const module = await import('./supabaseClient');
+    supabaseInstance = module.supabase;
+  }
+  return supabaseInstance;
+};
 import { initialStudents, initialSessions, initialInstructors } from './mockData';
 
 // Fallback localStorage keys
@@ -82,6 +89,7 @@ export async function getInstructors() {
     return saved ? JSON.parse(saved) : initialInstructors;
   }
   try {
+    const supabase = await getSupabase();
     const { data, error } = await supabase.from('instructors').select('*');
     if (error) throw error;
     // Map DB schema to UI state
@@ -122,6 +130,7 @@ export async function getStudents() {
     return saved ? JSON.parse(saved) : initialStudents;
   }
   try {
+    const supabase = await getSupabase();
     const { data, error } = await supabase.from('students').select('*');
     if (error) throw error;
     const dbStudents = data.map(db => ({
@@ -175,6 +184,7 @@ export async function getSessions() {
     return sanitizeData(savedSessions);
   }
   try {
+    const supabase = await getSupabase();
     const { data: { user } } = await supabase.auth.getUser();
     let allowedGroupIds = null;
     let allowedInstructorId = null;
@@ -250,6 +260,7 @@ export async function getPendingPayments() {
     return saved ? JSON.parse(saved) : [];
   }
   try {
+    const supabase = await getSupabase();
     const { data, error } = await supabase.from('pending_payments').select('*');
     if (error) throw error;
     return data.map(db => ({
@@ -273,6 +284,7 @@ export async function getPendingPayments() {
 export async function saveInstructor(inst) {
   if (!isSupabaseConfigured()) return;
   try {
+    const supabase = await getSupabase();
     const cleanInst = sanitizeData(inst);
     // Safely embed limit and whatsapp in groups JSON to preserve it across schema variations
     if (cleanInst.groups && cleanInst.groups.length > 0) {
@@ -312,6 +324,7 @@ export async function saveInstructor(inst) {
 export async function saveStudent(student) {
   if (!isSupabaseConfigured()) return;
   try {
+    const supabase = await getSupabase();
     const cleanStudent = sanitizeData(student);
     const dbRecord = {
       id: cleanStudent.id,
@@ -335,6 +348,7 @@ export async function saveStudent(student) {
 export async function saveSession(session) {
   if (!isSupabaseConfigured()) return;
   try {
+    const supabase = await getSupabase();
     const cleanSession = sanitizeData(session);
     const dbRecord = {
       id: cleanSession.id,
@@ -356,6 +370,7 @@ export async function saveSession(session) {
 export async function addPendingPayment(req) {
   if (!isSupabaseConfigured()) return;
   try {
+    const supabase = await getSupabase();
     const cleanReq = sanitizeData(req);
     const dbRecord = {
       id: cleanReq.id,
@@ -377,6 +392,7 @@ export async function addPendingPayment(req) {
 export async function deletePendingPayment(id) {
   if (!isSupabaseConfigured()) return;
   try {
+    const supabase = await getSupabase();
     await supabase.from('pending_payments').delete().eq('id', id);
   } catch (err) {
     console.error("Supabase delete error:", err);

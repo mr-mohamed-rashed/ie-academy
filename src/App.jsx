@@ -2,7 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Podium from './components/Podium';
 const Login = React.lazy(() => import('./components/Login'));
-import { supabase } from './supabaseClient';
+let supabaseInstance = null;
+const getSupabase = async () => {
+  if (!supabaseInstance) {
+    const module = await import('./supabaseClient');
+    supabaseInstance = module.supabase;
+  }
+  return supabaseInstance;
+};
 const InstructorDashboard = React.lazy(() => import('./components/InstructorDashboard'));
 const StudentDashboard = React.lazy(() => import('./components/StudentDashboard'));
 const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
@@ -303,36 +310,42 @@ function App() {
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setSupabaseUser(session.user);
-        const savedOAuthRole = localStorage.getItem('edu_oauth_role');
-        if (savedOAuthRole && savedOAuthRole !== 'login') {
-          setLoginModalRole(savedOAuthRole);
+    let subInstance;
+    getSupabase().then(supabase => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          setSupabaseUser(session.user);
+          const savedOAuthRole = localStorage.getItem('edu_oauth_role');
+          if (savedOAuthRole && savedOAuthRole !== 'login') {
+            setLoginModalRole(savedOAuthRole);
+          }
+          // Automatically pop up login overlay to chooser/wizard if not logged in
+          if (localStorage.getItem('edu_is_logged_in') !== 'true') {
+            setShowLoginModal(true);
+          }
         }
-        // Automatically pop up login overlay to chooser/wizard if not logged in
-        if (localStorage.getItem('edu_is_logged_in') !== 'true') {
-          setShowLoginModal(true);
+      });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          setSupabaseUser(session.user);
+          const savedOAuthRole = localStorage.getItem('edu_oauth_role');
+          if (savedOAuthRole && savedOAuthRole !== 'login') {
+            setLoginModalRole(savedOAuthRole);
+          }
+          if (localStorage.getItem('edu_is_logged_in') !== 'true') {
+            setShowLoginModal(true);
+          }
+        } else {
+          setSupabaseUser(null);
         }
-      }
+      });
+      subInstance = subscription;
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setSupabaseUser(session.user);
-        const savedOAuthRole = localStorage.getItem('edu_oauth_role');
-        if (savedOAuthRole && savedOAuthRole !== 'login') {
-          setLoginModalRole(savedOAuthRole);
-        }
-        if (localStorage.getItem('edu_is_logged_in') !== 'true') {
-          setShowLoginModal(true);
-        }
-      } else {
-        setSupabaseUser(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      if (subInstance) subInstance.unsubscribe();
+    };
   }, []);
 
   // Lock background scroll when modal overlays are active
@@ -513,6 +526,7 @@ function App() {
 
     if (isSupabaseConfigured()) {
       try {
+        const supabase = await getSupabase();
         await supabase.auth.updateUser({ data: { current_session_token: newToken } });
       } catch (err) {
         console.warn("Failed to sync session token with Supabase Auth metadata:", err);
@@ -630,13 +644,14 @@ function App() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setIsLoggedIn(false);
     setCurrentUser(null);
     setUserRole('landing');
     
     // Call Supabase signOut
     if (isSupabaseConfigured()) {
+      const supabase = await getSupabase();
       supabase.auth.signOut();
     }
     setSupabaseUser(null);
@@ -649,6 +664,7 @@ function App() {
 
     const checkSession = async () => {
       try {
+        const supabase = await getSupabase();
         const { data: { user }, error } = await supabase.auth.getUser();
         if (error || !user) return;
 
@@ -688,8 +704,9 @@ function App() {
     };
   }, [isLoggedIn, lang]);
 
-  const clearSupabaseSession = () => {
+  const clearSupabaseSession = async () => {
     if (isSupabaseConfigured()) {
+      const supabase = await getSupabase();
       supabase.auth.signOut();
     }
     setSupabaseUser(null);
