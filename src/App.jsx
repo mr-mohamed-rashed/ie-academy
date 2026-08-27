@@ -1067,7 +1067,7 @@ function App() {
               <Globe size={16} />
               <span className="hide-on-mobile">{lang === 'ar' ? 'English' : 'العربية'}</span>
             </button>
-            <button className="config-btn" onClick={handleThemeToggle}>
+            <button className="config-btn" onClick={handleThemeToggle} aria-label={lang === 'ar' ? 'تغيير المظهر' : 'Toggle Theme'}>
               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
             <button className="btn-primary" onClick={() => setShowLoginModal(true)} style={{ width: 'auto', padding: '0.55rem 1.25rem' }}>
@@ -1076,8 +1076,9 @@ function App() {
           </div>
         </header>
 
-        {/* Hero Section */}
-        <section className="visitor-hero">
+        <main className="visitor-main-content">
+          {/* Hero Section */}
+          <section className="visitor-hero">
           <div className="visitor-hero-overlay"></div>
           
           {/* Floating Educational Background Elements */}
@@ -1538,6 +1539,7 @@ function App() {
             </div>
           </div>
         </section>
+      </main>
 
         {/* Visitor Footer with Google Compliance Links */}
         <footer className="visitor-footer" style={{ padding: '2.5rem 1.5rem', textAlign: 'center', borderTop: '1px solid var(--border-glass)', marginTop: '4rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
