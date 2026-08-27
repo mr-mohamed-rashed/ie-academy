@@ -1104,6 +1104,9 @@ function App() {
             </button>
             <button className="config-btn" onClick={handleThemeToggle} aria-label={lang === 'ar' ? 'تغيير المظهر' : 'Toggle Theme'}>
               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+              <span className="hide-on-mobile">
+                {lang === 'ar' ? (theme === 'dark' ? 'المظهر الفاتح' : 'المظهر الداكن') : (theme === 'dark' ? 'Light Mode' : 'Dark Mode')}
+              </span>
             </button>
             <button className="btn-primary" onClick={() => setShowLoginModal(true)} style={{ width: 'auto', padding: '0.55rem 1.25rem' }}>
               {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
