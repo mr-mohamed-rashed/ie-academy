@@ -40,7 +40,7 @@
 [data-theme="light"] {
   /* Light Theme Variables */
   --bg-app: #f1f5f9;
-  --bg-image: url('/light-bg.jpg');
+  --bg-image: url('/light-bg.webp');
   --bg-sidebar: rgba(255, 255, 255, 0.85); /* Slightly transparent sidebar */
   --bg-card: rgba(255, 255, 255, 0.85); /* Slightly transparent cards */
   --bg-card-hover: rgba(255, 255, 255, 0.95);
