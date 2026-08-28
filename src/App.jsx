@@ -115,6 +115,31 @@ function App() {
     loadData();
   }, []);
 
+  // Sync currentUser with updated database records on mount
+  useEffect(() => {
+    if (!isLoading && currentUser) {
+      if (currentUser.role === 'instructor' && activeInstructorId) {
+        const dbInst = instructors.find(i => i.id === activeInstructorId);
+        if (dbInst) {
+          setCurrentUser(prev => ({
+            ...prev,
+            ...dbInst,
+            name: dbInst.nameAr || dbInst.nameEn || prev.name
+          }));
+        }
+      } else if (currentUser.role === 'student' && activeStudentId) {
+        const dbStud = students.find(s => s.id === activeStudentId);
+        if (dbStud) {
+          setCurrentUser(prev => ({
+            ...prev,
+            ...dbStud,
+            name: dbStud.nameAr || dbStud.nameEn || prev.name
+          }));
+        }
+      }
+    }
+  }, [isLoading, instructors, students, activeInstructorId, activeStudentId]);
+
   // Sync state to local storage and Supabase database
   useEffect(() => {
     if (!isLoading) {
@@ -548,13 +573,18 @@ function App() {
     // Existing user direct login logic
     if (profileData.isExisting) {
       setIsLoggedIn(true);
+      const fullRecord = profileData.role === 'instructor' 
+        ? instructors.find(i => i.id === profileData.id) 
+        : (profileData.role === 'student' ? students.find(s => s.id === profileData.id) : null);
+      
       setCurrentUser({
         id: profileData.id,
         name: formattedName,
         role: profileData.role,
         avatar: profileData.avatar,
         email: profileData.email,
-        isSubscribed: profileData.isSubscribed
+        isSubscribed: profileData.isSubscribed,
+        ...(fullRecord || {})
       });
       setUserRole(profileData.role);
       if (profileData.role === 'instructor') {
@@ -796,7 +826,9 @@ function App() {
               paymentMethods: updatedData.paymentMethods !== undefined ? updatedData.paymentMethods : inst.paymentMethods,
               yearAr: updatedData.yearAr || inst.yearAr,
               yearEn: updatedData.yearEn || inst.yearEn,
-              whatsapp: updatedData.whatsapp !== undefined ? updatedData.whatsapp : inst.whatsapp
+              whatsapp: updatedData.whatsapp !== undefined ? updatedData.whatsapp : inst.whatsapp,
+              cashNumber: updatedData.cashNumber !== undefined ? updatedData.cashNumber : inst.cashNumber,
+              paymentType: updatedData.paymentType !== undefined ? updatedData.paymentType : inst.paymentType
             };
             saveInstructor(updated);
             return updated;

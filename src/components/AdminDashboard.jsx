@@ -82,6 +82,8 @@ const AdminDashboard = ({
   const [price, setPrice] = useState('');
   const [paymentMethods, setPaymentMethods] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
+  const [cashNumber, setCashNumber] = useState('');
+  const [paymentType, setPaymentType] = useState('cash');
 
   // Removed static SUBSCRIPTION_FEE to use systemFee prop
 
@@ -233,6 +235,8 @@ const AdminDashboard = ({
     setPrice('');
     setPaymentMethods('');
     setWhatsapp('');
+    setCashNumber('');
+    setPaymentType('cash');
     setShowAddModal(true);
   };
 
@@ -252,6 +256,8 @@ const AdminDashboard = ({
     setPrice(teacher.price || '');
     setPaymentMethods(teacher.paymentMethods || '');
     setWhatsapp(teacher.whatsapp || '');
+    setCashNumber(teacher.cashNumber || '');
+    setPaymentType(teacher.paymentType || 'cash');
     setShowEditModal(true);
   };
 
@@ -274,7 +280,9 @@ const AdminDashboard = ({
       aboutEn,
       price,
       paymentMethods,
-      whatsapp
+      whatsapp,
+      cashNumber,
+      paymentType
     });
 
     triggerToast(t.toastAddSuccess, 'success');
@@ -299,7 +307,9 @@ const AdminDashboard = ({
       aboutEn,
       price,
       paymentMethods,
-      whatsapp
+      whatsapp,
+      cashNumber,
+      paymentType
     });
 
     triggerToast(t.toastEditSuccess, 'success');
@@ -774,15 +784,40 @@ const AdminDashboard = ({
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
                 <div className="form-group">
                   <label>{lang === 'ar' ? 'المبلغ المحدد للاشتراك' : 'Subscription Price'}</label>
                   <input type="text" className="form-control" value={price} onChange={e => setPrice(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
                 </div>
                 <div className="form-group">
-                  <label>{lang === 'ar' ? 'طرق الدفع المتاحة' : 'Payment Methods'}</label>
-                  <input type="text" className="form-control" value={paymentMethods} onChange={e => setPaymentMethods(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                  <label>{lang === 'ar' ? 'طريقة الدفع' : 'Payment Type'}</label>
+                  <select 
+                    className="form-control" 
+                    value={paymentType} 
+                    onChange={e => setPaymentType(e.target.value)} 
+                    style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
+                  >
+                    <option value="cash">{lang === 'ar' ? 'كاش (فودافون كاش)' : 'Cash (Vodafone Cash)'}</option>
+                    <option value="instapay">{lang === 'ar' ? 'انستا باي' : 'InstaPay'}</option>
+                    <option value="both">{lang === 'ar' ? 'كاش أو انستا باي' : 'Cash or InstaPay'}</option>
+                  </select>
                 </div>
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>
+                  {paymentType === 'instapay' 
+                    ? (lang === 'ar' ? 'رقم أو عنوان انستا باي' : 'InstaPay Number/Username')
+                    : (lang === 'ar' ? 'رقم الكاش (محفظة المحمول)' : 'Mobile Wallet Cash Number')}
+                </label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  value={cashNumber} 
+                  onChange={e => setCashNumber(e.target.value)} 
+                  placeholder={paymentType === 'instapay' ? 'username@instapay' : '01xxxxxxxxx'}
+                  style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} 
+                />
               </div>
 
               <div className="form-group" style={{ marginTop: '1rem' }}>
@@ -870,15 +905,40 @@ const AdminDashboard = ({
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
                 <div className="form-group">
                   <label>{lang === 'ar' ? 'المبلغ المحدد للاشتراك' : 'Subscription Price'}</label>
                   <input type="text" className="form-control" value={price} onChange={e => setPrice(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
                 </div>
                 <div className="form-group">
-                  <label>{lang === 'ar' ? 'طرق الدفع المتاحة' : 'Payment Methods'}</label>
-                  <input type="text" className="form-control" value={paymentMethods} onChange={e => setPaymentMethods(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                  <label>{lang === 'ar' ? 'طريقة الدفع' : 'Payment Type'}</label>
+                  <select 
+                    className="form-control" 
+                    value={paymentType} 
+                    onChange={e => setPaymentType(e.target.value)} 
+                    style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }}
+                  >
+                    <option value="cash">{lang === 'ar' ? 'كاش (فودافون كاش)' : 'Cash (Vodafone Cash)'}</option>
+                    <option value="instapay">{lang === 'ar' ? 'انستا باي' : 'InstaPay'}</option>
+                    <option value="both">{lang === 'ar' ? 'كاش أو انستا باي' : 'Cash or InstaPay'}</option>
+                  </select>
                 </div>
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>
+                  {paymentType === 'instapay' 
+                    ? (lang === 'ar' ? 'رقم أو عنوان انستا باي' : 'InstaPay Number/Username')
+                    : (lang === 'ar' ? 'رقم الكاش (محفظة المحمول)' : 'Mobile Wallet Cash Number')}
+                </label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  value={cashNumber} 
+                  onChange={e => setCashNumber(e.target.value)} 
+                  placeholder={paymentType === 'instapay' ? 'username@instapay' : '01xxxxxxxxx'}
+                  style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} 
+                />
               </div>
 
               <div className="form-group" style={{ marginTop: '1rem' }}>

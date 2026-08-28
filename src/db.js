@@ -116,7 +116,9 @@ export async function getInstructors() {
       aboutAr: db.about_ar || db.groups?.[0]?.aboutAr || '',
       aboutEn: db.about_en || db.groups?.[0]?.aboutEn || '',
       price: db.price || db.groups?.[0]?.price || '',
-      paymentMethods: db.payment_methods || db.groups?.[0]?.paymentMethods || ''
+      paymentMethods: db.payment_methods || db.groups?.[0]?.paymentMethods || '',
+      cashNumber: db.cash_number || db.groups?.[0]?.cashNumber || '',
+      paymentType: db.payment_type || db.groups?.[0]?.paymentType || 'cash'
     }));
 
     return sanitizeData(dbInstructors);
@@ -298,6 +300,8 @@ export async function saveInstructor(inst) {
       cleanInst.groups[0].aboutEn = cleanInst.aboutEn || cleanInst.about;
       cleanInst.groups[0].price = cleanInst.price;
       cleanInst.groups[0].paymentMethods = cleanInst.paymentMethods;
+      cleanInst.groups[0].cashNumber = cleanInst.cashNumber || '';
+      cleanInst.groups[0].paymentType = cleanInst.paymentType || 'cash';
     }
     const dbRecord = {
       id: cleanInst.id,
@@ -318,7 +322,9 @@ export async function saveInstructor(inst) {
       about_ar: cleanInst.aboutAr || cleanInst.about || '',
       about_en: cleanInst.aboutEn || cleanInst.about || '',
       price: cleanInst.price || '',
-      payment_methods: cleanInst.paymentMethods || ''
+      payment_methods: cleanInst.paymentMethods || '',
+      cash_number: cleanInst.cashNumber || '',
+      payment_type: cleanInst.paymentType || 'cash'
     };
     
     let { error } = await supabase.from('instructors').upsert(dbRecord);
@@ -330,6 +336,8 @@ export async function saveInstructor(inst) {
       delete fallbackRecord.about_en;
       delete fallbackRecord.price;
       delete fallbackRecord.payment_methods;
+      delete fallbackRecord.cash_number;
+      delete fallbackRecord.payment_type;
       
       const { error: retryError } = await supabase.from('instructors').upsert(fallbackRecord);
       if (retryError) throw retryError;

@@ -36,6 +36,8 @@ const Navbar = ({
   const [editPrice, setEditPrice] = useState(currentUser?.price || '');
   const [editPaymentMethods, setEditPaymentMethods] = useState(currentUser?.paymentMethods || '');
   const [editWhatsapp, setEditWhatsapp] = useState(currentUser?.whatsapp || '');
+  const [editCashNumber, setEditCashNumber] = useState(currentUser?.cashNumber || '');
+  const [editPaymentType, setEditPaymentType] = useState(currentUser?.paymentType || 'cash');
 
   // Visual Cropper States
   const [rawImage, setRawImage] = useState(null);
@@ -217,6 +219,8 @@ const Navbar = ({
     setEditPrice(currentUser?.price || '');
     setEditPaymentMethods(currentUser?.paymentMethods || '');
     setEditWhatsapp(currentUser?.whatsapp || '');
+    setEditCashNumber(currentUser?.cashNumber || '');
+    setEditPaymentType(currentUser?.paymentType || 'cash');
     setShowEditModal(true);
   };
 
@@ -235,6 +239,8 @@ const Navbar = ({
       price: currentUser.role === 'instructor' ? editPrice : undefined,
       paymentMethods: currentUser.role === 'instructor' ? editPaymentMethods : undefined,
       whatsapp: currentUser.role === 'instructor' ? editWhatsapp : undefined,
+      cashNumber: currentUser.role === 'instructor' ? editCashNumber : undefined,
+      paymentType: currentUser.role === 'instructor' ? editPaymentType : undefined,
       parentPhone: currentUser.role === 'student' ? editParentPhone : undefined
     });
     setShowEditModal(false);
@@ -596,15 +602,32 @@ const Navbar = ({
                       />
                     </div>
                     <div>
-                      <label>{lang === 'ar' ? 'طرق الدفع المتاحة' : 'Payment Methods'}</label>
-                      <input 
-                        type="text" 
+                      <label>{lang === 'ar' ? 'طريقة الدفع' : 'Payment Type'}</label>
+                      <select 
                         className="form-control" 
-                        placeholder={lang === 'ar' ? 'فودافون كاش، دفع إلكتروني...' : 'Vodafone Cash, etc.'}
-                        value={editPaymentMethods}
-                        onChange={(e) => setEditPaymentMethods(e.target.value)}
-                      />
+                        value={editPaymentType}
+                        onChange={(e) => setEditPaymentType(e.target.value)}
+                        style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-input)' }}
+                      >
+                        <option value="cash">{lang === 'ar' ? 'كاش (فودافون كاش)' : 'Cash (Vodafone Cash)'}</option>
+                        <option value="instapay">{lang === 'ar' ? 'انستا باي' : 'InstaPay'}</option>
+                        <option value="both">{lang === 'ar' ? 'كاش أو انستا باي' : 'Cash or InstaPay'}</option>
+                      </select>
                     </div>
+                  </div>
+                  <div className="form-group" style={{ marginTop: '1rem' }}>
+                    <label>
+                      {editPaymentType === 'instapay' 
+                        ? (lang === 'ar' ? 'رقم أو عنوان انستا باي' : 'InstaPay Number/Username')
+                        : (lang === 'ar' ? 'رقم الكاش (محفظة المحمول)' : 'Mobile Wallet Cash Number')}
+                    </label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      placeholder={editPaymentType === 'instapay' ? 'username@instapay' : '01xxxxxxxxx'}
+                      value={editCashNumber}
+                      onChange={(e) => setEditCashNumber(e.target.value)}
+                    />
                   </div>
                   <div className="form-group" style={{ marginTop: '1rem' }}>
                     <label>{lang === 'ar' ? 'رقم الواتساب للتواصل (مثال: 201234567890)' : 'WhatsApp Number (e.g. 201234567890)'}</label>

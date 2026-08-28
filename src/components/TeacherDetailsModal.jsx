@@ -52,11 +52,27 @@ const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
         </button>
 
         <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap' }}>
-          <img 
-            src={teacher.avatar} 
-            alt={teacher.nameAr} 
-            style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--border-glass)' }}
-          />
+          <div style={{ position: 'relative', width: '100px', height: '100px' }}>
+            <img 
+              src={teacher.avatar} 
+              alt={teacher.nameAr} 
+              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--accent-primary)', boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)' }}
+            />
+            {introVideo && (
+              <div 
+                onClick={() => setShowVideo(true)}
+                style={{
+                  position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                  backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', transition: 'all 0.2s', border: '2px solid var(--accent-gold)'
+                }}
+                className="hover-scale"
+              >
+                <PlayCircle size={36} color="white" />
+              </div>
+            )}
+          </div>
           <div>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 0.5rem 0' }}>
               {lang === 'ar' ? teacher.nameAr : teacher.nameEn}
@@ -96,10 +112,15 @@ const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
             <div style={{ backgroundColor: 'rgba(99, 102, 241, 0.08)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <CreditCard size={18} color="var(--accent-green)" />
-                {lang === 'ar' ? 'طرق الدفع' : 'Payment Methods'}
+                {lang === 'ar' ? 'طريقة ورقم الدفع' : 'Payment Method & No.'}
               </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: 0 }}>
-                {teacher.paymentMethods || (lang === 'ar' ? 'غير محدد' : 'Not specified')}
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: 0, fontWeight: 700 }}>
+                {teacher.paymentType === 'instapay' ? (lang === 'ar' ? 'انستا باي:' : 'InstaPay:') : 
+                 teacher.paymentType === 'both' ? (lang === 'ar' ? 'كاش أو انستا:' : 'Cash/InstaPay:') : 
+                 (lang === 'ar' ? 'كاش (فودافون كاش):' : 'Vodafone Cash:')}
+              </p>
+              <p style={{ color: 'var(--accent-green)', fontWeight: 'bold', fontSize: '1.05rem', marginTop: '0.25rem', marginBottom: 0 }}>
+                {teacher.cashNumber || teacher.paymentMethods || (lang === 'ar' ? 'غير محدد' : 'Not specified')}
               </p>
             </div>
           </div>
@@ -130,39 +151,42 @@ const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
             <MessageCircle size={22} />
             <span>{lang === 'ar' ? 'تواصل عبر واتساب' : 'Chat via WhatsApp'}</span>
           </a>
-
-          {/* Intro Video */}
-          {media && (
-            <div style={{ marginTop: '0.5rem' }}>
-              <button 
-                onClick={() => setShowVideo(!showVideo)} 
-                className="config-btn" 
-                style={{ width: '100%', padding: '0.75rem', justifyContent: 'center', gap: '0.5rem' }}
-              >
-                <PlayCircle size={18} />
-                <span>{lang === 'ar' ? 'مشاهدة الفيديو التعريفي' : 'Watch Intro Video'}</span>
-              </button>
-
-              {showVideo && (
-                <div style={{ marginTop: '1rem', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-glass)', aspectRatio: '16/9', backgroundColor: '#000' }}>
-                  {media.type === 'iframe' ? (
-                    <iframe 
-                      src={media.url} 
-                      title="Intro Video" 
-                      style={{ width: '100%', height: '100%', border: 'none' }}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                      allowFullScreen
-                    ></iframe>
-                  ) : (
-                    <video src={media.url} controls autoPlay style={{ width: '100%', height: '100%' }}></video>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
         </div>
+
       </div>
-    </div>
+
+      {/* Floating Video Modal */}
+      {showVideo && media && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 7000,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <button 
+            className="config-btn" 
+            onClick={() => setShowVideo(false)}
+            style={{ position: 'absolute', top: '2rem', right: '2rem', borderColor: 'var(--accent-red)', color: 'var(--accent-red)', padding: '0.5rem', borderRadius: '50%', zIndex: 10 }}
+          >
+            <CloseIcon size={24} />
+          </button>
+          
+          <div style={{ width: '90%', maxWidth: '900px', aspectRatio: '16/9', backgroundColor: '#000', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-glass)' }}>
+            {media.type === 'video' ? (
+              <video src={media.url} controls autoPlay style={{ width: '100%', height: '100%' }} />
+            ) : (
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src={media.url} 
+                title="Teacher Intro" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+              ></iframe>
+            )}
+          </div>
+        </div>
+      )}
   );
 };
 
