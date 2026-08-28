@@ -112,7 +112,11 @@ export async function getInstructors() {
         { id: `grade-sec-${db.id}`, nameAr: "ثانوي", nameEn: "High School", groups: db.groups || [{ id: `group-custom-${db.id}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }] }
       ],
       maxStudentsLimit: db.max_students_limit !== undefined ? db.max_students_limit : (db.groups?.[0]?.maxStudentsLimit ?? 999999),
-      whatsapp: db.whatsapp || db.groups?.[0]?.whatsapp || ''
+      whatsapp: db.whatsapp || db.groups?.[0]?.whatsapp || '',
+      aboutAr: db.about_ar || db.groups?.[0]?.aboutAr || '',
+      aboutEn: db.about_en || db.groups?.[0]?.aboutEn || '',
+      price: db.price || db.groups?.[0]?.price || '',
+      paymentMethods: db.payment_methods || db.groups?.[0]?.paymentMethods || ''
     }));
 
     return sanitizeData(dbInstructors);
@@ -286,10 +290,14 @@ export async function saveInstructor(inst) {
   try {
     const supabase = await getSupabase();
     const cleanInst = sanitizeData(inst);
-    // Safely embed limit and whatsapp in groups JSON to preserve it across schema variations
+    // Safely embed limit and whatsapp and bio/pricing fields in groups JSON to preserve it across schema variations
     if (cleanInst.groups && cleanInst.groups.length > 0) {
       cleanInst.groups[0].maxStudentsLimit = cleanInst.maxStudentsLimit;
       cleanInst.groups[0].whatsapp = cleanInst.whatsapp;
+      cleanInst.groups[0].aboutAr = cleanInst.aboutAr || cleanInst.about;
+      cleanInst.groups[0].aboutEn = cleanInst.aboutEn || cleanInst.about;
+      cleanInst.groups[0].price = cleanInst.price;
+      cleanInst.groups[0].paymentMethods = cleanInst.paymentMethods;
     }
     const dbRecord = {
       id: cleanInst.id,
@@ -306,14 +314,25 @@ export async function saveInstructor(inst) {
       groups: cleanInst.groups,
       grades: cleanInst.grades,
       max_students_limit: cleanInst.maxStudentsLimit,
-      whatsapp: cleanInst.whatsapp
+      whatsapp: cleanInst.whatsapp,
+      about_ar: cleanInst.aboutAr || cleanInst.about || '',
+      about_en: cleanInst.aboutEn || cleanInst.about || '',
+      price: cleanInst.price || '',
+      payment_methods: cleanInst.paymentMethods || ''
     };
-    const { error } = await supabase.from('instructors').upsert(dbRecord);
+    
+    let { error } = await supabase.from('instructors').upsert(dbRecord);
     if (error) {
-      // If column is missing (PostgREST error code 42703 or similar), retry without the whatsapp root key
-      console.warn("Retrying upsert without root whatsapp column:", error.message);
-      delete dbRecord.whatsapp;
-      await supabase.from('instructors').upsert(dbRecord);
+      console.warn("Upsert failed, retrying by stripping potential missing columns:", error.message);
+      const fallbackRecord = { ...dbRecord };
+      delete fallbackRecord.whatsapp;
+      delete fallbackRecord.about_ar;
+      delete fallbackRecord.about_en;
+      delete fallbackRecord.price;
+      delete fallbackRecord.payment_methods;
+      
+      const { error: retryError } = await supabase.from('instructors').upsert(fallbackRecord);
+      if (retryError) throw retryError;
     }
   } catch (err) {
     console.error("Supabase upsert error:", err);

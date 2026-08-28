@@ -378,6 +378,11 @@ function App() {
       yearAr: newTeacherData.yearAr,
       yearEn: newTeacherData.yearEn,
       isSubscribed: newTeacherData.isSubscribed,
+      aboutAr: newTeacherData.aboutAr || '',
+      aboutEn: newTeacherData.aboutEn || '',
+      price: newTeacherData.price || '',
+      paymentMethods: newTeacherData.paymentMethods || '',
+      whatsapp: newTeacherData.whatsapp || '',
       groups: [
         { id: `group-custom-${newId}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group" }
       ]
@@ -385,7 +390,6 @@ function App() {
     setInstructors((prev) => [...prev, newTeacherObj]);
     saveInstructor(newTeacherObj);
   };
-
   const handleEditTeacher = (id, updatedData) => {
     setInstructors((prev) =>
       prev.map((inst) => {

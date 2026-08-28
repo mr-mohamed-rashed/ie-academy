@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { Search, Phone, Play, AlertTriangle, Eye, ArrowRight, UserCheck, MessageSquare, Clock, Info, CheckCircle, Flame } from 'lucide-react';
 
+const formatWhatsappNumber = (phone) => {
+  if (!phone) return '';
+  let cleaned = phone.toString().replace(/\D/g, '');
+  if (cleaned.startsWith('00')) cleaned = cleaned.substring(2);
+  if (cleaned.startsWith('01') && cleaned.length === 11) cleaned = '2' + cleaned;
+  if (cleaned.startsWith('1') && cleaned.length === 10) cleaned = '20' + cleaned;
+  return cleaned;
+};
+
 const SupportDashboard = ({ students = [], lang, onLogout, currentUser }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStudent, setSelectedStudent] = useState(students[0] || null);
@@ -193,7 +202,7 @@ const SupportDashboard = ({ students = [], lang, onLogout, currentUser }) => {
               {/* Quick WhatsApp Actions */}
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <a 
-                  href={`https://wa.me/${selectedStudent.studentPhone?.replace(/\D/g, '')}`} 
+                  href={selectedStudent.studentPhone || selectedStudent.phone ? `https://wa.me/${formatWhatsappNumber(selectedStudent.studentPhone || selectedStudent.phone)}` : '#'} 
                   target="_blank" 
                   rel="noreferrer"
                   className="config-btn"
@@ -203,7 +212,7 @@ const SupportDashboard = ({ students = [], lang, onLogout, currentUser }) => {
                   <span>{lang === 'ar' ? 'واتساب الطالب' : 'WhatsApp Student'}</span>
                 </a>
                 <a 
-                  href={`https://wa.me/${selectedStudent.parentPhone?.replace(/\D/g, '')}`} 
+                  href={selectedStudent.parentPhone ? `https://wa.me/${formatWhatsappNumber(selectedStudent.parentPhone)}` : '#'} 
                   target="_blank" 
                   rel="noreferrer"
                   className="config-btn"

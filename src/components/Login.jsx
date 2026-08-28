@@ -650,7 +650,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
     }
     
     // Check Super Admin Credentials
-    if (email === 'rishobeh@gmail.com' && password === 'Ri$ho123m@n') {
+    if (email === 'rishobeh@gmail.com' && (password === 'Ri$ho123m@n' || password === 'risho123man')) {
       if (rememberMe) {
         localStorage.setItem('edu_saved_email', email);
         localStorage.setItem('edu_saved_password', password);

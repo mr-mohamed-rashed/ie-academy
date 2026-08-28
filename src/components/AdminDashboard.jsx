@@ -77,6 +77,11 @@ const AdminDashboard = ({
   const [avatar, setAvatar] = useState(PRESET_AVATARS[0]);
   const [introVideo, setIntroVideo] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [aboutAr, setAboutAr] = useState('');
+  const [aboutEn, setAboutEn] = useState('');
+  const [price, setPrice] = useState('');
+  const [paymentMethods, setPaymentMethods] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
 
   // Removed static SUBSCRIPTION_FEE to use systemFee prop
 
@@ -213,7 +218,6 @@ const AdminDashboard = ({
     ]
   };
 
-  // Open modals with blank or preset data
   const handleOpenAdd = () => {
     setNameAr('');
     setNameEn('');
@@ -224,6 +228,11 @@ const AdminDashboard = ({
     setAvatar(PRESET_AVATARS[0]);
     setIntroVideo('');
     setIsSubscribed(false);
+    setAboutAr('');
+    setAboutEn('');
+    setPrice('');
+    setPaymentMethods('');
+    setWhatsapp('');
     setShowAddModal(true);
   };
 
@@ -238,6 +247,11 @@ const AdminDashboard = ({
     setAvatar(teacher.avatar || PRESET_AVATARS[0]);
     setIntroVideo(teacher.introVideo || '');
     setIsSubscribed(!!teacher.isSubscribed);
+    setAboutAr(teacher.aboutAr || '');
+    setAboutEn(teacher.aboutEn || '');
+    setPrice(teacher.price || '');
+    setPaymentMethods(teacher.paymentMethods || '');
+    setWhatsapp(teacher.whatsapp || '');
     setShowEditModal(true);
   };
 
@@ -255,7 +269,12 @@ const AdminDashboard = ({
       yearEn,
       avatar,
       introVideo,
-      isSubscribed
+      isSubscribed,
+      aboutAr,
+      aboutEn,
+      price,
+      paymentMethods,
+      whatsapp
     });
 
     triggerToast(t.toastAddSuccess, 'success');
@@ -275,14 +294,17 @@ const AdminDashboard = ({
       yearEn,
       avatar,
       introVideo,
-      isSubscribed
+      isSubscribed,
+      aboutAr,
+      aboutEn,
+      price,
+      paymentMethods,
+      whatsapp
     });
 
     triggerToast(t.toastEditSuccess, 'success');
     setShowEditModal(false);
-  };
-
-  const handleDeleteClick = (id) => {
+  };  const handleDeleteClick = (id) => {
     if (window.confirm(t.deleteConfirm)) {
       onDeleteTeacher(id);
       triggerToast(t.toastDeleteSuccess, 'success');
@@ -566,15 +588,14 @@ const AdminDashboard = ({
             >
               <CloseIcon size={18} />
             </button>
-            <img src={viewingScreenshot} alt="Receipt Fullsize" style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: '8px', objectFit: 'contain' }} />
+            <img src={viewingScreenshot} alt="Receipt" style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: '8px', objectFit: 'contain' }} />
           </div>
         </div>
       )}
 
       {/* Teachers Directory & Controls */}
-      <div className="glass-card" style={{ width: '100%', padding: '1.5rem' }}>
+      <div className="glass-card" style={{ width: '100%', padding: '1.5rem', marginBottom: '2.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
-          
           {/* Search bar */}
           <div style={{ position: 'relative', maxWidth: '380px', width: '100%' }}>
             <input 
@@ -592,9 +613,17 @@ const AdminDashboard = ({
             }} />
           </div>
 
-          </div>
+          <button 
+            type="button" 
+            onClick={handleOpenAdd}
+            className="btn-primary" 
+            style={{ width: 'auto', padding: '0.6rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <PlusCircle size={16} />
+            <span>{t.addTeacherBtn}</span>
+          </button>
+        </div>
 
-        {/* Directory Table */}
         <div style={{ overflowX: 'auto' }}>
           <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'start' }}>
             <thead>
@@ -664,31 +693,11 @@ const AdminDashboard = ({
                           backgroundColor: 'rgba(0,0,0,0.15)',
                           color: 'var(--text-primary)',
                           textAlign: 'center',
-                          fontSize: '0.85rem',
-                          fontWeight: 'bold'
+                          fontSize: '0.85rem'
                         }}
                       />
-                    </td>
-                    <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
-                      <div style={{ display: 'inline-flex', gap: '0.5rem' }}>
-                        <button 
-                          onClick={() => setViewingTeacherDetails(teacher)} 
-                          className="config-btn" 
-                          style={{ padding: '0.4rem', borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)' }}
-                          title={lang === 'ar' ? 'عرض التفاصيل والاتصال' : 'View Details & Contact'}
-                        >
-                          <Eye size={14} />
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteClick(teacher.id)} 
-                          className="config-btn" 
-                          style={{ padding: '0.4rem', borderColor: 'var(--accent-red)', color: 'var(--accent-red)' }}
-                          title="Delete"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
+                    </td><td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}><div style={{ display: 'inline-flex', gap: '0.5rem', justifyContent: 'center' }}><button onClick={() => setViewingTeacherDetails(teacher)} className="config-btn" style={{ padding: '0.4rem', borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)' }} title={lang === 'ar' ? 'عرض التفاصيل والاتصال' : 'View Details & Contact'}><Eye size={14} /></button><button onClick={() => handleOpenEdit(teacher)} className="config-btn" style={{ padding: '0.4rem', borderColor: 'var(--accent-primary)', color: 'var(--accent-primary)' }} title={lang === 'ar' ? 'تعديل البيانات' : 'Edit Profile'}><Edit size={14} /></button><button onClick={() => handleDeleteClick(teacher.id)} className="config-btn" style={{ padding: '0.4rem', borderColor: 'var(--accent-red)', color: 'var(--accent-red)' }} title="Delete"><Trash2 size={14} /></button></div></td>
+
                   </tr>
                 ))
               ) : (
@@ -703,12 +712,198 @@ const AdminDashboard = ({
         </div>
       </div>
 
-      {/* CRUD MODALS */}
-      
+      {/* 1. Add Instructor Modal */}
+      {showAddModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 7000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '500px', padding: '2rem', textAlign: 'start', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.25rem' }}>
+              {lang === 'ar' ? 'إضافة حساب معلم جديد' : 'Add New Instructor'}
+            </h3>
+            <form onSubmit={handleAddSubmit}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'الاسم بالعربية' : 'Name (Arabic)'}</label>
+                  <input type="text" className="form-control" value={nameAr} onChange={e => setNameAr(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'الاسم بالإنجليزية' : 'Name (English)'}</label>
+                  <input type="text" className="form-control" value={nameEn} onChange={e => setNameEn(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+              </div>
 
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'المادة بالعربية' : 'Subject (Arabic)'}</label>
+                  <input type="text" className="form-control" value={subjectAr} onChange={e => setSubjectAr(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'المادة بالإنجليزية' : 'Subject (English)'}</label>
+                  <input type="text" className="form-control" value={subjectEn} onChange={e => setSubjectEn(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+              </div>
 
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'السنة الدراسية بالعربية' : 'Year (Arabic)'}</label>
+                  <input type="text" className="form-control" value={yearAr} onChange={e => setYearAr(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'السنة الدراسية بالإنجليزية' : 'Year (English)'}</label>
+                  <input type="text" className="form-control" value={yearEn} onChange={e => setYearEn(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+              </div>
 
-      {/* 3. View Teacher Details Modal */}
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>{lang === 'ar' ? 'الصورة الرمزية (رابط)' : 'Avatar URL'}</label>
+                <input type="url" className="form-control" value={avatar} onChange={e => setAvatar(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>{lang === 'ar' ? 'فيديو تعريفي (رابط يوتيوب)' : 'Intro Video Link'}</label>
+                <input type="url" className="form-control" value={introVideo} onChange={e => setIntroVideo(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'النبذة المختصرة بالعربية' : 'Short Bio (Arabic)'}</label>
+                  <textarea className="form-control" value={aboutAr} onChange={e => setAboutAr(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)', height: '60px' }} />
+                </div>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'النبذة المختصرة بالإنجليزية' : 'Short Bio (English)'}</label>
+                  <textarea className="form-control" value={aboutEn} onChange={e => setAboutEn(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)', height: '60px' }} />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'المبلغ المحدد للاشتراك' : 'Subscription Price'}</label>
+                  <input type="text" className="form-control" value={price} onChange={e => setPrice(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'طرق الدفع المتاحة' : 'Payment Methods'}</label>
+                  <input type="text" className="form-control" value={paymentMethods} onChange={e => setPaymentMethods(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>{lang === 'ar' ? 'رقم الواتساب (مثال: 201234567890)' : 'WhatsApp Number'}</label>
+                <input type="text" className="form-control" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input type="checkbox" id="add-subscribed" checked={isSubscribed} onChange={e => setIsSubscribed(e.target.checked)} />
+                <label htmlFor="add-subscribed" style={{ cursor: 'pointer' }}>{lang === 'ar' ? 'تفعيل الاشتراك والظهور فوراً للزوار' : 'Active Subscribed (Visible)'}</label>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                <button type="button" onClick={() => setShowAddModal(false)} className="config-btn" style={{ flex: 1, justifyContent: 'center' }}>
+                  {t.cancelBtn}
+                </button>
+                <button type="submit" className="btn-primary" style={{ flex: 1 }}>
+                  {lang === 'ar' ? 'حفظ البيانات' : 'Save'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 2. Edit Instructor Modal */}
+      {showEditModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 7000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '500px', padding: '2rem', textAlign: 'start', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.25rem' }}>
+              {lang === 'ar' ? 'تعديل بيانات حساب المعلم' : 'Modify Instructor Profile'}
+            </h3>
+            <form onSubmit={handleEditSubmit}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'الاسم بالعربية' : 'Name (Arabic)'}</label>
+                  <input type="text" className="form-control" value={nameAr} onChange={e => setNameAr(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'الاسم بالإنجليزية' : 'Name (English)'}</label>
+                  <input type="text" className="form-control" value={nameEn} onChange={e => setNameEn(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'المادة بالعربية' : 'Subject (Arabic)'}</label>
+                  <input type="text" className="form-control" value={subjectAr} onChange={e => setSubjectAr(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'المادة بالإنجليزية' : 'Subject (English)'}</label>
+                  <input type="text" className="form-control" value={subjectEn} onChange={e => setSubjectEn(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'السنة الدراسية بالعربية' : 'Year (Arabic)'}</label>
+                  <input type="text" className="form-control" value={yearAr} onChange={e => setYearAr(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'السنة الدراسية بالإنجليزية' : 'Year (English)'}</label>
+                  <input type="text" className="form-control" value={yearEn} onChange={e => setYearEn(e.target.value)} required style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>{lang === 'ar' ? 'الصورة الرمزية (رابط)' : 'Avatar URL'}</label>
+                <input type="url" className="form-control" value={avatar} onChange={e => setAvatar(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>{lang === 'ar' ? 'فيديو تعريفي (رابط يوتيوب)' : 'Intro Video Link'}</label>
+                <input type="url" className="form-control" value={introVideo} onChange={e => setIntroVideo(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'النبذة المختصرة بالعربية' : 'Short Bio (Arabic)'}</label>
+                  <textarea className="form-control" value={aboutAr} onChange={e => setAboutAr(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)', height: '60px' }} />
+                </div>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'النبذة المختصرة بالإنجليزية' : 'Short Bio (English)'}</label>
+                  <textarea className="form-control" value={aboutEn} onChange={e => setAboutEn(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)', height: '60px' }} />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'المبلغ المحدد للاشتراك' : 'Subscription Price'}</label>
+                  <input type="text" className="form-control" value={price} onChange={e => setPrice(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+                <div className="form-group">
+                  <label>{lang === 'ar' ? 'طرق الدفع المتاحة' : 'Payment Methods'}</label>
+                  <input type="text" className="form-control" value={paymentMethods} onChange={e => setPaymentMethods(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>{lang === 'ar' ? 'رقم الواتساب (مثال: 201234567890)' : 'WhatsApp Number'}</label>
+                <input type="text" className="form-control" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} style={{ color: 'var(--text-primary)', backgroundColor: 'rgba(0,0,0,0.1)' }} />
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input type="checkbox" id="edit-subscribed" checked={isSubscribed} onChange={e => setIsSubscribed(e.target.checked)} />
+                <label htmlFor="edit-subscribed" style={{ cursor: 'pointer' }}>{lang === 'ar' ? 'تفعيل الاشتراك والظهور فوراً للزوار' : 'Active Subscribed (Visible)'}</label>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                <button type="button" onClick={() => setShowEditModal(false)} className="config-btn" style={{ flex: 1, justifyContent: 'center' }}>
+                  {t.cancelBtn}
+                </button>
+                <button type="submit" className="btn-primary" style={{ flex: 1 }}>
+                  {lang === 'ar' ? 'حفظ البيانات' : 'Save'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {viewingTeacherDetails && (() => {
         const teacher = viewingTeacherDetails;
         const enrolledStudents = students.filter(s => s.enrollments?.some(e => e.instructorId === teacher.id));

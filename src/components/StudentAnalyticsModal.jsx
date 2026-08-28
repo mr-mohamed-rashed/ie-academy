@@ -1,6 +1,15 @@
 import React from 'react';
 import { X as CloseIcon, User, BarChart2, MessageCircle, AlertTriangle, Sparkles } from 'lucide-react';
 
+const formatWhatsappNumber = (phone) => {
+  if (!phone) return '';
+  let cleaned = phone.toString().replace(/\D/g, '');
+  if (cleaned.startsWith('00')) cleaned = cleaned.substring(2);
+  if (cleaned.startsWith('01') && cleaned.length === 11) cleaned = '2' + cleaned;
+  if (cleaned.startsWith('1') && cleaned.length === 10) cleaned = '20' + cleaned;
+  return cleaned;
+};
+
 const StudentAnalyticsModal = ({ student, instructorId, lang, onClose }) => {
   if (!student) return null;
 
@@ -28,7 +37,7 @@ const StudentAnalyticsModal = ({ student, instructorId, lang, onClose }) => {
     if (gpa >= 90 && attendanceRate >= 90) {
       analysisText = 'أداء ممتاز وملتزم جداً بالحضور. مستواه في تصاعد مستمر.';
     } else if (gpa >= 80 && attendanceRate >= 80) {
-      analysisText = 'مستوى جيد، ولكن يمكن تحسين الدرجات قليلاً. الحضور منتظم.';
+      analysisText = 'أداء جيد، ولكن يمكن تحسين الدرجات قليلاً مع الحفاظ على الحضور.';
     } else if (gpa < 70 || attendanceRate < 70) {
       analysisText = 'الطالب بحاجة لمتابعة مستمرة. يوجد ضعف في الحضور أو الدرجات.';
     } else {
@@ -47,24 +56,24 @@ const StudentAnalyticsModal = ({ student, instructorId, lang, onClose }) => {
   }
 
   const handleParentWhatsapp = () => {
-    const msg = lang === 'ar' 
+    const msg = lang === 'ar'
       ? `مرحباً ولي أمر الطالب ${student.nameAr}، نود إعلامكم بتفاصيل أداء الطالب مؤخراً.\nنسبة الحضور: ${attendanceRate}%\nالمعدل: ${gpa}%`
       : `Hello parent of ${student.nameEn}, here is the student's recent performance.\nAttendance: ${attendanceRate}%\nGPA: ${gpa}%`;
-    window.open(`https://wa.me/${student.parentPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/${formatWhatsappNumber(student.parentPhone)}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const handleStudentWhatsapp = () => {
-    const msg = lang === 'ar' 
+    const msg = lang === 'ar'
       ? `مرحباً ${student.nameAr}، استمر في مجهودك بالمذاكرة!`
       : `Hello ${student.nameEn}, keep up the good work!`;
-    window.open(`https://wa.me/${student.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/${formatWhatsappNumber(student.phone)}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const handleAbsenceAlert = () => {
-    const msg = lang === 'ar' 
+    const msg = lang === 'ar'
       ? `تنبيه غياب: نود إعلامكم بأن الطالب ${student.nameAr} لم يحضر المحاضرة الأخيرة.`
       : `Absence Alert: Please note that ${student.nameEn} did not attend the last session.`;
-    window.open(`https://wa.me/${student.parentPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/${formatWhatsappNumber(student.parentPhone)}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   return (
