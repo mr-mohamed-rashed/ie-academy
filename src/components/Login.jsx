@@ -244,9 +244,10 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
   useEffect(() => {
     if (isLoading) return; // Wait until DB data is loaded to prevent race conditions!
     if (supabaseUser) {
-      const email = supabaseUser.email || '';
+      const email = (supabaseUser.email || '').trim();
       const name = supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || email.split('@')[0] || 'User';
       const avatar = supabaseUser.user_metadata?.avatar_url || supabaseUser.user_metadata?.picture || PRESET_AVATARS[0];
+      const providerType = supabaseUser.app_metadata?.provider || 'google';
       
       const ADMIN_EMAILS = ['rishobeh@gmail.com', 'admin@ie-academy.com', 'admin@ie.com'];
       if (ADMIN_EMAILS.includes(email.toLowerCase())) {
@@ -267,49 +268,46 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
         }
         return true;
       });
-      if (accounts.length === 1) {
-        // Log in directly!
+
+      if (accounts.length >= 1) {
+        // Log in directly! No modal or form needed!
         const account = accounts[0];
         onLogin({
           id: account.data.id,
-          name: account.role === 'instructor' ? (account.data.nameAr || account.data.nameEn) : (account.data.nameEn || account.data.nameAr),
+          name: account.role === 'instructor' ? (account.data.nameAr || account.data.nameEn || name) : (account.data.nameAr || account.data.nameEn || name),
           role: account.role,
-          avatar: account.data.avatar,
+          avatar: account.data.avatar || avatar,
           email: email,
           isSubscribed: account.data.isSubscribed,
           isExisting: true
         });
         onClose();
-      } else if (accounts.length > 1) {
-        // Show account chooser
-        setConsentUser({ name, email, avatar, type: supabaseUser.app_metadata?.provider || 'google' });
+        return;
       } else {
-        // Brand new user!
+        // Brand new user from Google/OAuth!
+        setConsentUser({ name, email, avatar, type: providerType });
+        setFullName(name);
+        setEmail(email);
+        setAvatarUrl(avatar);
+
+        const targetRole = role || initialRole || 'student';
+        setRole(targetRole);
+
+        // If user came to log in, directly log them in without blocking them with forms!
         if (authMode === 'login') {
-          setErrorMessage(lang === 'ar' ? 'هذا الحساب غير مسجل. يرجى استكمال البيانات بالأسفل لإنشاء حسابك الجديد!' : 'This account is not registered. Please complete the form below to create your account!');
-          setAuthMode('signup');
-          setFullName(name);
-          setEmail(email);
-          setAvatarUrl(avatar);
-          setRole(role || initialRole || 'student');
-          setShowModal(true);
+          onLogin({
+            name: name,
+            email: email,
+            role: targetRole,
+            avatar: avatar,
+            studentPhone: '',
+            parentPhone: '',
+            isExisting: false
+          });
+          onClose();
         } else {
-          setErrorMessage(''); // Clear error if switching to signup
-          if (role === 'student' || initialRole === 'student') {
-            setFullName(name);
-            setEmail(email);
-            setAvatarUrl(avatar);
-            setRole('student');
-            setShowModal(true);
-          } else if (role === 'instructor' || initialRole === 'instructor') {
-            setFullName(name);
-            setEmail(email);
-            setAvatarUrl(avatar);
-            setRole('instructor');
-            setShowModal(true);
-          } else {
-            setConsentUser({ name, email, avatar, type: supabaseUser.app_metadata?.provider || 'google' });
-          }
+          // Explicit sign up mode -> show setup wizard without passwords
+          setShowModal(true);
         }
       }
     }
@@ -502,14 +500,38 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
   const getExistingAccounts = (selectedEmail) => {
     const list = [];
     if (!selectedEmail) return list;
-    const inst = instructors?.find(i => i.email?.toLowerCase() === selectedEmail.toLowerCase());
+    const cleanEmail = selectedEmail.trim().toLowerCase();
+
+    // Check props
+    const inst = instructors?.find(i => i.email?.trim().toLowerCase() === cleanEmail);
     if (inst) {
       list.push({ role: 'instructor', data: inst });
     }
-    const stud = students?.find(s => s.email?.toLowerCase() === selectedEmail.toLowerCase());
+    const stud = students?.find(s => s.email?.trim().toLowerCase() === cleanEmail);
     if (stud) {
       list.push({ role: 'student', data: stud });
     }
+
+    // Check localStorage fallback
+    try {
+      const savedInsts = JSON.parse(localStorage.getItem('edu_instructors') || '[]');
+      const savedStuds = JSON.parse(localStorage.getItem('edu_students') || '[]');
+      if (!inst) {
+        const localInst = savedInsts.find(i => i.email?.trim().toLowerCase() === cleanEmail);
+        if (localInst) list.push({ role: 'instructor', data: localInst });
+      }
+      if (!stud) {
+        const localStud = savedStuds.find(s => s.email?.trim().toLowerCase() === cleanEmail);
+        if (localStud) list.push({ role: 'student', data: localStud });
+      }
+      const savedUser = JSON.parse(localStorage.getItem('edu_current_user') || 'null');
+      if (savedUser && savedUser.email?.trim().toLowerCase() === cleanEmail && !list.some(a => a.role === savedUser.role)) {
+        list.push({ role: savedUser.role, data: savedUser });
+      }
+    } catch (e) {
+      console.warn("Error reading localStorage in getExistingAccounts", e);
+    }
+
     return list;
   };
 
@@ -752,7 +774,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
     }
     
     // For direct email signup via wizard
-    const isLocalEmailSignup = !consentUser || consentUser.type === 'email_signup';
+    const isLocalEmailSignup = consentUser?.type === 'email_signup';
     if (isLocalEmailSignup) {
       if (!email) {
         setErrorMessage(lang === 'ar' ? 'الرجاء إدخال البريد الإلكتروني!' : 'Please enter email address!');
@@ -782,15 +804,15 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
     }
 
     if (role === 'student') {
-      if (!/^\d{11}$/.test(studentPhone)) {
+      if (studentPhone && !/^\d{11}$/.test(studentPhone)) {
         setErrorMessage(lang === 'ar' ? 'رقم هاتف الطالب يجب أن يتكون من 11 رقماً!' : 'Student phone number must be exactly 11 digits!');
         return;
       }
-      if (!/^\d{11}$/.test(parentPhone)) {
+      if (parentPhone && !/^\d{11}$/.test(parentPhone)) {
         setErrorMessage(lang === 'ar' ? 'رقم هاتف ولي الأمر يجب أن يتكون من 11 رقماً!' : 'Parent phone number must be exactly 11 digits!');
         return;
       }
-      if (studentStep === 1 && !inviteTeacherId) {
+      if (studentStep === 1 && !inviteTeacherId && (studentPhone || parentPhone)) {
         setErrorMessage('');
         setStudentStep(2);
         return;
@@ -1236,8 +1258,8 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
                 />
               </div>
 
-              {/* Local Email & Passwords Fields */}
-              {(!consentUser || consentUser.type === 'email_signup') && (
+              {/* Local Email & Passwords Fields ONLY for email signup */}
+              {consentUser?.type === 'email_signup' && (
                 <>
                   <div className="form-group" style={{ marginTop: '1rem' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>

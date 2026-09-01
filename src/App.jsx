@@ -199,8 +199,9 @@ function App() {
   
   // Auto-logout if local state is corrupt (e.g. database cleared but user session remains)
   useEffect(() => {
+    if (isLoading) return; // Prevent premature logout while database is loading!
     if (isLoggedIn) {
-      if (userRole === 'instructor' && activeInstructorId && !instructors.some(i => i.id === activeInstructorId)) {
+      if (userRole === 'instructor' && activeInstructorId && instructors.length > 0 && !instructors.some(i => i.id === activeInstructorId)) {
         // Run clear session
         setIsLoggedIn(false);
         setCurrentUser(null);
@@ -208,7 +209,7 @@ function App() {
         localStorage.setItem('edu_is_logged_in', 'false');
         localStorage.removeItem('edu_current_user');
         localStorage.removeItem('edu_active_instructor_id');
-      } else if (userRole === 'student' && activeStudentId && !students.some(s => s.id === activeStudentId)) {
+      } else if (userRole === 'student' && activeStudentId && students.length > 0 && !students.some(s => s.id === activeStudentId)) {
         setIsLoggedIn(false);
         setCurrentUser(null);
         setUserRole('landing');
@@ -217,7 +218,7 @@ function App() {
         localStorage.removeItem('edu_active_student_id');
       }
     }
-  }, [isLoggedIn, userRole, activeInstructorId, activeStudentId, instructors, students]);
+  }, [isLoggedIn, userRole, activeInstructorId, activeStudentId, instructors, students, isLoading]);
   
   // PWA BeforeInstallPrompt Listener
   useEffect(() => {
@@ -570,30 +571,34 @@ function App() {
       formattedName = formatTeacherName(profileData.name);
     }
     
-    // Existing user direct login logic
-    if (profileData.isExisting) {
-      setIsLoggedIn(true);
-      const fullRecord = profileData.role === 'instructor' 
-        ? instructors.find(i => i.id === profileData.id) 
-        : (profileData.role === 'student' ? students.find(s => s.id === profileData.id) : null);
+    // Existing user direct login or auto-match existing account by email
+    const cleanEmail = (profileData.email || '').trim().toLowerCase();
+    const existingInstructor = cleanEmail ? instructors.find(i => i.email?.trim().toLowerCase() === cleanEmail) : null;
+    const existingStudent = cleanEmail ? students.find(s => s.email?.trim().toLowerCase() === cleanEmail) : null;
+
+    if (profileData.isExisting || existingInstructor || existingStudent) {
+      const match = (profileData.role === 'instructor' ? existingInstructor : (profileData.role === 'student' ? existingStudent : null)) || existingInstructor || existingStudent;
+      const matchedRole = match ? (match === existingInstructor ? 'instructor' : 'student') : profileData.role;
+      const targetId = match ? match.id : profileData.id;
       
+      setIsLoggedIn(true);
       setCurrentUser({
-        id: profileData.id,
-        name: formattedName,
-        role: profileData.role,
-        avatar: profileData.avatar,
-        email: profileData.email,
-        isSubscribed: profileData.isSubscribed,
-        ...(fullRecord || {})
+        id: targetId,
+        name: match?.nameAr || match?.nameEn || formattedName,
+        role: matchedRole,
+        avatar: match?.avatar || profileData.avatar,
+        email: match?.email || profileData.email,
+        isSubscribed: match?.isSubscribed ?? profileData.isSubscribed,
+        ...(match || {})
       });
-      setUserRole(profileData.role);
-      if (profileData.role === 'instructor') {
-        setActiveInstructorId(profileData.id);
-      } else if (profileData.role === 'student') {
-        setActiveStudentId(profileData.id);
+      setUserRole(matchedRole);
+      if (matchedRole === 'instructor') {
+        setActiveInstructorId(targetId);
+      } else if (matchedRole === 'student') {
+        setActiveStudentId(targetId);
       }
       setShowLoginModal(false);
-      triggerToast(lang === 'ar' ? `مرحباً بعودتك يا ${formattedName}!` : `Welcome back, ${formattedName}!`, 'success');
+      triggerToast(lang === 'ar' ? `مرحباً بعودتك يا ${match?.nameAr || formattedName}!` : `Welcome back, ${match?.nameEn || formattedName}!`, 'success');
       return;
     }
     
