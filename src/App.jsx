@@ -392,7 +392,7 @@ function App() {
 
   // Admin CRUD action callbacks
   const handleAddTeacher = (newTeacherData) => {
-    const newId = 100 + instructors.length + 1;
+    const newId = instructors.length > 0 ? Math.max(...instructors.map(i => Number(i.id) || 100)) + 1 : 101;
     const newTeacherObj = {
       id: newId,
       nameAr: newTeacherData.nameAr,
@@ -604,7 +604,7 @@ function App() {
 
     if (updatedProfileData.role === 'instructor') {
       // Create new instructor profile in list
-      const newTeacherId = 100 + instructors.length + 1;
+      const newTeacherId = instructors.length > 0 ? Math.max(...instructors.map(i => Number(i.id) || 100)) + 1 : 101;
       const rawStages = profileData.grades || ['sec'];
       const instructorGrades = rawStages.map((stage) => {
         let nameAr = "ثانوي";
@@ -651,7 +651,7 @@ function App() {
       triggerToast(lang === 'ar' ? `مرحباً بك يا مدير المنصة ${profileData.name}!` : `Welcome Admin ${profileData.name}!`, 'success');
     } else {
       // Create new student profile in list
-      const newStudentId = students.length + 1;
+      const newStudentId = students.length > 0 ? Math.max(...students.map(s => Number(s.id) || 0)) + 1 : 1;
       const newStudentObj = {
         id: newStudentId,
         email: profileData.email, // Save email!
@@ -884,10 +884,10 @@ function App() {
 
   // Session addition callback
   const handleAddSession = (newSessionData) => {
-    const newSessionId = sessions.length + 1000 + Math.floor(Math.random() * 900); // Random unique ID
+    const newSessionId = newSessionData.id || (sessions.length + 1000 + Math.floor(Math.random() * 900));
     const newSession = {
-      id: newSessionId,
       ...newSessionData,
+      id: newSessionId,
     };
     
     // Add session to sessions list
@@ -898,7 +898,9 @@ function App() {
       prevStudents.map((student) => {
         // Only add attendance check if student is enrolled in this teacher group
         const isEnrolled = student.enrollments.some(
-          (e) => e.instructorId === newSessionData.instructorId && e.groupId === newSessionData.groupId
+          (e) => e.instructorId === newSessionData.instructorId && 
+                 (!newSessionData.groupId || e.groupId === newSessionData.groupId) &&
+                 (!newSessionData.gradeId || e.gradeId === newSessionData.gradeId)
         );
 
         if (isEnrolled) {
@@ -906,7 +908,7 @@ function App() {
           const newAttendance = {
             instructorId: newSessionData.instructorId,
             sessionId: newSessionId,
-            date: newSessionData.date,
+            date: newSessionData.date || new Date().toISOString().split('T')[0],
             status: 'absent',
           };
           return {
@@ -917,6 +919,7 @@ function App() {
         return student;
       })
     );
+    return newSessionId;
   };
 
   // Group addition callback

@@ -141,7 +141,8 @@ const StudentDashboard = ({
 
   // Filter sessions ONLY corresponding to student's group
   const groupSessions = sessions.filter(session => 
-    session.instructorId === activeTeacherId && session.groupId === activeGroupId
+    session.instructorId === activeTeacherId && 
+    (!session.groupId || session.groupId === activeGroupId)
   );
 
   // Filter student grades and attendance specific to this teacher

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X as CloseIcon, Camera, Copy, PlayCircle } from 'lucide-react';
+import { Users, GraduationCap, Calendar, Clock, PlusCircle, CheckCircle, Share2, QrCode, Trash2, Edit, DollarSign, X as CloseIcon, Camera, Copy, PlayCircle, Maximize2, Minimize2, Radio, Check, Sparkles, Timer, AlertCircle, Play, Eye } from 'lucide-react';
 import { calculateGPA, calculateAttendanceRate } from '../mockData';
 const StudentAnalyticsModal = React.lazy(() => import('./StudentAnalyticsModal'));
 import Podium from './Podium';
@@ -84,7 +84,7 @@ const InstructorDashboard = ({
   const [selectedStudentForAnalytics, setSelectedStudentForAnalytics] = useState(null);
   const [showInviteQrModal, setShowInviteQrModal] = useState(false);
 
-  // Session State
+  // Online Curriculum Session Publishing State
   const [sessionTitleAr, setSessionTitleAr] = useState('');
   const [sessionTitleEn, setSessionTitleEn] = useState('');
   const [sessionDescAr, setSessionDescAr] = useState('');
@@ -93,7 +93,28 @@ const InstructorDashboard = ({
   const [formLang, setFormLang] = useState('ar'); // 'ar' | 'en'
   const [playingSessionId, setPlayingSessionId] = useState(null);
 
-  const [selectedQrSessionId, setSelectedQrSessionId] = useState('');
+  // Live Classroom Attendance (QR Session) State
+  const [showLiveSessionModal, setShowLiveSessionModal] = useState(false);
+  const [activeLiveSession, setActiveLiveSession] = useState(null);
+  const [liveTopicAr, setLiveTopicAr] = useState('');
+  const [liveTopicEn, setLiveTopicEn] = useState('');
+  const [liveScheduleTime, setLiveScheduleTime] = useState('');
+  const [liveDuration, setLiveDuration] = useState('30'); // Duration in minutes (0 = open)
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [isFullscreenQr, setIsFullscreenQr] = useState(false);
+
+  // Timer effect for live session
+  React.useEffect(() => {
+    let interval = null;
+    if (activeLiveSession && activeLiveSession.isLive) {
+      interval = setInterval(() => {
+        setElapsedSeconds(prev => prev + 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [activeLiveSession]);
 
   // Payment Modal State
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -103,9 +124,9 @@ const InstructorDashboard = ({
   const [screenshot, setScreenshot] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  // Prevent background scrolling when payment modal is open
+  // Prevent background scrolling when payment modal or live modal is open
   React.useEffect(() => {
-    if (showPaymentModal) {
+    if (showPaymentModal || (showLiveSessionModal && isFullscreenQr)) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -113,7 +134,7 @@ const InstructorDashboard = ({
     return () => {
       document.body.style.overflow = '';
     };
-  }, [showPaymentModal]);
+  }, [showPaymentModal, showLiveSessionModal, isFullscreenQr]);
 
   // Add Group State
   const [showAddGroup, setShowAddGroup] = useState(false);
@@ -129,7 +150,7 @@ const InstructorDashboard = ({
   const t = {
     en: {
       dashboardTitle: "Instructor Control Center",
-      dashboardSubtitle: "Add new lecture sessions, grade student tasks, and generate attendance QR Codes.",
+      dashboardSubtitle: "Add new lecture sessions, grade student tasks, and manage live in-center QR attendance.",
       statStudents: "Group Students",
       statAvgGPA: "Group Average GPA",
       statAttendance: "Group Avg Attendance",
@@ -140,13 +161,13 @@ const InstructorDashboard = ({
       quizTitleEn: "Task Name (English)",
       scoreLabel: "Grade (Out of 100)",
       submitGrade: "Record Grade",
-      sessionTitle: "Publish New Lesson Session",
-      sTitleAr: "Session Title (Arabic)",
-      sTitleEn: "Session Title (English)",
-      sDescAr: "Session Description (Arabic)",
-      sDescEn: "Session Description (English)",
-      sVideo: "Video Embed URL (YouTube/Vimeo)",
-      submitSession: "Publish Session",
+      sessionTitle: "Publish Lesson / Explanation for Group",
+      sTitleAr: "Lesson Title (Arabic)",
+      sTitleEn: "Lesson Title (English)",
+      sDescAr: "Explanation & Details (Arabic)",
+      sDescEn: "Explanation & Details (English)",
+      sVideo: "Video Link (YouTube / Vimeo)",
+      submitSession: "Publish Lesson Now",
       studentListTitle: "Student Roster & Progress Analytics",
       tblName: "Student Name",
       tblGPA: "Current GPA",
@@ -157,17 +178,34 @@ const InstructorDashboard = ({
       average: "Average",
       pass: "Needs Review",
       toastGradeSuccess: "Successfully recorded grade for ",
-      toastSessionSuccess: "Successfully published session: ",
+      toastSessionSuccess: "Successfully published lesson: ",
       videoPlaceholder: "e.g., https://www.youtube.com/embed/SqcY0GlETPk",
       inviteTitle: "Invite Students to this Group",
       inviteDesc: "Share this link with your students to automatically register them to this class group.",
       copyBtn: "Copy Invitation Link",
       toastCopied: "Signup invitation link copied to clipboard!",
-      qrTitle: "In-Center Attendance QR Generator",
-      qrDesc: "Display this QR code on the screen in your classroom/center. Students can scan it on their portals to record attendance instantly.",
-      qrSelectSession: "Select Session to Generate QR",
-      qrGenerateBtn: "Generate Attendance QR",
-      noSessionsQr: "Please publish a session first to generate a QR code.",
+      liveSessionBtn: "Start Class (Live QR)",
+      liveSessionActive: "Class in Progress",
+      liveModalTitle: "Live Classroom Attendance (QR Code)",
+      liveModalDesc: "Launch attendance session for students entering the center. Customize duration and view live scan records.",
+      liveTopicLabel: "Class Topic / Title",
+      liveScheduleLabel: "Group Schedule Time",
+      liveDurationLabel: "Attendance Scan Window",
+      dur15: "15 Minutes",
+      dur30: "30 Minutes",
+      dur45: "45 Minutes",
+      dur60: "60 Minutes",
+      durOpen: "Open (Until manually closed)",
+      startLiveBtn: "Start Class & Generate QR",
+      endLiveBtn: "End Class & Close Attendance",
+      projectorMode: "Projector Mode (Fullscreen)",
+      exitProjector: "Exit Fullscreen",
+      sessionIdLabel: "Session ID",
+      copySessionId: "Copy ID",
+      liveAttendeesCount: "Attended Students",
+      livePendingCount: "Not Checked-In",
+      liveStatusRunning: "Class in Progress - Scan QR",
+      liveEndedToast: "Class attendance finalized for: ",
       activeGroupLabel: "Active Classroom Group:",
       addGroupBtn: "Create Group",
       addGroupTitle: "Create New Classroom Group",
@@ -184,7 +222,7 @@ const InstructorDashboard = ({
     },
     ar: {
       dashboardTitle: "مركز التحكم والتدريب",
-      dashboardSubtitle: "إضافة محاضرات جديدة، رصد درجات الطلاب، وتوليد كود الحضور والـ QR في السنتر.",
+      dashboardSubtitle: "نشر شروحات الدروس، رصد درجات الطلاب، وبدء الحصص المباشرة لتسجيل الحضور بالـ QR في السنتر.",
       statStudents: "طلاب المجموعة",
       statAvgGPA: "متوسط درجات المجموعة",
       statAttendance: "نسبة الحضور للمجموعة",
@@ -195,13 +233,13 @@ const InstructorDashboard = ({
       quizTitleEn: "اسم الاختبار/الواجب (بالإنجليزية)",
       scoreLabel: "الدرجة (من 100)",
       submitGrade: "تسجيل الدرجة",
-      sessionTitle: "نشر محاضرة / درس جديد للمجموعة",
-      sTitleAr: "عنوان المحاضرة (بالعربية)",
-      sTitleEn: "عنوان المحاضرة (بالإنجليزية)",
-      sDescAr: "شرح وتفاصيل المحاضرة (بالعربية)",
-      sDescEn: "شرح وتفاصيل المحاضرة (بالإنجليزية)",
-      sVideo: "رابط تضمين الفيديو (YouTube / Vimeo)",
-      submitSession: "نشر المحاضرة الآن",
+      sessionTitle: "نشر شرح / درس جديد للمجموعة",
+      sTitleAr: "عنوان الدرس (بالعربية)",
+      sTitleEn: "عنوان الدرس (بالإنجليزية)",
+      sDescAr: "شرح وتفاصيل الدرس (بالعربية)",
+      sDescEn: "شرح وتفاصيل الدرس (بالإنجليزية)",
+      sVideo: "رابط فيديو الشرح (YouTube / Vimeo)",
+      submitSession: "نشر الدرس الآن للمجموعة",
       studentListTitle: "سجل حضور ودرجات طلاب المجموعة",
       tblName: "اسم الطالب",
       tblGPA: "المعدل التراكمي",
@@ -212,17 +250,34 @@ const InstructorDashboard = ({
       average: "جيد/متوسط",
       pass: "يحتاج مراجعة",
       toastGradeSuccess: "تم رصد الدرجة بنجاح للطالب ",
-      toastSessionSuccess: "تم نشر المحاضرة بنجاح: ",
+      toastSessionSuccess: "تم نشر الدرس بنجاح: ",
       videoPlaceholder: "مثال: https://www.youtube.com/embed/SqcY0GlETPk",
       inviteTitle: "دعوة الطلاب للانضمام للمجموعة",
       inviteDesc: "شارك هذا الرابط مع الطلاب ليقوموا بالتسجيل والانضمام تلقائياً لهذه المجموعة الدراسية.",
       copyBtn: "نسخ رابط الدعوة",
       toastCopied: "تم نسخ رابط دعوة التسجيل إلى الحافظة!",
-      qrTitle: "توليد رمز حضور الحصة (QR Code)",
-      qrDesc: "اعرض رمز الـ QR هذا للطلاب في السنتر/القاعة. يمكن للطلاب عمل مسح للكود من هواتفهم لتسجيل حضورهم فوراً.",
-      qrSelectSession: "اختر الحصة لتوليد رمز الحضور لها",
-      qrGenerateBtn: "توليد كود الحضور الـ QR",
-      noSessionsQr: "الرجاء نشر محاضرة أولاً لتوليد كود الـ QR.",
+      liveSessionBtn: "بدء الحصة (Live QR)",
+      liveSessionActive: "الحصة جارية الآن",
+      liveModalTitle: "لوحة حضور الحصة المباشرة (السنتر)",
+      liveModalDesc: "بدء الحصة الفعلية في السنتر وتوليد رمز QR للطلاب مع ضبط التوقيت ومدة التسجيل بدقة.",
+      liveTopicLabel: "عنوان أو موضوع الحصة",
+      liveScheduleLabel: "ميعاد وتوقيت الحصة",
+      liveDurationLabel: "مدة استقبال تسجيل الحضور",
+      dur15: "15 دقيقة",
+      dur30: "30 دقيقة",
+      dur45: "45 دقيقة",
+      dur60: "60 دقيقة",
+      durOpen: "مفتوح (حتى إغلاق الحصة يدوياً)",
+      startLiveBtn: "بدء الحصة وتوليد كود الـ QR",
+      endLiveBtn: "إنهاء الحصة وإغلاق الحضور",
+      projectorMode: "شاشة البروجكتور (ملء الشاشة)",
+      exitProjector: "خروج من ملء الشاشة",
+      sessionIdLabel: "رقم الحصة",
+      copySessionId: "نسخ رقم الحصة",
+      liveAttendeesCount: "الطلاب الحاضرين",
+      livePendingCount: "لم يسجلوا بعد",
+      liveStatusRunning: "الحصة جارية الآن - يرجى مسح الكود",
+      liveEndedToast: "تم إنهاء الحصة وتسجيل حضور الطلاب بنجاح لـ ",
       activeGroupLabel: "الصف الدراسي النشط:",
       addGroupBtn: "إضافة صف / مجموعة",
       addGroupTitle: "إضافة صف دراسي جديد",
@@ -258,14 +313,66 @@ const InstructorDashboard = ({
     }
   }, [activeGroupId, students]);
 
-  // Set default QR session
-  React.useEffect(() => {
-    if (gradeSessions.length > 0) {
-      setSelectedQrSessionId(gradeSessions[0].id.toString());
-    } else {
-      setSelectedQrSessionId('');
-    }
-  }, [activeGradeId, sessions]);
+  const formatTimer = (totalSeconds) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleStartLiveSession = (e) => {
+    if (e) e.preventDefault();
+    const newSessionId = 1000 + Math.floor(Math.random() * 9000);
+    const topicAr = liveTopicAr.trim() || (activeGroup ? `حصة ${activeGroup.nameAr} - ${new Date().toLocaleDateString('ar-EG')}` : 'حصة اليوم');
+    const topicEn = liveTopicEn.trim() || topicAr;
+
+    const newSessionData = {
+      id: newSessionId,
+      instructorId: instructor.id,
+      gradeId: activeGradeId,
+      groupId: activeGroupId,
+      titleAr: topicAr,
+      titleEn: topicEn,
+      descAr: `حصة تفاعلية مباشرة في السنتر للمجموعة (${activeGroup?.nameAr || ''}) - التوقيت: ${liveScheduleTime || 'مباشر'}`,
+      descEn: `In-center live attendance session for (${activeGroup?.nameEn || ''})`,
+      date: new Date().toISOString().split('T')[0],
+      time: liveScheduleTime || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isLive: true
+    };
+
+    onAddSession(newSessionData);
+
+    setActiveLiveSession({
+      id: newSessionId,
+      titleAr: topicAr,
+      titleEn: topicEn,
+      gradeId: activeGradeId,
+      groupId: activeGroupId,
+      durationMinutes: Number(liveDuration),
+      scheduleTime: liveScheduleTime,
+      startTime: Date.now(),
+      isLive: true
+    });
+    setElapsedSeconds(0);
+    triggerToast(lang === 'ar' ? `تم بدء الحصة وتوليد رمز الحضور (Session #${newSessionId})` : `Class started with QR Code (Session #${newSessionId})`, 'success');
+  };
+
+  const handleEndLiveSession = () => {
+    if (!activeLiveSession) return;
+    const attendedCount = groupStudents.filter(s => 
+      s.attendance?.some(a => a.sessionId === activeLiveSession.id && a.status === 'present')
+    ).length;
+
+    triggerToast(
+      lang === 'ar' 
+        ? `تم إنهاء الحصة وإغلاق الحضور. حضر ${attendedCount} من إجمالي ${groupStudents.length} طالب.` 
+        : `Class ended. ${attendedCount} of ${groupStudents.length} students attended.`,
+      'success'
+    );
+
+    setActiveLiveSession(null);
+    setIsFullscreenQr(false);
+    setShowLiveSessionModal(false);
+  };
 
   // Copy referral invite link
   const copyInviteLink = () => {
@@ -509,7 +616,7 @@ const InstructorDashboard = ({
       
       {/* Group selector and Referral Link header */}
       <div className="glass-card" style={{ gridColumn: 'span 12', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <button 
             className="btn-primary"
             onClick={() => {
@@ -521,6 +628,50 @@ const InstructorDashboard = ({
             <PlusCircle size={18} />
             <span>{lang === 'ar' ? 'إنشاء صف / مجموعة جديدة' : 'Create Grade / Group'}</span>
           </button>
+
+          {activeLiveSession ? (
+            <button 
+              className="btn-primary"
+              onClick={() => setShowLiveSessionModal(true)}
+              style={{ 
+                padding: '0.65rem 1.25rem', 
+                display: 'flex', 
+                gap: '0.5rem', 
+                alignItems: 'center',
+                backgroundColor: 'rgba(239, 68, 68, 0.95)',
+                boxShadow: '0 0 15px rgba(239, 68, 68, 0.4)',
+                border: '1px solid #ef4444',
+                color: '#fff',
+                fontWeight: 800
+              }}
+            >
+              <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#fff', display: 'inline-block', boxShadow: '0 0 8px #fff' }}></span>
+              <Radio size={16} />
+              <span>{lang === 'ar' ? `الحصة جارية الآن (#${activeLiveSession.id})` : `Class Live in Progress (#${activeLiveSession.id})`}</span>
+            </button>
+          ) : (
+            <button 
+              className="btn-primary"
+              onClick={() => {
+                setLiveTopicAr(activeGroup ? `حصة ${activeGroup.nameAr} - ${new Date().toLocaleDateString('ar-EG')}` : 'حصة اليوم');
+                setLiveScheduleTime(activeGroup?.time || '4:00 م');
+                setShowLiveSessionModal(true);
+              }}
+              style={{ 
+                padding: '0.65rem 1.25rem', 
+                display: 'flex', 
+                gap: '0.5rem', 
+                alignItems: 'center',
+                backgroundColor: 'var(--accent-green)',
+                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
+                color: '#fff',
+                fontWeight: 700
+              }}
+            >
+              <QrCode size={18} />
+              <span>{t.liveSessionBtn}</span>
+            </button>
+          )}
         </div>
 
         {/* Invite Student Card */}
@@ -602,6 +753,78 @@ const InstructorDashboard = ({
           <div style={{ gridColumn: 'span 12' }}>
             <Podium students={students} lang={lang} instructorId={instructor.id} gradeId={activeGradeId} groupId={activeGroupId} />
           </div>
+
+          {/* Live Session Quick Banner */}
+          <div className="glass-card" style={{ 
+            gridColumn: 'span 12', 
+            padding: '1.25rem 1.5rem', 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            flexWrap: 'wrap', 
+            gap: '1rem',
+            background: activeLiveSession 
+              ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(99, 102, 241, 0.1))' 
+              : 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(99, 102, 241, 0.08))',
+            border: activeLiveSession ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(16, 185, 129, 0.3)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ 
+                width: '46px', height: '46px', borderRadius: '12px', 
+                backgroundColor: activeLiveSession ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                color: activeLiveSession ? '#ef4444' : 'var(--accent-green)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <QrCode size={24} />
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {activeLiveSession ? (
+                    <>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block', boxShadow: '0 0 8px #ef4444' }}></span>
+                      <span>{lang === 'ar' ? `حصة حضور جارية الآن (رقم الحصة: #${activeLiveSession.id})` : `Class Session in Progress (ID: #${activeLiveSession.id})`}</span>
+                    </>
+                  ) : (
+                    <span>{lang === 'ar' ? 'حضور الحصة الفعلية في السنتر (Live QR)' : 'Live In-Center Class Attendance'}</span>
+                  )}
+                </h4>
+                <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  {activeLiveSession 
+                    ? (lang === 'ar' 
+                        ? `جاري استقبال الطلاب للمسح • الوقت المنقضي: ${formatTimer(elapsedSeconds)} • حضر ${groupStudents.filter(s => s.attendance?.some(a => a.sessionId === activeLiveSession.id && a.status === 'present')).length} طالب` 
+                        : `Scanning active • Elapsed: ${formatTimer(elapsedSeconds)} • ${groupStudents.filter(s => s.attendance?.some(a => a.sessionId === activeLiveSession.id && a.status === 'present')).length} checked in`)
+                    : (lang === 'ar' 
+                        ? 'اضغط لبدء الحصة وتوليد كود الـ QR للطلاب على شاشة القاعة عند بدء موعد المجموعة.' 
+                        : 'Click to start class and display the QR code on the classroom screen for student check-in.')
+                  }
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <button 
+                onClick={() => {
+                  if (!activeLiveSession) {
+                    setLiveTopicAr(activeGroup ? `حصة ${activeGroup.nameAr} - ${new Date().toLocaleDateString('ar-EG')}` : 'حصة اليوم');
+                    setLiveScheduleTime(activeGroup?.time || '4:00 م');
+                  }
+                  setShowLiveSessionModal(true);
+                }}
+                className="btn-primary"
+                style={{ 
+                  padding: '0.65rem 1.25rem', 
+                  backgroundColor: activeLiveSession ? '#ef4444' : 'var(--accent-green)',
+                  fontWeight: 800,
+                  fontSize: '0.95rem',
+                  boxShadow: activeLiveSession ? '0 0 15px rgba(239, 68, 68, 0.4)' : '0 4px 14px rgba(16, 185, 129, 0.35)'
+                }}
+              >
+                <QrCode size={18} />
+                <span>{activeLiveSession ? (lang === 'ar' ? 'عرض شاشة الحصة والـ QR' : 'View Live QR Screen') : t.liveSessionBtn}</span>
+              </button>
+            </div>
+          </div>
+
       {/* Classroom Grade Table */}
       <div className="glass-card" style={{ gridColumn: 'span 12' }}>
         <div className="card-title-group" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -787,10 +1010,15 @@ const InstructorDashboard = ({
 
       {activeTab === 'curriculum' && (
         <>
-      {/* Create Session Form */}
-      <div className="glass-card session-create-card" style={{ gridColumn: 'span 7' }}>
+      {/* Create Lesson / Explanation Form */}
+      <div className="glass-card session-create-card" style={{ gridColumn: 'span 12' }}>
         <div className="card-title-group" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
-          <h3 style={{ margin: 0 }}>{t.sessionTitle}</h3>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '1.25rem' }}>{t.sessionTitle}</h3>
+            <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+              {lang === 'ar' ? 'رفع المحاضرات والشروحات والفيديوهات المخصصة لمشاهدتها من قبل طلاب هذه المجموعة.' : 'Upload lecture videos and notes for students of this group to study online.'}
+            </p>
+          </div>
           <div style={{ display: 'flex', gap: '0.25rem', padding: '0.25rem', backgroundColor: 'rgba(0,0,0,0.15)', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
             <button 
               type="button"
@@ -829,147 +1057,89 @@ const InstructorDashboard = ({
           </div>
         </div>
         <form onSubmit={handleSessionSubmit}>
-          {formLang === 'ar' ? (
-            <>
-              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sTitleAr}</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="المحاضرة 6: مدخل إلى..."
-                  value={sessionTitleAr}
-                  onChange={(e) => setSessionTitleAr(e.target.value)}
-                  required={!sessionTitleEn.trim()}
-                />
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+            {formLang === 'ar' ? (
+              <>
+                <div className="form-group">
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sTitleAr}</label>
+                  <input 
+                    type="text" 
+                    className="form-control" 
+                    placeholder="المحاضرة 6: مدخل إلى..."
+                    value={sessionTitleAr}
+                    onChange={(e) => setSessionTitleAr(e.target.value)}
+                    required={!sessionTitleEn.trim()}
+                  />
+                </div>
 
-              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sDescAr}</label>
-                <textarea 
-                  rows="3" 
-                  className="form-control" 
-                  placeholder="اكتب شرحاً مختصراً للمحاضرة هنا..."
-                  value={sessionDescAr}
-                  onChange={(e) => setSessionDescAr(e.target.value)}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sTitleEn}</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="Session 6: Introduction to..."
-                  value={sessionTitleEn}
-                  onChange={(e) => setSessionTitleEn(e.target.value)}
-                  required={!sessionTitleAr.trim()}
-                />
-              </div>
+                <div className="form-group">
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sVideo}</label>
+                  <input 
+                    type="url" 
+                    className="form-control" 
+                    placeholder={t.videoPlaceholder}
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    required
+                  />
+                </div>
 
-              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sDescEn}</label>
-                <textarea 
-                  rows="3" 
-                  className="form-control" 
-                  placeholder="Write a brief explanation of the session..."
-                  value={sessionDescEn}
-                  onChange={(e) => setSessionDescEn(e.target.value)}
-                />
-              </div>
-            </>
-          )}
+                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sDescAr}</label>
+                  <textarea 
+                    rows="3" 
+                    className="form-control" 
+                    placeholder="اكتب شرحاً مختصراً للمحاضرة هنا..."
+                    value={sessionDescAr}
+                    onChange={(e) => setSessionDescAr(e.target.value)}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="form-group">
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sTitleEn}</label>
+                  <input 
+                    type="text" 
+                    className="form-control" 
+                    placeholder="Session 6: Introduction to..."
+                    value={sessionTitleEn}
+                    onChange={(e) => setSessionTitleEn(e.target.value)}
+                    required={!sessionTitleAr.trim()}
+                  />
+                </div>
 
-          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sVideo}</label>
-            <input 
-              type="url" 
-              className="form-control" 
-              placeholder={t.videoPlaceholder}
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
-              required
-            />
+                <div className="form-group">
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sVideo}</label>
+                  <input 
+                    type="url" 
+                    className="form-control" 
+                    placeholder={t.videoPlaceholder}
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t.sDescEn}</label>
+                  <textarea 
+                    rows="3" 
+                    className="form-control" 
+                    placeholder="Write a brief explanation of the session..."
+                    value={sessionDescEn}
+                    onChange={(e) => setSessionDescEn(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
           </div>
 
-          <button type="submit" className="btn-primary" style={{ backgroundColor: 'var(--accent-purple)', width: '100%', padding: '0.75rem', justifyContent: 'center' }}>
+          <button type="submit" className="btn-primary" style={{ backgroundColor: 'var(--accent-purple)', width: '100%', padding: '0.85rem', justifyContent: 'center', marginTop: '1rem', fontWeight: 700 }}>
             <PlusCircle size={18} />
             <span>{t.submitSession}</span>
           </button>
         </form>
-      </div>
-
-      {/* In-Center Attendance QR Generator Card */}
-      <div className="glass-card" style={{ gridColumn: 'span 5' }}>
-        <div className="card-title-group">
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <QrCode size={20} color="var(--accent-primary)" />
-            {t.qrTitle}
-          </h3>
-          <p style={{ marginTop: '0.25rem' }}>{t.qrDesc}</p>
-        </div>
-
-        {gradeSessions.length > 0 ? (
-          <div>
-            <div className="form-group">
-              <label>{t.qrSelectSession}</label>
-              <select 
-                value={selectedQrSessionId}
-                onChange={(e) => setSelectedQrSessionId(e.target.value)}
-                className="form-control"
-              >
-                {gradeSessions.map(s => (
-                  <option key={s.id} value={s.id}>
-                    {lang === 'ar' ? s.titleAr : s.titleEn}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Simulated Live Pulsing QR Code Box */}
-            <div style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center', 
-              padding: '1.5rem', 
-              backgroundColor: '#fff', 
-              borderRadius: '12px',
-              border: '2px dashed var(--accent-primary)',
-              marginTop: '1rem',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              {/* Pulsing Radar scanning line */}
-              <div style={{
-                position: 'absolute',
-                width: '100%',
-                height: '4px',
-                background: 'linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.8), transparent)',
-                top: '0',
-                left: '0',
-                animation: 'scan 2.5s linear infinite',
-                boxShadow: '0 0 10px rgba(99, 102, 241, 0.8)'
-              }}></div>
-              
-              {/* Renders custom SVG QR Mockup with active session ID info */}
-              <svg width="150" height="150" viewBox="0 0 29 29" style={{ shapeRendering: 'crispEdges' }}>
-                <path d="M0 0h7v7H0zM22 0h7v7h-7zM0 22h7v7H0zM3 3h1v1H3zM25 3h1v1h-1zM3 25h1v1H3z" fill="#0f172a" />
-                {/* Random blocks representing QR details dependent on active session */}
-                <path d={`M8 1h2v1H8zM12 0h1v3h-1zM15 2h3v1h-3zM20 1h1v1h-1zM10 4h3v1h-3zM15 5h1v2h-1zM19 4h2v3h-2zM0 8h2v1H0zM4 9h3v1H4zM9 8h2v2H9zM13 9h4v1h-4zM20 8h1v2h-1zM23 9h4v1h-4zM2 12h1v3H2zM6 13h2v1H6zM10 11h4v1h-4zM16 12h2v3h-2zM21 11h3v2h-3zM27 12h1v2h-1zM1 16h3v1H1zM6 15h1v3H6zM9 16h4v1H9zM15 16h2v2h-2zM19 15h2v3h-2zM23 16h3v1h-3zM28 15h1v3h-1zM1 19h2v1H1zM5 20h3v1H5zM10 19h2v2h-2zM14 20h3v1h-3zM19 19h4v2h-4zM25 20h3v1h-3zM8 22h3v1H8zM13 23h2v1h-2zM17 22h2v2h-2zM21 23h3v1h-3zM26 22h2v2h-2z` 
-                  + (selectedQrSessionId ? `M10 15h3v2h-3zM12 18h2v2h-2z` : '')} fill="#0f172a" />
-              </svg>
-              
-              <span style={{ color: '#0f172a', fontWeight: 800, fontSize: '0.8rem', marginTop: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Session ID: #{selectedQrSessionId}
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            {t.noSessionsQr}
-          </div>
-        )}
       </div>
 
       {/* Published Sessions List */}
@@ -1602,6 +1772,382 @@ const InstructorDashboard = ({
             <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--accent-primary)', padding: '0.5rem 1rem', border: '1px dashed var(--accent-primary)', borderRadius: '8px', display: 'inline-block' }}>
               {lang === 'ar' ? `كود الدعوة: IE-${instructor.id}` : `Invite Code: IE-${instructor.id}`}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Live Classroom Attendance Modal */}
+      {showLiveSessionModal && (
+        <div className="modal-overlay" style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: isFullscreenQr ? '#090d16' : 'rgba(0, 0, 0, 0.85)', 
+          backdropFilter: isFullscreenQr ? 'none' : 'blur(12px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000,
+          padding: isFullscreenQr ? 0 : '1rem',
+          transition: 'all 0.3s ease'
+        }}>
+          <div className="glass-card" style={{ 
+            maxWidth: isFullscreenQr ? '100vw' : '720px', 
+            width: isFullscreenQr ? '100vw' : '100%', 
+            height: isFullscreenQr ? '100vh' : 'auto',
+            maxHeight: isFullscreenQr ? '100vh' : '90vh',
+            overflowY: 'auto',
+            padding: isFullscreenQr ? '3rem 2rem' : '2rem', 
+            borderRadius: isFullscreenQr ? 0 : '16px',
+            border: isFullscreenQr ? 'none' : '1px solid var(--border-glass)',
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: isFullscreenQr ? 'center' : 'flex-start',
+            direction: lang === 'ar' ? 'rtl' : 'ltr',
+            textAlign: 'start'
+          }}>
+            
+            {/* Top Bar Controls */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ 
+                  width: '42px', height: '42px', borderRadius: '10px', 
+                  backgroundColor: activeLiveSession ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                  color: activeLiveSession ? '#ef4444' : 'var(--accent-green)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <QrCode size={24} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {t.liveModalTitle}
+                  </h3>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    {activeGrade?.nameAr || ''} • {activeGroup?.nameAr || ''}
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {activeLiveSession && (
+                  <button 
+                    onClick={() => setIsFullscreenQr(!isFullscreenQr)} 
+                    className="config-btn"
+                    style={{ padding: '0.45rem 0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem' }}
+                    title={isFullscreenQr ? t.exitProjector : t.projectorMode}
+                  >
+                    {isFullscreenQr ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                    <span>{isFullscreenQr ? t.exitProjector : t.projectorMode}</span>
+                  </button>
+                )}
+                <button 
+                  onClick={() => {
+                    setIsFullscreenQr(false);
+                    setShowLiveSessionModal(false);
+                  }} 
+                  className="close-btn" 
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '0.4rem' }}
+                >
+                  <CloseIcon size={22} />
+                </button>
+              </div>
+            </div>
+
+            {/* Content: Setup Mode vs Live Mode */}
+            {!activeLiveSession ? (
+              <form onSubmit={handleStartLiveSession} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                  {t.liveModalDesc}
+                </p>
+
+                <div style={{ backgroundColor: 'rgba(255,255,255,0.03)', padding: '1rem 1.25rem', borderRadius: '10px', border: '1px solid var(--border-glass)' }}>
+                  <div className="form-group" style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700, fontSize: '0.9rem' }}>
+                      {t.liveTopicLabel}
+                    </label>
+                    <input 
+                      type="text" 
+                      className="form-control"
+                      placeholder={activeGroup ? `حصة ${activeGroup.nameAr} - ${new Date().toLocaleDateString('ar-EG')}` : 'حصة اليوم'}
+                      value={liveTopicAr}
+                      onChange={(e) => setLiveTopicAr(e.target.value)}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                    <div className="form-group">
+                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700, fontSize: '0.9rem' }}>
+                        {t.liveScheduleLabel}
+                      </label>
+                      <input 
+                        type="text" 
+                        className="form-control"
+                        placeholder="مثال: 4:00 مساءً"
+                        value={liveScheduleTime}
+                        onChange={(e) => setLiveScheduleTime(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700, fontSize: '0.9rem' }}>
+                        {t.liveDurationLabel}
+                      </label>
+                      <select 
+                        className="form-control"
+                        value={liveDuration}
+                        onChange={(e) => setLiveDuration(e.target.value)}
+                      >
+                        <option value="15">{t.dur15}</option>
+                        <option value="30">{t.dur30}</option>
+                        <option value="45">{t.dur45}</option>
+                        <option value="60">{t.dur60}</option>
+                        <option value="0">{t.durOpen}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowLiveSessionModal(false)}
+                    className="config-btn"
+                    style={{ flex: 1, padding: '0.85rem', justifyContent: 'center' }}
+                  >
+                    {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn-primary"
+                    style={{ 
+                      flex: 2, 
+                      padding: '0.85rem', 
+                      backgroundColor: 'var(--accent-green)', 
+                      justifyContent: 'center', 
+                      fontWeight: 800,
+                      fontSize: '1.05rem',
+                      boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)'
+                    }}
+                  >
+                    <PlayCircle size={20} />
+                    <span>{t.startLiveBtn}</span>
+                  </button>
+                </div>
+              </form>
+            ) : (
+              // Live Mode Display
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+                
+                {/* Live Status and Timer Header */}
+                <div style={{ 
+                  width: '100%', 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  flexWrap: 'wrap', 
+                  gap: '1rem',
+                  padding: '0.85rem 1.25rem',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <span style={{ 
+                      width: '12px', height: '12px', borderRadius: '50%', 
+                      backgroundColor: '#ef4444', 
+                      display: 'inline-block',
+                      boxShadow: '0 0 10px #ef4444' 
+                    }}></span>
+                    <span style={{ fontWeight: 800, color: '#ef4444', fontSize: '0.95rem' }}>
+                      {t.liveStatusRunning}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.9rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-primary)', fontWeight: 700 }}>
+                      <Timer size={16} color="var(--color-gold)" />
+                      <span>{lang === 'ar' ? 'الوقت المنقضي:' : 'Elapsed:'}</span>
+                      <strong style={{ color: 'var(--color-gold)', fontSize: '1.1rem', fontFamily: 'monospace' }}>
+                        {formatTimer(elapsedSeconds)}
+                      </strong>
+                    </div>
+
+                    {activeLiveSession.durationMinutes > 0 && (
+                      <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                        ({lang === 'ar' ? 'المدة المحددة:' : 'Window:'} {activeLiveSession.durationMinutes} {lang === 'ar' ? 'دقيقة' : 'min'})
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Main QR Display Box */}
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  padding: isFullscreenQr ? '2.5rem 3rem' : '1.75rem 2rem', 
+                  backgroundColor: '#ffffff', 
+                  borderRadius: '16px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                  border: '3px solid var(--accent-primary)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  maxWidth: isFullscreenQr ? '450px' : '360px',
+                  width: '100%'
+                }}>
+                  {/* Pulsing Scan Beam */}
+                  <div style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '4px',
+                    background: 'linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.9), transparent)',
+                    top: '0',
+                    left: '0',
+                    animation: 'scan 2.5s linear infinite',
+                    boxShadow: '0 0 12px rgba(99, 102, 241, 0.9)'
+                  }}></div>
+
+                  <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(String(activeLiveSession.id))}`}
+                    alt="Live Attendance QR"
+                    style={{ 
+                      width: isFullscreenQr ? '280px' : '220px', 
+                      height: isFullscreenQr ? '280px' : '220px', 
+                      objectFit: 'contain',
+                      display: 'block' 
+                    }}
+                  />
+
+                  {/* Big Session ID Badge with Copy */}
+                  <div style={{ 
+                    marginTop: '1.25rem', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.75rem', 
+                    backgroundColor: '#0f172a', 
+                    padding: '0.65rem 1.25rem', 
+                    borderRadius: '10px',
+                    width: '100%',
+                    justifyContent: 'center'
+                  }}>
+                    <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>
+                      {t.sessionIdLabel}:
+                    </span>
+                    <span style={{ color: '#38bdf8', fontSize: '1.5rem', fontWeight: 900, letterSpacing: '2px' }}>
+                      #{activeLiveSession.id}
+                    </span>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        navigator.clipboard.writeText(String(activeLiveSession.id));
+                        triggerToast(lang === 'ar' ? 'تم نسخ كود الحصة!' : 'Session ID copied!', 'success');
+                      }}
+                      style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center' }}
+                      title={t.copySessionId}
+                    >
+                      <Copy size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Live Real-time Attendance Stats */}
+                {(() => {
+                  const attendees = groupStudents.filter(s => 
+                    s.attendance?.some(a => a.sessionId === activeLiveSession.id && a.status === 'present')
+                  );
+                  const attendeeCount = attendees.length;
+                  const totalCount = groupStudents.length;
+                  const percent = totalCount > 0 ? Math.round((attendeeCount / totalCount) * 100) : 0;
+
+                  return (
+                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.95rem', fontWeight: 700 }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Users size={18} color="var(--accent-primary)" />
+                          <span>{t.liveAttendeesCount}: <strong style={{ color: 'var(--accent-green)' }}>{attendeeCount}</strong> / {totalCount}</span>
+                        </span>
+                        <span style={{ color: 'var(--accent-primary)' }}>{percent}%</span>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div style={{ width: '100%', height: '8px', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ 
+                          width: `${percent}%`, 
+                          height: '100%', 
+                          backgroundColor: 'var(--accent-green)', 
+                          transition: 'width 0.4s ease',
+                          boxShadow: '0 0 8px var(--accent-green)'
+                        }}></div>
+                      </div>
+
+                      {/* Attendee Live Pills */}
+                      <div style={{ 
+                        display: 'flex', 
+                        gap: '0.5rem', 
+                        flexWrap: 'wrap', 
+                        maxHeight: '120px', 
+                        overflowY: 'auto', 
+                        padding: '0.5rem 0' 
+                      }}>
+                        {attendees.length > 0 ? (
+                          attendees.map(s => (
+                            <div key={s.id} style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: '0.4rem', 
+                              padding: '0.35rem 0.75rem', 
+                              borderRadius: '20px', 
+                              backgroundColor: 'rgba(16, 185, 129, 0.15)', 
+                              border: '1px solid rgba(16, 185, 129, 0.3)',
+                              fontSize: '0.8rem',
+                              color: 'var(--text-primary)',
+                              animation: 'slide-in 0.2s ease-out'
+                            }}>
+                              <CheckCircle size={14} color="var(--accent-green)" />
+                              <span>{lang === 'ar' ? s.nameAr : s.nameEn}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                            {lang === 'ar' ? 'في انتظار تسجيل الطلاب للحضور...' : 'Waiting for students to scan and check in...'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Footer Controls */}
+                <div style={{ width: '100%', display: 'flex', gap: '1rem', borderTop: '1px solid var(--border-glass)', paddingTop: '1.25rem', flexWrap: 'wrap' }}>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setIsFullscreenQr(false);
+                      setShowLiveSessionModal(false);
+                    }}
+                    className="config-btn"
+                    style={{ flex: 1, padding: '0.75rem', justifyContent: 'center' }}
+                  >
+                    {lang === 'ar' ? 'تصغير وإبقاء الحصة جارية' : 'Minimize (Keep Running)'}
+                  </button>
+
+                  <button 
+                    type="button"
+                    onClick={handleEndLiveSession}
+                    className="btn-primary"
+                    style={{ 
+                      flex: 1.5, 
+                      padding: '0.75rem', 
+                      backgroundColor: '#ef4444', 
+                      justifyContent: 'center',
+                      fontWeight: 800,
+                      boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)'
+                    }}
+                  >
+                    <CloseIcon size={18} />
+                    <span>{t.endLiveBtn}</span>
+                  </button>
+                </div>
+
+              </div>
+            )}
+
           </div>
         </div>
       )}

@@ -187,6 +187,7 @@ const TeacherDetailsModal = ({ teacher, lang, onClose }) => {
           </div>
         </div>
       )}
+    </div>
   );
 };
 
