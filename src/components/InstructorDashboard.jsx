@@ -56,8 +56,21 @@ const InstructorDashboard = ({
     );
   }
 
-  // Use props for grade and group state
-  const activeGrade = instructor.grades?.find(g => g.id === activeGradeId) || instructor.grades?.[0];
+  // Use props for grade and group state with safe fallbacks
+  const instructorGrades = (instructor.grades && instructor.grades.length > 0)
+    ? instructor.grades
+    : [
+        {
+          id: `grade-default-${instructor.id || '101'}`,
+          nameAr: "ثانوي",
+          nameEn: "High School",
+          groups: (instructor.groups && instructor.groups.length > 0)
+            ? instructor.groups
+            : [{ id: `group-default-${instructor.id || '101'}`, nameAr: "المجموعة الافتراضية", nameEn: "Default Group", time: "08:00 PM" }]
+        }
+      ];
+
+  const activeGrade = instructorGrades.find(g => g.id === activeGradeId) || instructorGrades[0];
   const derivedActiveGradeId = activeGrade?.id || '';
 
   const activeGroup = activeGrade?.groups?.find(g => g.id === activeGroupId) || activeGrade?.groups?.[0];

@@ -1089,8 +1089,14 @@ function App() {
     return success;
   };
 
-  const activeStudent = students.find((s) => s.id === activeStudentId) || students[0];
-  const activeInstructor = instructors.find((i) => i.id === activeInstructorId) || instructors[0];
+  // Derived active instructor & student with robust fallbacks
+  const activeInstructor = instructors.find(i => i.id === activeInstructorId || (currentUser?.email && i.email?.trim().toLowerCase() === currentUser.email?.trim().toLowerCase())) || 
+                           (currentUser?.role === 'instructor' ? currentUser : null) || 
+                           instructors[0] || null;
+
+  const activeStudent = students.find(s => s.id === activeStudentId || (currentUser?.email && s.email?.trim().toLowerCase() === currentUser.email?.trim().toLowerCase())) || 
+                        (currentUser?.role === 'student' ? currentUser : null) || 
+                        students[0] || null;
 
   const t = {
     en: {
