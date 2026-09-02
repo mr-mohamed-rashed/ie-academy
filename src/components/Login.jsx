@@ -633,7 +633,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
     }
   };
 
-  const handleEmailLoginSubmit = (e) => {
+  const handleEmailLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     
@@ -644,27 +644,67 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
         return;
       }
       
+      const cleanEmail = email.trim().toLowerCase();
+      
       // Check if email already exists in local database
       const savedInstructors = JSON.parse(localStorage.getItem('edu_instructors') || '[]');
       const savedStudents = JSON.parse(localStorage.getItem('edu_students') || '[]');
       const emailExists = role === 'instructor' 
-        ? savedInstructors.some(i => i.email?.toLowerCase() === email.toLowerCase())
-        : savedStudents.some(s => s.email?.toLowerCase() === email.toLowerCase());
+        ? savedInstructors.some(i => i.email?.trim().toLowerCase() === cleanEmail)
+        : savedStudents.some(s => s.email?.trim().toLowerCase() === cleanEmail);
       
       if (emailExists) {
         setErrorMessage(lang === 'ar' ? 'هذا البريد الإلكتروني مسجل بالفعل!' : 'This email is already registered!');
         return;
       }
       
+      // Register user with Supabase Auth if configured
+      const url = import.meta.env.VITE_SUPABASE_URL;
+      const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+
+      if (isConfigured) {
+        try {
+          const { data: authData, error: authError } = await supabase.auth.signUp({
+            email: cleanEmail,
+            password: password,
+            options: {
+              data: {
+                role: role || initialRole || 'instructor',
+                full_name: email.split('@')[0]
+              }
+            }
+          });
+
+          if (authError) {
+            if (authError.message?.toLowerCase().includes('already registered')) {
+              const { error: signInErr } = await supabase.auth.signInWithPassword({
+                email: cleanEmail,
+                password: password
+              });
+              if (signInErr) {
+                setErrorMessage(lang === 'ar' ? 'هذا البريد مسجل بالفعل ولكن كلمة المرور غير مطابقة!' : 'Email is already registered but password does not match!');
+                return;
+              }
+            } else {
+              setErrorMessage(authError.message);
+              return;
+            }
+          }
+        } catch (err) {
+          console.warn("Supabase auth signUp error:", err);
+        }
+      }
+
       // Save password for this email in localStorage
       const passwords = JSON.parse(localStorage.getItem('edu_user_passwords') || '{}');
-      passwords[email.toLowerCase()] = password;
+      passwords[cleanEmail] = password;
       localStorage.setItem('edu_user_passwords', JSON.stringify(passwords));
       
       // Go to setup wizard
       setConsentUser({
         name: email.split('@')[0],
-        email: email,
+        email: cleanEmail,
         avatar: PRESET_AVATARS[0],
         type: 'email_signup'
       });
@@ -688,15 +728,103 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
       return;
     }
     
-    // Check custom registered users from global Supabase lists or local storage
-    const matchedTeacher = instructors.find(i => i.email?.toLowerCase() === email.toLowerCase());
-    const matchedStudent = students.find(s => s.email?.toLowerCase() === email.toLowerCase());
+    const cleanEmail = email.trim().toLowerCase();
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+
+    // 1. First authenticate with Supabase Auth for cross-device persistence
+    if (isConfigured) {
+      try {
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password: password
+        });
+
+        if (!authError && authData?.user) {
+          // Look up matching teacher or student in local lists or direct DB query
+          let matchedTeacher = instructors.find(i => i.email?.trim().toLowerCase() === cleanEmail);
+          let matchedStudent = students.find(s => s.email?.trim().toLowerCase() === cleanEmail);
+
+          if (!matchedTeacher && !matchedStudent) {
+            const { data: dbInst } = await supabase.from('instructors').select('*').eq('email', cleanEmail).maybeSingle();
+            if (dbInst) {
+              matchedTeacher = {
+                id: dbInst.id,
+                email: dbInst.email,
+                nameAr: dbInst.name_ar,
+                nameEn: dbInst.name_en,
+                avatar: dbInst.avatar,
+                subjectAr: dbInst.subject_ar,
+                subjectEn: dbInst.subject_en,
+                yearAr: dbInst.year_ar,
+                yearEn: dbInst.year_en,
+                videoUrl: dbInst.video_url,
+                isSubscribed: dbInst.is_subscribed,
+                groups: dbInst.groups || [],
+                grades: dbInst.grades || []
+              };
+            }
+          }
+
+          if (rememberMe) {
+            localStorage.setItem('edu_saved_email', email);
+            localStorage.setItem('edu_saved_password', password);
+          }
+
+          if (matchedTeacher) {
+            onLogin({
+              id: matchedTeacher.id,
+              name: matchedTeacher.nameAr || matchedTeacher.nameEn,
+              role: 'instructor',
+              avatar: matchedTeacher.avatar,
+              email: matchedTeacher.email,
+              isSubscribed: matchedTeacher.isSubscribed,
+              isExisting: true
+            });
+            return;
+          }
+
+          if (matchedStudent) {
+            onLogin({
+              id: matchedStudent.id,
+              name: matchedStudent.nameAr || matchedStudent.nameEn,
+              role: 'student',
+              avatar: matchedStudent.avatar,
+              email: matchedStudent.email,
+              parentPhone: matchedStudent.parentPhone,
+              studentPhone: matchedStudent.studentPhone,
+              isExisting: true
+            });
+            return;
+          }
+
+          // If in Auth but profile not yet completed, create default profile
+          const authRole = authData.user.user_metadata?.role || role || initialRole || 'instructor';
+          const authName = authData.user.user_metadata?.full_name || authData.user.user_metadata?.name || email.split('@')[0];
+          onLogin({
+            name: authName,
+            email: cleanEmail,
+            role: authRole,
+            avatar: PRESET_AVATARS[0],
+            isExisting: false
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn("Supabase signInWithPassword check error:", err);
+      }
+    }
+
+    // 2. Offline / local fallback check
+    const matchedTeacher = instructors.find(i => i.email?.trim().toLowerCase() === cleanEmail);
+    const matchedStudent = students.find(s => s.email?.trim().toLowerCase() === cleanEmail);
 
     const globalPassword = matchedTeacher?.password || matchedTeacher?.groups?.[0]?.password || 
                            matchedStudent?.password || matchedStudent?.enrollments?.[0]?.password || '';
                            
     const localPasswords = JSON.parse(localStorage.getItem('edu_user_passwords') || '{}');
-    const localPassword = localPasswords[email.toLowerCase()] || '';
+    const localPassword = localPasswords[cleanEmail] || '';
     
     const isCorrectPassword = (globalPassword && globalPassword === password) || (localPassword && localPassword === password);
 
@@ -706,8 +834,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
           localStorage.setItem('edu_saved_email', email);
           localStorage.setItem('edu_saved_password', password);
         }
-        // Cache password locally for offline support
-        localPasswords[email.toLowerCase()] = password;
+        localPasswords[cleanEmail] = password;
         localStorage.setItem('edu_user_passwords', JSON.stringify(localPasswords));
         
         onLogin({
@@ -727,8 +854,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
           localStorage.setItem('edu_saved_email', email);
           localStorage.setItem('edu_saved_password', password);
         }
-        // Cache password locally for offline support
-        localPasswords[email.toLowerCase()] = password;
+        localPasswords[cleanEmail] = password;
         localStorage.setItem('edu_user_passwords', JSON.stringify(localPasswords));
         
         onLogin({
@@ -761,7 +887,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
     setErrorMessage(lang === 'ar' ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة!' : 'Invalid email or password!');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     
@@ -773,6 +899,8 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
       return;
     }
     
+    const cleanEmail = email.trim().toLowerCase();
+
     // For direct email signup via wizard
     const isLocalEmailSignup = consentUser?.type === 'email_signup';
     if (isLocalEmailSignup) {
@@ -785,21 +913,31 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
         return;
       }
       
-      // Check if email already exists
-      const savedInstructors = JSON.parse(localStorage.getItem('edu_instructors') || '[]');
-      const savedStudents = JSON.parse(localStorage.getItem('edu_students') || '[]');
-      const emailExists = role === 'instructor' 
-        ? savedInstructors.some(i => i.email?.toLowerCase() === email.toLowerCase())
-        : savedStudents.some(s => s.email?.toLowerCase() === email.toLowerCase());
-      
-      if (emailExists) {
-        setErrorMessage(lang === 'ar' ? 'هذا البريد الإلكتروني مسجل بالفعل!' : 'This email is already registered!');
-        return;
+      // Register with Supabase Auth
+      const url = import.meta.env.VITE_SUPABASE_URL;
+      const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const isConfigured = url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+
+      if (isConfigured) {
+        try {
+          await supabase.auth.signUp({
+            email: cleanEmail,
+            password: password,
+            options: {
+              data: {
+                role: role || 'instructor',
+                full_name: fullName
+              }
+            }
+          });
+        } catch (err) {
+          console.warn("Supabase auth signup during wizard submit:", err);
+        }
       }
       
       // Save password
       const passwords = JSON.parse(localStorage.getItem('edu_user_passwords') || '{}');
-      passwords[email.toLowerCase()] = password;
+      passwords[cleanEmail] = password;
       localStorage.setItem('edu_user_passwords', JSON.stringify(passwords));
     }
 
@@ -849,7 +987,7 @@ const Login = ({ mode, onLogin, lang, instructors = [], students = [], initialRo
 
     onLogin({
       name: fullName,
-      email: isLocalEmailSignup ? email : (consentUser?.email || ''),
+      email: isLocalEmailSignup ? cleanEmail : ((consentUser?.email || '').trim().toLowerCase()),
       role: role,
       avatar: avatarUrl,
       subject: role === 'instructor' ? subject : '',

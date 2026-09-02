@@ -303,9 +303,10 @@ export async function saveInstructor(inst) {
       cleanInst.groups[0].cashNumber = cleanInst.cashNumber || '';
       cleanInst.groups[0].paymentType = cleanInst.paymentType || 'cash';
     }
+    const cleanEmail = (cleanInst.email || '').trim().toLowerCase();
     const dbRecord = {
       id: cleanInst.id,
-      email: cleanInst.email,
+      email: cleanEmail,
       name_ar: cleanInst.nameAr,
       name_en: cleanInst.nameEn,
       avatar: cleanInst.avatar,
@@ -327,7 +328,7 @@ export async function saveInstructor(inst) {
       payment_type: cleanInst.paymentType || 'cash'
     };
     
-    let { error } = await supabase.from('instructors').upsert(dbRecord);
+    let { error } = await supabase.from('instructors').upsert(dbRecord, { onConflict: 'id' });
     if (error) {
       console.warn("Upsert failed, retrying by stripping potential missing columns:", error.message);
       const fallbackRecord = { ...dbRecord };
@@ -339,7 +340,7 @@ export async function saveInstructor(inst) {
       delete fallbackRecord.cash_number;
       delete fallbackRecord.payment_type;
       
-      const { error: retryError } = await supabase.from('instructors').upsert(fallbackRecord);
+      const { error: retryError } = await supabase.from('instructors').upsert(fallbackRecord, { onConflict: 'id' });
       if (retryError) throw retryError;
     }
   } catch (err) {

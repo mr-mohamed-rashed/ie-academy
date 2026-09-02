@@ -631,12 +631,12 @@ function App() {
 
       const newTeacherObj = {
         id: newTeacherId,
-        email: profileData.email, // Save email!
+        email: (profileData.email || '').trim().toLowerCase(), // Save normalized email!
         nameAr: formattedName,
         nameEn: formattedName,
         avatar: profileData.avatar,
-        subjectAr: profileData.subject,
-        subjectEn: profileData.subject,
+        subjectAr: profileData.subject || "الرياضيات",
+        subjectEn: profileData.subject || "Mathematics",
         yearAr: profileData.yearAr || "ثانوي",
         yearEn: profileData.yearEn || "High School",
         isSubscribed: false, // Starts as free/unapproved (hidden from visitors)
