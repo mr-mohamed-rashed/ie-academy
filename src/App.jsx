@@ -1054,19 +1054,35 @@ function App() {
             (a) => a.instructorId === instructorId && a.sessionId === sessionId
           );
 
+          const updatedGrades = [...(student.grades || [])];
+          const hasAttendanceGrade = updatedGrades.some(g => g.instructorId === instructorId && g.sessionId === sessionId);
+
           if (logIdx > -1) {
-            if (student.attendance[logIdx].status === 'absent') {
-              const updatedAttendance = [...student.attendance];
-              updatedAttendance[logIdx] = {
-                ...updatedAttendance[logIdx],
-                status: 'present'
-              };
-              success = true;
-              return {
-                ...student,
-                attendance: updatedAttendance
-              };
+            const updatedAttendance = [...student.attendance];
+            updatedAttendance[logIdx] = {
+              ...updatedAttendance[logIdx],
+              status: 'present'
+            };
+            
+            if (!hasAttendanceGrade) {
+              updatedGrades.push({
+                id: Date.now(),
+                instructorId: instructorId,
+                sessionId: sessionId,
+                titleAr: `حضور الحصة #${sessionId}`,
+                titleEn: `Attendance Session #${sessionId}`,
+                score: 100,
+                max: 100,
+                date: new Date().toISOString().split('T')[0]
+              });
             }
+
+            success = true;
+            return {
+              ...student,
+              attendance: updatedAttendance,
+              grades: updatedGrades
+            };
           } else {
             // Log doesn't exist, create a new present log
             const newLog = {
@@ -1075,10 +1091,25 @@ function App() {
               date: new Date().toISOString().split('T')[0],
               status: 'present'
             };
+
+            if (!hasAttendanceGrade) {
+              updatedGrades.push({
+                id: Date.now(),
+                instructorId: instructorId,
+                sessionId: sessionId,
+                titleAr: `حضور الحصة #${sessionId}`,
+                titleEn: `Attendance Session #${sessionId}`,
+                score: 100,
+                max: 100,
+                date: new Date().toISOString().split('T')[0]
+              });
+            }
+
             success = true;
             return {
               ...student,
-              attendance: [...student.attendance, newLog]
+              attendance: [...student.attendance, newLog],
+              grades: updatedGrades
             };
           }
         }
