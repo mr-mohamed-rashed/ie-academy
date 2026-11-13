@@ -18,9 +18,11 @@ const KEYS = {
 
 // Check if Supabase is properly configured
 const isSupabaseConfigured = () => {
-  const url = import.meta.env.VITE_SUPABASE_URL || 'https://luhaxtokriahwqruaymr.supabase.co';
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_ofzb67GhUvtuPpHXRrLT5w_o4t3laqY';
-  return url && url !== 'https://your-supabase-project-url.supabase.co' && key && key !== 'your-supabase-public-anon-key';
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  if (!url || !key) return false;
+  if (url.includes('your-') || url.includes('luhaxtokriahwqruaymr') || key.includes('your-') || key.includes('anon-key')) return false;
+  return true;
 };
 
 // Helper to decode HTML entities to restore and repair any previously corrupted strings

@@ -25,9 +25,11 @@ import {
 } from './db';
 
 const isSupabaseConfigured = () => {
-  const url = import.meta.env.VITE_SUPABASE_URL || 'https://luhaxtokriahwqruaymr.supabase.co';
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_ofzb67GhUvtuPpHXRrLT5w_o4t3laqY';
-  return url && url !== 'https://your-supabase-url.supabase.co' && key && key !== 'your-anon-key' && url !== 'https://your-supabase-project-url.supabase.co' && key !== 'your-supabase-public-anon-key';
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  if (!url || !key) return false;
+  if (url.includes('your-') || url.includes('luhaxtokriahwqruaymr') || key.includes('your-') || key.includes('anon-key')) return false;
+  return true;
 };
 
 function App() {
@@ -102,15 +104,37 @@ function App() {
   // Load data from Supabase on mount (falls back to localStorage if not configured)
   useEffect(() => {
     async function loadData() {
-      const insts = await getInstructors();
-      const studs = await getStudents();
-      const sesss = await getSessions();
-      const pends = await getPendingPayments();
-      setInstructors(insts);
-      setStudents(studs);
-      setSessions(sesss);
-      setPendingPayments(pends);
-      setIsLoading(false);
+      try {
+        const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 1500));
+        const fetchAll = Promise.all([
+          getInstructors(),
+          getStudents(),
+          getSessions(),
+          getPendingPayments()
+        ]);
+        const result = await Promise.race([fetchAll, timeout]);
+        if (result) {
+          const [insts, studs, sesss, pends] = result;
+          setInstructors(insts || []);
+          setStudents(studs || []);
+          setSessions(sesss || []);
+          setPendingPayments(pends || []);
+        } else {
+          // Timeout reached (e.g. unreachable Supabase host), fallback to local storage instantly
+          const savedInst = localStorage.getItem('edu_instructors');
+          const savedStud = localStorage.getItem('edu_students');
+          const savedSess = localStorage.getItem('edu_sessions');
+          const savedPend = localStorage.getItem('edu_pending_payments');
+          setInstructors(savedInst ? JSON.parse(savedInst) : initialInstructors);
+          setStudents(savedStud ? JSON.parse(savedStud) : initialStudents);
+          setSessions(savedSess ? JSON.parse(savedSess) : initialSessions);
+          setPendingPayments(savedPend ? JSON.parse(savedPend) : []);
+        }
+      } catch (err) {
+        console.warn("loadData error, falling back:", err);
+      } finally {
+        setIsLoading(false);
+      }
     }
     loadData();
   }, []);
@@ -1150,8 +1174,10 @@ function App() {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--bg-app)', color: 'white' }}>
-        <div className="loader" style={{ width: '40px', height: '40px', borderTopColor: 'var(--accent-primary)' }}></div>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--bg-app)', color: 'var(--text-primary)', gap: '1.25rem' }}>
+        <style>{`@keyframes spinLoader { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+        <div style={{ width: '45px', height: '45px', border: '4px solid rgba(99, 102, 241, 0.2)', borderTop: '4px solid #6366f1', borderRadius: '50%', animation: 'spinLoader 0.8s linear infinite' }}></div>
+        <p style={{ fontWeight: 700, fontSize: '1rem', color: '#6366f1' }}>{lang === 'ar' ? 'جاري تحميل المنصة...' : 'Loading Platform...'}</p>
       </div>
     );
   }
@@ -1626,7 +1652,7 @@ function App() {
                     src={`${import.meta.env.BASE_URL}classroom.webp`} 
                     alt="Smart Classroom AI" 
                     style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
-                    fetchpriority="high"
+                    fetchPriority="high"
                     loading="eager"
                   />
                 </picture>
