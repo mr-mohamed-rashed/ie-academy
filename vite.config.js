@@ -8,7 +8,6 @@ import { visualizer } from 'rollup-plugin-visualizer'
 export default defineConfig({
   plugins: [
     react(),
-    cssInjectedByJsPlugin(),
     visualizer({
       filename: 'bundle-analysis.html',
       open: false,
@@ -35,19 +34,6 @@ export default defineConfig({
   build: {
     modulePreload: false,
     sourcemap: true,
-    cssCodeSplit: true,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'vendor-react';
-            if (id.includes('lucide-react')) return 'vendor-icons';
-            if (id.includes('@supabase')) return 'vendor-database';
-            if (id.includes('chart.js') || id.includes('react-chartjs-2')) return 'vendor-charts';
-            return 'vendor-helpers';
-          }
-        }
-      }
-    }
+    cssCodeSplit: true
   }
 })
