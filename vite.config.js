@@ -64,6 +64,27 @@ export default defineConfig({
   base: '/',
   build: {
     sourcemap: false,
-    cssCodeSplit: false
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          const nid = id.replace(/\\/g, '/');
+          if (nid.includes('/node_modules/')) {
+            if (nid.includes('/react/') || nid.includes('/react-dom/') || nid.includes('/scheduler/')) {
+              return 'vendor-react';
+            }
+            if (nid.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            if (nid.includes('@supabase/')) {
+              return 'vendor-supabase';
+            }
+            if (nid.includes('jsqr')) {
+              return 'vendor-qr';
+            }
+          }
+        }
+      }
+    }
   }
 })

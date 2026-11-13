@@ -25,3 +25,5 @@ dist-ssr
 
 # Build Analysis Reports
 bundle-analysis.html
+
+scratch/
