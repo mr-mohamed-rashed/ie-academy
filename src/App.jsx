@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import Podium from './components/Podium';
+const Navbar = React.lazy(() => import('./components/Navbar'));
+const Podium = React.lazy(() => import('./components/Podium'));
 const Login = React.lazy(() => import('./components/Login'));
 let supabaseInstance = null;
 const getSupabase = async () => {
@@ -14,8 +14,8 @@ const InstructorDashboard = React.lazy(() => import('./components/InstructorDash
 const StudentDashboard = React.lazy(() => import('./components/StudentDashboard'));
 const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
 const SupportDashboard = React.lazy(() => import('./components/SupportDashboard'));
-import TeacherProfileModal from './components/TeacherProfileModal';
-import TeacherDetailsModal from './components/TeacherDetailsModal';
+const TeacherProfileModal = React.lazy(() => import('./components/TeacherProfileModal'));
+const TeacherDetailsModal = React.lazy(() => import('./components/TeacherDetailsModal'));
 import { initialStudents, initialSessions, initialInstructors } from './mockData';
 import { GraduationCap, Award, BookOpen, Star, AlertCircle, ShieldAlert, Globe, Sun, Moon, User, Info, Play, X as CloseIcon, Pencil, Ruler, Lightbulb, QrCode, MessageSquare, TrendingUp, BarChart3, Link, Activity, FileText, Users } from 'lucide-react';
 import { 
@@ -1754,7 +1754,9 @@ function App() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             backdropFilter: 'blur(10px)', overflowY: 'auto', padding: '2rem 1rem'
           }}>
+            <React.Suspense fallback={null}>
               <Podium students={students} lang={lang} instructorId={landingPodiumTeacherId} onClose={() => setShowPodiumModal(false)} />
+            </React.Suspense>
           </div>
         )}
 
@@ -1851,24 +1853,32 @@ function App() {
         )}
 
         {/* Teacher Profile Modal */}
-        <TeacherProfileModal 
-          teacher={selectedTeacherProfile} 
-          lang={lang} 
-          onClose={() => setSelectedTeacherProfile(null)} 
-          onLoginClick={(teacherId, gradeId, groupId) => {
-            window.history.pushState({}, '', `?teacher=${teacherId}&grade=${gradeId}&group=${groupId}`);
-            setSelectedTeacherProfile(null);
-            setLoginModalRole('student');
-            setShowLoginModal(true);
-          }}
-        />
+        {selectedTeacherProfile && (
+          <React.Suspense fallback={null}>
+            <TeacherProfileModal 
+              teacher={selectedTeacherProfile} 
+              lang={lang} 
+              onClose={() => setSelectedTeacherProfile(null)} 
+              onLoginClick={(teacherId, gradeId, groupId) => {
+                window.history.pushState({}, '', `?teacher=${teacherId}&grade=${gradeId}&group=${groupId}`);
+                setSelectedTeacherProfile(null);
+                setLoginModalRole('student');
+                setShowLoginModal(true);
+              }}
+            />
+          </React.Suspense>
+        )}
 
         {/* Teacher Details Modal */}
-        <TeacherDetailsModal 
-          teacher={selectedTeacherDetails} 
-          lang={lang} 
-          onClose={() => setSelectedTeacherDetails(null)} 
-        />
+        {selectedTeacherDetails && (
+          <React.Suspense fallback={null}>
+            <TeacherDetailsModal 
+              teacher={selectedTeacherDetails} 
+              lang={lang} 
+              onClose={() => setSelectedTeacherDetails(null)} 
+            />
+          </React.Suspense>
+        )}
 
         {/* Toast Notifications */}
         <div className="toast-container">
@@ -1923,28 +1933,30 @@ function App() {
   return (
     <div className="app-layout">
       {/* Sidebar Navigation */}
-      <Navbar
-        lang={lang}
-        theme={theme}
-        userRole={userRole}
-        activeStudentId={activeStudentId}
-        activeInstructorId={activeInstructorId}
-        students={students}
-        instructors={instructors}
-        currentUser={currentUser}
-        onLangToggle={handleLangToggle}
-        onThemeToggle={handleThemeToggle}
-        onRoleChange={setUserRole}
-        onStudentChange={setActiveStudentId}
-        onInstructorChange={setActiveInstructorId}
-        onLogout={handleLogout}
-        onUpdateProfile={handleUpdateProfile}
-        activeGradeId={activeGradeId}
-        activeGroupId={activeGroupId}
-        onGradeChange={setActiveGradeId}
-        onGroupChange={setActiveGroupId}
-        onPlayVideo={handlePlayVideo}
-      />
+      <React.Suspense fallback={<aside className="sidebar" style={{ minWidth: '280px' }} />}>
+        <Navbar
+          lang={lang}
+          theme={theme}
+          userRole={userRole}
+          activeStudentId={activeStudentId}
+          activeInstructorId={activeInstructorId}
+          students={students}
+          instructors={instructors}
+          currentUser={currentUser}
+          onLangToggle={handleLangToggle}
+          onThemeToggle={handleThemeToggle}
+          onRoleChange={setUserRole}
+          onStudentChange={setActiveStudentId}
+          onInstructorChange={setActiveInstructorId}
+          onLogout={handleLogout}
+          onUpdateProfile={handleUpdateProfile}
+          activeGradeId={activeGradeId}
+          activeGroupId={activeGroupId}
+          onGradeChange={setActiveGradeId}
+          onGroupChange={setActiveGroupId}
+          onPlayVideo={handlePlayVideo}
+        />
+      </React.Suspense>
 
       {/* Main Panel Viewport */}
       <main className="main-viewport">
@@ -2047,7 +2059,9 @@ function App() {
                 {/* Renders dynamic podium for chosen course */}
                 <div style={{ gridColumn: 'span 12' }}>
                   {landingPodiumTeacherId && (
-                    <Podium students={students} lang={lang} instructorId={landingPodiumTeacherId} />
+                    <React.Suspense fallback={<div style={{ minHeight: '300px' }} />}>
+                      <Podium students={students} lang={lang} instructorId={landingPodiumTeacherId} />
+                    </React.Suspense>
                   )}
                 </div>
               </>
