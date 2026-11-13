@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   GraduationCap, BookOpen, Star, AlertCircle, Link, Activity, 
-  TrendingUp, FileText, Award, User, Info 
+  TrendingUp, FileText, Award, User, Info, CheckCircle, QrCode 
 } from 'lucide-react';
 
 export default function VisitorBelowTheFold({
@@ -394,60 +394,260 @@ export default function VisitorBelowTheFold({
           </div>
         )}
 
-        {/* Smart Centers Gallery - Rendered statically below the tab contents */}
+        {/* Interactive Platform Interface Showcase: Instructor Experience vs Student Experience */}
         <div className="centers-gallery-section" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', marginTop: '5rem', borderTop: '1px solid var(--border-glass)', paddingTop: '4rem' }}>
           <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-              {lang === 'ar' ? 'بيئة دراسية تفاعلية حديثة' : 'Modern Interactive Study Environment'}
+            <span className="hero-badge" style={{ marginBottom: '0.75rem' }}>
+              {lang === 'ar' ? 'تصميم مبتكر وسرعة فائقة' : 'Next-Gen Interface & 0-Lag Design'}
+            </span>
+            <h3 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+              {lang === 'ar' ? 'واجهات ذكية مخصصة لكل من المعلم والطالب' : 'Dedicated Intelligent Interfaces for Instructors & Students'}
             </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.25rem' }}>
-              {lang === 'ar' ? 'قاعات تدريب مجهزه باحدث تقنيات التعليم الذكى' : 'Visual showcase of our tutoring center classrooms and study lounges equipped with smart learning tech.'}
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.25rem', maxWidth: '720px', margin: '0.25rem auto 0 auto' }}>
+              {lang === 'ar' 
+                ? 'استمتع بتجربة تفاعلية سلسة مصممة بأحدث تقنيات الويب دون انتظار أو تحميل صور ثقيلة، مجهزة بكامل أدوات الأتمتة والمتابعة اللحظية.' 
+                : 'Experience ultra-fast, zero-bloat reactive dashboards built with modern cloud tech for real-time tracking and automated grading.'}
             </p>
           </div>
 
-          <div className="visitor-teachers-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
-            {/* Classroom Card */}
-            <div className="glass-card visitor-teacher-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-glass)' }}>
-              <picture>
-                <source srcSet={`${import.meta.env.BASE_URL}classroom.webp`} type="image/webp" />
-                <img 
-                  src={`${import.meta.env.BASE_URL}classroom.webp`} 
-                  alt="Smart Classroom AI" 
-                  style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
-                  fetchPriority="high"
-                  loading="lazy"
-                />
-              </picture>
-              <div style={{ padding: '1.5rem', textAlign: 'start' }}>
-                <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  {lang === 'ar' ? 'القاعات الدراسية والتدريبية الذكية' : 'Smart Training Classrooms'}
-                </h4>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.5rem', lineHeight: '1.6' }}>
-                  {lang === 'ar' ? 'قاعات تدريس مجهزة بشاشات تفاعلية ذكية، وإضاءة مريحة للعين، ونظام بث مباشر لتسهيل حضور المحاضرات والتفاعل بين المعلم والطلاب.' : 'Classrooms equipped with smart interactive boards, eye-care ambient lighting, and live stream rigs to enable premium interaction.'}
-                </p>
+          <div className="visitor-teachers-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+            
+            {/* 1. Instructor Interface Showcase Card */}
+            <div className="glass-card" style={{ 
+              padding: '2rem', 
+              borderRadius: '24px', 
+              border: '1px solid rgba(99, 102, 241, 0.35)', 
+              background: 'linear-gradient(145deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.03) 100%)',
+              boxShadow: '0 12px 36px rgba(99, 102, 241, 0.12)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              {/* Top Accent Line */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, #6366f1, #8b5cf6)' }} />
+
+              {/* Card Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '46px', height: '46px', borderRadius: '14px', background: 'linear-gradient(135deg, #6366f1, #4f46e5)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)' }}>
+                    <BookOpen size={22} />
+                  </div>
+                  <div style={{ textAlign: 'start' }}>
+                    <h4 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+                      {lang === 'ar' ? 'واجهة المعلم الذكية' : 'Smart Instructor Portal'}
+                    </h4>
+                    <span style={{ fontSize: '0.8rem', color: '#818cf8', fontWeight: 600 }}>
+                      {lang === 'ar' ? 'تحكم كامل وأتمتة للفصول' : 'Full Control & Classroom Automation'}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.3rem 0.75rem', borderRadius: '20px', background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.3)', color: '#a5b4fc', fontSize: '0.75rem', fontWeight: 700 }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block', boxShadow: '0 0 8px #10b981' }}></span>
+                  {lang === 'ar' ? 'جلسة بث مباشر نشطة' : 'Live Session Active'}
+                </div>
               </div>
+
+              {/* Interactive Mockup Preview Box */}
+              <div style={{ 
+                background: 'rgba(10, 4, 18, 0.55)', 
+                borderRadius: '16px', 
+                border: '1px solid rgba(167, 139, 250, 0.2)', 
+                padding: '1.25rem', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '1rem',
+                backdropFilter: 'blur(8px)'
+              }}>
+                {/* Mini Stats Bar */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', textAlign: 'center' }}>
+                  <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '0.65rem 0.4rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#818cf8' }}>142</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>{lang === 'ar' ? 'طالب مسجل' : 'Students'}</div>
+                  </div>
+                  <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '0.65rem 0.4rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981' }}>98.5%</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>{lang === 'ar' ? 'حضور بالـ QR' : 'QR Attend.'}</div>
+                  </div>
+                  <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '0.65rem 0.4rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f59e0b' }}>34</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>{lang === 'ar' ? 'كويز مصحح' : 'AI Quizzes'}</div>
+                  </div>
+                </div>
+
+                {/* Simulated Live QR Code Card */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', borderRadius: '12px', background: 'linear-gradient(90deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.08))', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#6366f1', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <QrCode size={20} />
+                    </div>
+                    <div style={{ textAlign: 'start' }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {lang === 'ar' ? 'كود تسجيل حضور القاعة' : 'Live Attendance QR'}
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: '#c4b5fd' }}>
+                        {lang === 'ar' ? 'رمز فوري يتجدد تلقائياً لمنع التلاعب' : 'Self-regenerating secure live token'}
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#a5b4fc', padding: '0.2rem 0.5rem', borderRadius: '6px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(165, 180, 252, 0.3)' }}>
+                    LIVE #882
+                  </span>
+                </div>
+              </div>
+
+              {/* Bullet Features */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', textAlign: 'start', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <CheckCircle size={16} color="#6366f1" />
+                  <span>{lang === 'ar' ? 'إدارة المجموعات ومتابعة الاشتراكات المستحقة' : 'Manage study groups and collect subscription fees'}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <CheckCircle size={16} color="#6366f1" />
+                  <span>{lang === 'ar' ? 'إرسال تقارير أوتوماتيكية للواتساب لأولياء الأمور' : 'Automated WhatsApp performance dispatches to parents'}</span>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button 
+                onClick={() => {
+                  setLoginModalRole('instructor');
+                  setShowLoginModal(true);
+                }}
+                className="btn-primary" 
+                style={{ 
+                  marginTop: 'auto', 
+                  padding: '0.85rem', 
+                  borderRadius: '12px', 
+                  fontWeight: 800, 
+                  fontSize: '0.95rem',
+                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                  boxShadow: '0 4px 15px rgba(99, 102, 241, 0.35)'
+                }}
+              >
+                {lang === 'ar' ? '🚀 دخول وتجربة واجهة المعلم' : '🚀 Try Instructor Portal'}
+              </button>
             </div>
 
-            {/* Lobby Card */}
-            <div className="glass-card visitor-teacher-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-glass)' }}>
-              <picture>
-                <source srcSet={`${import.meta.env.BASE_URL}lobby.webp`} type="image/webp" />
-                <img 
-                  src={`${import.meta.env.BASE_URL}lobby.webp`} 
-                  alt="Luxury Lobby AI" 
-                  style={{ width: '100%', height: '260px', objectFit: 'cover', borderBottom: '1px solid var(--border-glass)' }}
-                  loading="lazy"
-                />
-              </picture>
-              <div style={{ padding: '1.5rem', textAlign: 'start' }}>
-                <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  {lang === 'ar' ? 'ردهات الاستراحة والمذاكرة الفاخرة' : 'Premium Study Lounges'}
-                </h4>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.5rem', lineHeight: '1.6' }}>
-                  {lang === 'ar' ? 'مساحات انتظار ومذاكرة مهيأة تماماً ومريحة للأعصاب، تحفز الطلاب على التركيز والمراجعة بشكل فردي أو جماعي قبل الحصص.' : 'Calm waiting and study areas, structured to encourage focused individual or group reviews before class sessions begin.'}
-                </p>
+            {/* 2. Student & Parent Interface Showcase Card */}
+            <div className="glass-card" style={{ 
+              padding: '2rem', 
+              borderRadius: '24px', 
+              border: '1px solid rgba(16, 185, 129, 0.35)', 
+              background: 'linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(20, 184, 166, 0.03) 100%)',
+              boxShadow: '0 12px 36px rgba(16, 185, 129, 0.12)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              {/* Top Accent Line */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, #10b981, #06b6d4)' }} />
+
+              {/* Card Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '46px', height: '46px', borderRadius: '14px', background: 'linear-gradient(135deg, #10b981, #059669)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)' }}>
+                    <GraduationCap size={22} />
+                  </div>
+                  <div style={{ textAlign: 'start' }}>
+                    <h4 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+                      {lang === 'ar' ? 'واجهة الطالب وولي الأمر' : 'Student & Parent Portal'}
+                    </h4>
+                    <span style={{ fontSize: '0.8rem', color: '#6ee7b7', fontWeight: 600 }}>
+                      {lang === 'ar' ? 'متابعة تفاعلية وجوائز تفوق' : 'Gamified Learning & Instant Feedback'}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.3rem 0.75rem', borderRadius: '20px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#a7f3d0', fontSize: '0.75rem', fontWeight: 700 }}>
+                  <Award size={14} color="#10b981" />
+                  {lang === 'ar' ? 'لوحة الشرف: المركز الأول 🥇' : 'Podium Rank: 1st Place 🥇'}
+                </div>
               </div>
+
+              {/* Interactive Mockup Preview Box */}
+              <div style={{ 
+                background: 'rgba(10, 4, 18, 0.55)', 
+                borderRadius: '16px', 
+                border: '1px solid rgba(52, 211, 153, 0.2)', 
+                padding: '1.25rem', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '1rem',
+                backdropFilter: 'blur(8px)'
+              }}>
+                {/* Mini Stats Bar */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', textAlign: 'center' }}>
+                  <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '0.65rem 0.4rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#34d399' }}>99/100</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>{lang === 'ar' ? 'درجة الكويز' : 'Quiz GPA'}</div>
+                  </div>
+                  <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '0.65rem 0.4rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fbbf24' }}>1,850</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>{lang === 'ar' ? 'نقاط تميز' : 'Earned XP'}</div>
+                  </div>
+                  <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '0.65rem 0.4rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#38bdf8' }}>100%</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>{lang === 'ar' ? 'نسبة الالتزام' : 'Attendance'}</div>
+                  </div>
+                </div>
+
+                {/* Simulated Student Progress Strip */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', borderRadius: '12px', background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.08))', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#10b981', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Activity size={20} />
+                    </div>
+                    <div style={{ textAlign: 'start' }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {lang === 'ar' ? 'كاميرا مسح الـ QR لحصد النقاط' : 'Scan Live QR & Earn Points'}
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: '#a7f3d0' }}>
+                        {lang === 'ar' ? 'تسجيل فوري مع إشعار تلقائي لولي الأمر' : 'Instant check-in & parent WhatsApp alert'}
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#6ee7b7', padding: '0.2rem 0.5rem', borderRadius: '6px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(110, 231, 183, 0.3)' }}>
+                    +50 XP
+                  </span>
+                </div>
+              </div>
+
+              {/* Bullet Features */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', textAlign: 'start', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <CheckCircle size={16} color="#10b981" />
+                  <span>{lang === 'ar' ? 'مكتبة شروحات مسجلة ومذكرات جاهزة للتحميل' : 'On-demand recorded sessions and downloadable notes'}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <CheckCircle size={16} color="#10b981" />
+                  <span>{lang === 'ar' ? 'منصة منافسة شريفة ومراكز الترتيب على المجموعة' : 'Friendly podium leaderboards and rankings'}</span>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button 
+                onClick={() => {
+                  setLoginModalRole('student');
+                  setShowLoginModal(true);
+                }}
+                className="btn-primary" 
+                style={{ 
+                  marginTop: 'auto', 
+                  padding: '0.85rem', 
+                  borderRadius: '12px', 
+                  fontWeight: 800, 
+                  fontSize: '0.95rem',
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  boxShadow: '0 4px 15px rgba(16, 185, 129, 0.35)'
+                }}
+              >
+                {lang === 'ar' ? '🎓 دخول وتجربة واجهة الطالب' : '🎓 Try Student Portal'}
+              </button>
             </div>
+
           </div>
         </div>
       </section>
@@ -579,3 +779,4 @@ export default function VisitorBelowTheFold({
     </>
   );
 }
+

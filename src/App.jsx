@@ -1392,7 +1392,7 @@ function App() {
   }
 
   return (
-    <div className="app-layout">
+    <div className={`app-layout role-${userRole}`}>
       {/* Sidebar Navigation */}
       <React.Suspense fallback={<aside className="sidebar" style={{ minWidth: '280px' }} />}>
         <Navbar

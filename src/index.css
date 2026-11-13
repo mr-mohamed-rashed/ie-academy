@@ -40,7 +40,7 @@
 [data-theme="light"] {
   /* Light Theme Variables */
   --bg-app: #f1f5f9;
-  --bg-image: url('/light-bg.webp');
+  --bg-image: radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.07) 0%, transparent 45%), radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 45%), linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
   --bg-sidebar: rgba(255, 255, 255, 0.85); /* Slightly transparent sidebar */
   --bg-card: rgba(255, 255, 255, 0.85); /* Slightly transparent cards */
   --bg-card-hover: rgba(255, 255, 255, 0.95);
@@ -98,6 +98,39 @@ body.rtl {
   display: flex;
   min-height: 100vh;
   direction: var(--dir);
+}
+
+/* Custom Distinct Theming for Instructor vs Student Interfaces */
+.app-layout.role-instructor {
+  --role-accent: #6366f1;
+  --role-glow: rgba(99, 102, 241, 0.2);
+}
+.app-layout.role-instructor .sidebar {
+  border-inline-end-color: rgba(99, 102, 241, 0.25);
+  box-shadow: inset -1px 0 20px rgba(99, 102, 241, 0.04);
+}
+.app-layout.role-instructor .nav-link.active {
+  border-inline-start-color: #6366f1;
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.18), transparent);
+}
+
+.app-layout.role-student {
+  --role-accent: #10b981;
+  --role-glow: rgba(16, 185, 129, 0.2);
+  --accent-primary: #10b981;
+  --accent-primary-hover: #059669;
+}
+.app-layout.role-student .sidebar {
+  border-inline-end-color: rgba(16, 185, 129, 0.25);
+  box-shadow: inset -1px 0 20px rgba(16, 185, 129, 0.04);
+}
+.app-layout.role-student .nav-link.active {
+  border-inline-start-color: #10b981;
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.18), transparent);
+}
+.app-layout.role-student .brand-icon {
+  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
 }
 
 /* Sidebar Styling */
